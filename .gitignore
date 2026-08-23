@@ -1,0 +1,35 @@
+# Java and Maven
+target/
+.mvn/timing.properties
+
+# Python and uv
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.uv-cache/
+.coverage
+htmlcov/
+tools/agent-evaluation/reports/
+
+# Node and Vite
+node_modules/
+dist/
+coverage/
+
+# IDE and OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Local configuration and secrets
+.env*
+!.env.example
+*.log
+*.key
+*.pem
+*.p12
+*.pfx
+*.crt

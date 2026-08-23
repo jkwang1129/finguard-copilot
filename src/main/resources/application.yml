@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: finguard-copilot
+  datasource:
+    url: ${COPILOT_DB_URL}
+    username: ${COPILOT_DB_USERNAME}
+    password: ${COPILOT_DB_PASSWORD}
+  flyway:
+    enabled: true
+  jpa:
+    open-in-view: false
+
+server:
+  shutdown: graceful
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+
+finguard:
+  copilot:
+    core:
+      base-url: ${FINGUARD_CORE_BASE_URL:http://localhost:8080}
+    embedding:
+      dimensions: ${COPILOT_EMBEDDING_DIMENSIONS:8}
+    retrieval:
+      top-k: ${COPILOT_RETRIEVAL_TOP_K:5}
