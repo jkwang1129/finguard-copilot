@@ -19,18 +19,18 @@
 
 ## 阶段 1：只读事实闭环
 
-- [ ] 在 Core 设计并实现 `/api/auth/me`。
-- [ ] 在 Core 设计并实现 `/api/review-tasks/{id}/context`。
-- [ ] 为 Core 契约建立 200/401/403/404/超时测试。
-- [ ] 实现 Copilot 身份代理和 `REVIEWER` 校验。
-- [ ] 实现分析创建、查询、状态机和幂等语义。
-- [ ] 实现脱敏事实快照、校验和与 30 天删除任务。
-- [ ] 实现事务 Outbox、RabbitMQ Relay 和幂等 Worker。
-- [ ] 定义 RabbitMQ Exchange、Queue、DLQ、重试和 Outbox 清理策略。
-- [ ] 验证消息重复、乱序、RabbitMQ 中断和恢复不会丢失或重复分析。
-- [ ] 实现 Stub 结构化分析。
-- [ ] 实现 JSON Schema 与事实一致性校验。
-- [ ] 验证 Copilot 不调用任何 Core 写接口。
+- [x] 在 Core 设计并实现 `/api/auth/me`。
+- [x] 在 Core 设计并实现 `/api/review-tasks/{id}/context`。
+- [x] 为 Core 契约建立 200/401/403/404/超时测试。
+- [x] 实现 Copilot 身份代理和 `REVIEWER` 校验。
+- [x] 实现分析创建、查询、状态机和幂等语义。
+- [x] 实现脱敏事实快照、校验和与 30 天删除任务。
+- [x] 实现事务 Outbox、RabbitMQ Relay 和幂等 Worker。
+- [x] 定义 RabbitMQ Exchange、Queue、DLQ、重试和 Outbox 清理策略。
+- [x] 验证消息重复、乱序、RabbitMQ 中断和恢复不会丢失或重复分析。
+- [x] 实现 Stub 结构化分析。
+- [x] 实现 JSON Schema 与事实一致性校验。
+- [x] 验证 Copilot 不调用任何 Core 写接口。
 
 ## 阶段 2：RAG 与知识数据管道
 

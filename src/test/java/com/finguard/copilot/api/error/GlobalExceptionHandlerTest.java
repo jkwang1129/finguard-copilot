@@ -53,6 +53,26 @@ class GlobalExceptionHandlerTest {
                 .andExpect(content().string(not(containsString("do-not-leak"))));
     }
 
+    @Test
+    void mapsOutputSchemaFailureToBoundedInternalProblemDetail() throws Exception {
+        mockMvc.perform(get("/schema-invalid"))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.type")
+                        .value("urn:finguard:error:output-schema-invalid"))
+                .andExpect(jsonPath("$.code").value("OUTPUT_SCHEMA_INVALID"))
+                .andExpect(jsonPath("$.detail").value("analysis output is invalid"));
+    }
+
+    @Test
+    void mapsFactValidationFailureToBoundedInternalProblemDetail() throws Exception {
+        mockMvc.perform(get("/fact-invalid"))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.type")
+                        .value("urn:finguard:error:fact-validation-failed"))
+                .andExpect(jsonPath("$.code").value("FACT_VALIDATION_FAILED"))
+                .andExpect(jsonPath("$.detail").value("analysis facts are invalid"));
+    }
+
     @RestController
     static class ErrorTestController {
 
@@ -67,6 +87,16 @@ class GlobalExceptionHandlerTest {
         @GetMapping("/unexpected")
         String unexpected() {
             throw new IllegalStateException("database-password=do-not-leak");
+        }
+
+        @GetMapping("/schema-invalid")
+        String schemaInvalid() {
+            throw new CopilotException(ErrorCode.OUTPUT_SCHEMA_INVALID, "analysis output is invalid");
+        }
+
+        @GetMapping("/fact-invalid")
+        String factInvalid() {
+            throw new CopilotException(ErrorCode.FACT_VALIDATION_FAILED, "analysis facts are invalid");
         }
     }
 }

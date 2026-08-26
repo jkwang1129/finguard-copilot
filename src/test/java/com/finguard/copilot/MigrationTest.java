@@ -36,7 +36,9 @@ class MigrationTest {
             "idempotency_key",
             "request_hash",
             "created_at",
-            "updated_at"
+            "updated_at",
+            "failure_code",
+            "fully_reproducible"
     );
 
     @Container

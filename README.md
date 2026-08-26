@@ -21,11 +21,14 @@ C:\dev\finguard-copilot    AI 审核辅助系统（本仓库）
 
 ## 当前阶段
 
-当前仓库已完成 Phase 0 工程与契约基线：Java 17/Spring Boot 生产服务、MySQL/Flyway
-模式、Python 3.12 离线评测包和 React/TypeScript 演示边界均已初始化；配置启动校验、
-RFC 9457 错误边界、模型/Embedding/向量存储/Core 客户端端口，以及仅供测试和本地开发
-使用的确定性 `stub` profile 已通过自动化验证。Core 集成、真实模型、RAG 和 Agent
-Workflow 尚未实现，不能把当前页面或 Stub 运行时表述为已经完成的 Agent 能力。
+Phase 1“只读事实闭环”已完成实现和仓库级验收：Core 提供认证的当前用户与 review-task
+context 只读契约，Copilot 提供 REVIEWER 限定的分析创建/查询、不可变脱敏快照、幂等、
+事务 Outbox、RabbitMQ Worker、保留期清理，以及只返回
+`INSUFFICIENT_EVIDENCE` 的确定性结果。Phase 1 不包含真实模型、RAG、Agent Workflow、
+UI/SSE 或 production-like 部署；这些能力不能由当前 Stub 运行时推断出来。
+
+详细命令、测试计数、边界检查和已知验收限制见
+[Phase 1 验收记录](docs/acceptance/phase-1-read-only-fact-loop.md)。
 
 - [范围与验收边界](docs/SCOPE.md)
 - [系统架构](docs/ARCHITECTURE.md)

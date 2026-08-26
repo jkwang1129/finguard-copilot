@@ -27,3 +27,9 @@ finguard:
       dimensions: ${COPILOT_EMBEDDING_DIMENSIONS:8}
     retrieval:
       top-k: ${COPILOT_RETRIEVAL_TOP_K:5}
+    jobs:
+      enabled: ${COPILOT_JOBS_ENABLED:false}
+      batch-size: ${COPILOT_JOBS_BATCH_SIZE:100}
+      snapshot-retention: ${COPILOT_SNAPSHOT_RETENTION:30d}
+      published-outbox-retention: ${COPILOT_PUBLISHED_OUTBOX_RETENTION:7d}
+      fixed-delay: ${COPILOT_JOBS_FIXED_DELAY:1h}

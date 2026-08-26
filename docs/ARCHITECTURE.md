@@ -219,9 +219,9 @@ OpenAI-compatible 接口作为两个候选适配器，并由 `ModelRouter` 根�
 
 ```text
 summary
-riskExplanation
+riskRuleExplanation
 businessEvidence[]
-knowledgeCitations[]
+policyCitations[]
 recommendation
 reasoningSummary
 missingInformation[]

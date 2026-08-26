@@ -105,4 +105,52 @@ class PortContractTest {
         assertThatThrownBy(() -> context.riskFacts().clear())
                 .isInstanceOf(UnsupportedOperationException.class);
     }
+
+    @Test
+    void reviewTaskAllowsCoreVersionZero() {
+        ReviewTask reviewTask = new ReviewTask(
+                1001L,
+                0L,
+                "PENDING",
+                "HIGH_AMOUNT",
+                "AMOUNT_THRESHOLD_EXCEEDED",
+                Instant.parse("2026-08-20T08:00:00Z")
+        );
+
+        assertThat(reviewTask.version()).isZero();
+    }
+
+    @Test
+    void reviewTaskAllowsNullableRuleCodeForReconciliationException() {
+        ReviewTask reviewTask = new ReviewTask(
+                1001L,
+                3L,
+                "PENDING",
+                null,
+                "RECONCILIATION_EXCEPTION",
+                Instant.parse("2026-08-20T08:00:00Z")
+        );
+
+        assertThat(reviewTask.ruleCode()).isNull();
+    }
+
+    @Test
+    void reviewTaskRejectsNegativeVersionAndBlankRuleCode() {
+        assertThatThrownBy(() -> new ReviewTask(
+                1001L,
+                -1L,
+                "PENDING",
+                "HIGH_AMOUNT",
+                "AMOUNT_THRESHOLD_EXCEEDED",
+                Instant.parse("2026-08-20T08:00:00Z")
+        )).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new ReviewTask(
+                1001L,
+                3L,
+                "PENDING",
+                " ",
+                "RECONCILIATION_EXCEPTION",
+                Instant.parse("2026-08-20T08:00:00Z")
+        )).isInstanceOf(IllegalArgumentException.class);
+    }
 }
