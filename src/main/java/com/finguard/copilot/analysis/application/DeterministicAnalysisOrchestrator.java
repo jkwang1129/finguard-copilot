@@ -14,6 +14,10 @@ import com.finguard.copilot.context.FactSnapshot;
 import com.finguard.copilot.coreclient.port.ReviewTaskContext;
 import com.finguard.copilot.guardrail.AnalysisOutputSchemaValidator;
 import com.finguard.copilot.guardrail.FactConsistencyValidator;
+import com.finguard.copilot.knowledge.retrieval.KnowledgeCitationValidator;
+import com.finguard.copilot.knowledge.retrieval.KnowledgeEvidence;
+import com.finguard.copilot.knowledge.retrieval.KnowledgeRetrievalException;
+import com.finguard.copilot.knowledge.retrieval.KnowledgeRetrievalService;
 
 public final class DeterministicAnalysisOrchestrator implements AnalysisOrchestrator {
 
@@ -22,20 +26,34 @@ public final class DeterministicAnalysisOrchestrator implements AnalysisOrchestr
 
     private final AnalysisOutputSchemaValidator schemaValidator;
     private final FactConsistencyValidator factConsistencyValidator;
+    private final KnowledgeRetrievalService retrievalService;
+    private final KnowledgeCitationValidator citationValidator;
 
     public DeterministicAnalysisOrchestrator() {
         ObjectMapper mapper = new ObjectMapper();
         this.schemaValidator = new AnalysisOutputSchemaValidator(mapper);
         this.factConsistencyValidator = new FactConsistencyValidator();
+        this.retrievalService = null;
+        this.citationValidator = new KnowledgeCitationValidator();
     }
 
     public DeterministicAnalysisOrchestrator(
             AnalysisOutputSchemaValidator schemaValidator,
             FactConsistencyValidator factConsistencyValidator
     ) {
+        this(schemaValidator, factConsistencyValidator, null);
+    }
+
+    public DeterministicAnalysisOrchestrator(
+            AnalysisOutputSchemaValidator schemaValidator,
+            FactConsistencyValidator factConsistencyValidator,
+            KnowledgeRetrievalService retrievalService
+    ) {
         this.schemaValidator = Objects.requireNonNull(schemaValidator, "schemaValidator must not be null");
         this.factConsistencyValidator = Objects.requireNonNull(
                 factConsistencyValidator, "factConsistencyValidator must not be null");
+        this.retrievalService = retrievalService;
+        this.citationValidator = new KnowledgeCitationValidator();
     }
 
     @Override
@@ -53,6 +71,15 @@ public final class DeterministicAnalysisOrchestrator implements AnalysisOrchestr
                     ErrorCode.FACT_VALIDATION_FAILED,
                     "snapshot ruleCode is unavailable for deterministic evidence");
         }
+
+        List<KnowledgeEvidence> evidence = retrievePolicyEvidence(ruleCode + " " + reasonCode);
+        List<com.finguard.copilot.analysis.domain.AnalysisResult.PolicyCitation> policyCitations =
+                evidence.stream().map(item -> new com.finguard.copilot.analysis.domain.AnalysisResult.PolicyCitation(
+                        item.citation().documentId(), item.citation().documentVersion(),
+                        item.citation().sectionPath(), item.excerpt())).toList();
+        citationValidator.validate(evidence, evidence.stream().map(KnowledgeEvidence::citation).toList());
+        List<String> missingInformation = policyCitations.isEmpty() ? List.of(POLICY_CITATION_MISSING) : List.of();
+        List<String> limitations = policyCitations.isEmpty() ? List.of(NO_KNOWLEDGE_INDEX) : List.of();
 
         AnalysisResult candidate = new AnalysisResult(
                 AnalysisResult.CURRENT_SCHEMA_VERSION,
@@ -73,14 +100,25 @@ public final class DeterministicAnalysisOrchestrator implements AnalysisOrchestr
                                 "transaction.currency",
                                 "reviewTask.ruleCode",
                                 "reviewTask.reasonCode"))),
-                List.of(),
+                policyCitations,
                 AnalysisRecommendation.INSUFFICIENT_EVIDENCE,
                 "Directional recommendation is withheld because no published policy citation is available.",
-                List.of(POLICY_CITATION_MISSING),
-                List.of(NO_KNOWLEDGE_INDEX));
+                missingInformation,
+                limitations);
 
         AnalysisResult validated = schemaValidator.validate(candidate);
         factConsistencyValidator.validate(analysisId, snapshot, validated);
         return validated;
+    }
+
+    private List<KnowledgeEvidence> retrievePolicyEvidence(String query) {
+        if (retrievalService == null) {
+            return List.of();
+        }
+        try {
+            return retrievalService.retrieve(query, 3);
+        } catch (KnowledgeRetrievalException exception) {
+            return List.of();
+        }
     }
 }

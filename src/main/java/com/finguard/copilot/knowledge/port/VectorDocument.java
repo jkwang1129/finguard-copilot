@@ -13,7 +13,9 @@ public record VectorDocument(
     public VectorDocument {
         requireText(id, "id");
         requireText(indexVersion, "indexVersion");
-        requireText(content, "content");
+        if (content == null) {
+            throw new IllegalArgumentException("content must not be null");
+        }
         if (embedding == null) {
             throw new IllegalArgumentException("embedding must not be null");
         }

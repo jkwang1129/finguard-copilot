@@ -1,0 +1,3 @@
+{"case_id":"policy-high-amount-001","query":"What policy applies when a review is flagged as high amount?","expected_chunk_ids":["policy-amount:v1:0"],"required_citation_document_id":"policy-amount","required_citation_document_version":"v1","forbidden_chunk_ids":["manual-audit:v1:0"]}
+{"case_id":"manual-audit-001","query":"What is the audit review procedure?","expected_chunk_ids":["manual-audit:v1:0"],"required_citation_document_id":"manual-audit","required_citation_document_version":"v1","forbidden_chunk_ids":["policy-amount:v1:0"]}
+{"case_id":"unknown-policy-001","query":"What is the unsupported exception handling policy?","expected_chunk_ids":[],"forbidden_chunk_ids":["policy-amount:v1:0","manual-audit:v1:0"]}

@@ -21,6 +21,16 @@ C:\dev\finguard-copilot    AI 审核辅助系统（本仓库）
 
 ## 当前阶段
 
+Phase 2“RAG 与知识数据管道”已完成实现和仓库级验收：知识文档会经过脱敏准入、规范化、
+校验和、分段和去重，候选 Qdrant 索引必须完成固定评测后才能原子发布；运行时只检索一个
+已发布版本，更新、删除、回滚和引用校验均有 MySQL/Qdrant 集成证据。Qdrant 只保存向量
+与白名单元数据，片段正文按文档/版本/片段从 MySQL 回取并重新校验 checksum。
+
+Phase 2 不包含真实模型、BM25/重排、Agent Workflow、Tool Calling、MCP、UI/SSE 或
+production-like 部署；固定 Embedding 和离线评测只代表可重复测试能力，不能推断生产模型
+效果。详细命令、指标、边界检查和已知限制见
+[Phase 2 验收记录](docs/acceptance/phase-2-rag-knowledge-pipeline.md)。
+
 Phase 1“只读事实闭环”已完成实现和仓库级验收：Core 提供认证的当前用户与 review-task
 context 只读契约，Copilot 提供 REVIEWER 限定的分析创建/查询、不可变脱敏快照、幂等、
 事务 Outbox、RabbitMQ Worker、保留期清理，以及只返回

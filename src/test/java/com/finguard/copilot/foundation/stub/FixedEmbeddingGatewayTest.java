@@ -13,12 +13,14 @@ class FixedEmbeddingGatewayTest {
     void producesStableNormalizedVectorsWithConfiguredDimension() {
         FixedEmbeddingGateway gateway = new FixedEmbeddingGateway(8);
 
-        EmbeddingVector first = gateway.embed("review task 42");
-        EmbeddingVector second = gateway.embed("review task 42");
-        EmbeddingVector different = gateway.embed("review task 43");
+        EmbeddingVector first = gateway.embed("review task 42", "fixed-v1");
+        EmbeddingVector second = gateway.embed("review task 42", "fixed-v1");
+        EmbeddingVector different = gateway.embed("review task 43", "fixed-v1");
+        EmbeddingVector differentVersion = gateway.embed("review task 42", "fixed-v2");
 
         assertThat(first).isEqualTo(second);
         assertThat(first).isNotEqualTo(different);
+        assertThat(first).isNotEqualTo(differentVersion);
         assertThat(first.dimension()).isEqualTo(8);
         assertThat(first.values()).allSatisfy(value -> assertThat(value).isFinite());
         double norm = Math.sqrt(first.values().stream().mapToDouble(value -> value * value).sum());
@@ -31,7 +33,9 @@ class FixedEmbeddingGatewayTest {
                 .isInstanceOf(IllegalArgumentException.class);
         assertThatThrownBy(() -> new FixedEmbeddingGateway(4097))
                 .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() -> new FixedEmbeddingGateway(8).embed(" "))
+        assertThatThrownBy(() -> new FixedEmbeddingGateway(8).embed(" ", "fixed-v1"))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> new FixedEmbeddingGateway(8).embed("text", " "))
                 .isInstanceOf(IllegalArgumentException.class);
     }
 
