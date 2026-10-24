@@ -149,7 +149,7 @@ class DispatchFailureDispositionTest {
     }
 
     @Test
-    void onMessageNacksWithoutRequeueWhenRetryAndDlqPublicationFail() throws Exception {
+    void onMessageRequeuesWhenRetryAndDlqPublicationFail() throws Exception {
         RabbitTemplate rabbit = mock(RabbitTemplate.class);
         doThrow(new AmqpException("broker unavailable")).when(rabbit).convertAndSend(
                 anyString(), eq(RabbitTopologyConfiguration.ANALYSIS_ROUTING_KEY),
@@ -162,7 +162,7 @@ class DispatchFailureDispositionTest {
 
         worker.onMessage(new Message(MAPPER.writeValueAsBytes(message()), properties), channel);
 
-        verify(channel).basicNack(43L, false, false);
+        verify(channel).basicNack(43L, false, true);
         verify(channel, never()).basicAck(anyLong(), anyBoolean());
     }
 
@@ -197,7 +197,7 @@ class DispatchFailureDispositionTest {
     }
 
     @Test
-    void malformedMessageUsesTerminalNackWhenDlqCannotBeConfirmed() throws Exception {
+    void malformedMessageIsRequeuedWhenDlqCannotBeConfirmed() throws Exception {
         RabbitTemplate rabbit = mock(RabbitTemplate.class);
         doThrow(new AmqpException("broker unavailable")).when(rabbit).send(
                 eq(RabbitTopologyConfiguration.DLX_EXCHANGE),
@@ -209,7 +209,7 @@ class DispatchFailureDispositionTest {
 
         worker.onMessage(new Message("broken".getBytes(java.nio.charset.StandardCharsets.UTF_8), properties), channel);
 
-        verify(channel).basicNack(42L, false, false);
+        verify(channel).basicNack(42L, false, true);
         verify(channel, never()).basicAck(anyLong(), anyBoolean());
     }
 

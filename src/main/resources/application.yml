@@ -23,6 +23,25 @@ finguard:
   copilot:
     core:
       base-url: ${FINGUARD_CORE_BASE_URL:http://localhost:8080}
+    model:
+      provider: ${COPILOT_MODEL_PROVIDER:}
+      model-id: ${COPILOT_MODEL_ID:}
+      base-url: ${COPILOT_MODEL_BASE_URL:}
+      api-key: ${COPILOT_MODEL_API_KEY:}
+      chat-completions-path: ${COPILOT_MODEL_CHAT_COMPLETIONS_PATH:}
+      input-token-limit: ${COPILOT_MODEL_INPUT_TOKEN_LIMIT:32000}
+      output-token-limit: ${COPILOT_MODEL_OUTPUT_TOKEN_LIMIT:2000}
+      timeout: ${COPILOT_MODEL_TIMEOUT:20s}
+      price-table-version: ${COPILOT_PRICE_TABLE_VERSION:unset}
+      currency: ${COPILOT_MODEL_CURRENCY:USD}
+      input-price-per-million: ${COPILOT_MODEL_INPUT_PRICE_PER_MILLION:0}
+      output-price-per-million: ${COPILOT_MODEL_OUTPUT_PRICE_PER_MILLION:0}
+    prompt:
+      version: ${COPILOT_PROMPT_VERSION:review-analysis-v1}
+    budget:
+      max-input-tokens: ${COPILOT_MAX_INPUT_TOKENS:32000}
+      max-output-tokens: ${COPILOT_MAX_OUTPUT_TOKENS:2000}
+      max-model-calls: ${COPILOT_MAX_MODEL_CALLS:1}
     embedding:
       dimensions: ${COPILOT_EMBEDDING_DIMENSIONS:8}
     retrieval:

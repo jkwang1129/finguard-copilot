@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.finguard.copilot.analysis.application.AnalysisOrchestrator;
+import com.finguard.copilot.analysis.application.AnalysisExecution;
 import com.finguard.copilot.analysis.application.CreateAnalysisCommand;
 import com.finguard.copilot.analysis.application.CreateAnalysisService;
 import com.finguard.copilot.api.analysis.AnalysisAcceptedResponse;
@@ -20,6 +21,9 @@ import com.finguard.copilot.coreclient.port.ReviewTaskContext;
 import com.finguard.copilot.context.SnapshotCodec;
 import com.finguard.copilot.guardrail.AnalysisOutputSchemaValidator;
 import com.finguard.copilot.guardrail.FactConsistencyValidator;
+import com.finguard.copilot.model.port.ModelUsage;
+import com.finguard.copilot.usage.ModelCallReservations;
+import com.finguard.copilot.usage.ModelUsageRecorder;
 import org.springframework.amqp.core.MessagePostProcessor;
 import org.springframework.amqp.rabbit.connection.CorrelationData;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -95,11 +99,21 @@ class AnalysisWorkerIntegrationTest {
     @Autowired
     private CopilotProperties copilotProperties;
 
+    @Autowired
+    private TransactionTemplate transactions;
+
+    @Autowired
+    private ModelUsageRecorder usageRecorder;
+
+    @Autowired
+    private ModelCallReservations reservations;
+
     @MockitoBean
     private CoreClient coreClient;
 
     @BeforeEach
     void cleanTables() {
+        jdbc.update("DELETE FROM model_usage_ledger");
         jdbc.update("DELETE FROM analysis_message_receipt");
         jdbc.update("DELETE FROM analysis_result");
         jdbc.update("DELETE FROM outbox_event");
@@ -110,6 +124,115 @@ class AnalysisWorkerIntegrationTest {
                 .thenReturn(new CurrentUser("worker-reviewer", Set.of("REVIEWER")));
         when(coreClient.reviewTaskContext(anyLong(), anyString()))
                 .thenAnswer(invocation -> context(invocation.getArgument(0, Long.class)));
+    }
+
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(booleans = {true, false})
+    void modelCallIsNotRepeatedWhenResultOrReceiptWriteRollsBack(boolean failResultWrite) {
+        AnalysisAcceptedResponse accepted = createAnalysisService.create(
+                new CreateAnalysisCommand(101, "model-write-failure-" + failResultWrite), REVIEWER_TOKEN);
+        UUID analysisId = accepted.analysisId();
+        UUID eventId = eventId(analysisId);
+        AnalysisRequestedMessage message = new AnalysisRequestedMessage(1, eventId, analysisId, CAPTURED_AT);
+        AtomicInteger modelCalls = new AtomicInteger();
+        AnalysisOrchestrator model = new AnalysisOrchestrator() {
+            @Override
+            public boolean requiresModelCall() {
+                return true;
+            }
+
+            @Override
+            public com.finguard.copilot.analysis.domain.AnalysisResult analyze(
+                    UUID id, com.finguard.copilot.context.FactSnapshot snapshot) {
+                return productionOrchestrator.analyze(id, snapshot);
+            }
+
+            @Override
+            public AnalysisExecution execute(UUID id, com.finguard.copilot.context.FactSnapshot snapshot) {
+                modelCalls.incrementAndGet();
+                return new AnalysisExecution(analyze(id, snapshot), "qwen", "model-v1", "prompt-v1",
+                        new ModelUsage(12, 4, java.time.Duration.ofMillis(42)));
+            }
+        };
+        AnalysisRunRepository faultyRuns = new FaultyWriteRepository(runRepository, failResultWrite);
+        RabbitTemplate rabbit = mock(RabbitTemplate.class);
+        doAnswer(invocation -> {
+            CorrelationData correlation = invocation.getArgument(4);
+            correlation.getFuture().complete(new CorrelationData.Confirm(true, null));
+            return null;
+        }).when(rabbit).convertAndSend(anyString(), eq(RabbitTopologyConfiguration.ANALYSIS_ROUTING_KEY),
+                any(AnalysisRequestedMessage.class), any(MessagePostProcessor.class), any(CorrelationData.class));
+        AnalysisWorker protectedWorker = new AnalysisWorker(faultyRuns, new SnapshotCodec(), model,
+                schemaValidator, factValidator, transactions, rabbit, objectMapper, copilotProperties,
+                java.time.Clock.systemUTC(), usageRecorder, reservations);
+
+        assertThat(protectedWorker.process(message, 1)).isEqualTo(AnalysisWorker.WorkerOutcome.DEAD_LETTERED);
+        assertThat(protectedWorker.process(message, 2)).isEqualTo(AnalysisWorker.WorkerOutcome.NOOP);
+        assertThat(modelCalls).hasValue(1);
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM model_call_reservation WHERE analysis_id = UUID_TO_BIN(?)",
+                Integer.class, analysisId.toString())).isEqualTo(1);
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM model_usage_ledger WHERE analysis_id = UUID_TO_BIN(?)",
+                Integer.class, analysisId.toString())).isEqualTo(1);
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM analysis_result WHERE analysis_id = UUID_TO_BIN(?)",
+                Integer.class, analysisId.toString())).isZero();
+        assertThat(jdbc.queryForObject("SELECT failure_code FROM analysis_run WHERE id = UUID_TO_BIN(?)",
+                String.class, analysisId.toString())).isEqualTo("MODEL_CALL_OUTCOME_UNKNOWN");
+    }
+
+    private static final class FaultyWriteRepository implements AnalysisRunRepository {
+        private final AnalysisRunRepository delegate;
+        private final boolean failResultWrite;
+        private boolean failed;
+
+        private FaultyWriteRepository(AnalysisRunRepository delegate, boolean failResultWrite) {
+            this.delegate = delegate;
+            this.failResultWrite = failResultWrite;
+        }
+
+        @Override
+        public int insert(com.finguard.copilot.analysis.domain.AnalysisRun run) {
+            return delegate.insert(run);
+        }
+
+        @Override
+        public java.util.Optional<AnalysisView> findByIdAndReviewer(UUID id, String reviewer) {
+            return delegate.findByIdAndReviewer(id, reviewer);
+        }
+
+        @Override
+        public java.util.Optional<WorkView> findForWork(UUID id) {
+            return delegate.findForWork(id);
+        }
+
+        @Override
+        public boolean hasReceipt(UUID eventId) {
+            return delegate.hasReceipt(eventId);
+        }
+
+        @Override
+        public int updateStatus(UUID id, com.finguard.copilot.analysis.domain.AnalysisStatus expected,
+                                com.finguard.copilot.analysis.domain.AnalysisStatus next,
+                                String code, Instant at) {
+            return delegate.updateStatus(id, expected, next, code, at);
+        }
+
+        @Override
+        public int insertResult(UUID id, int version, String recommendation, String json, Instant at) {
+            if (failResultWrite && !failed) {
+                failed = true;
+                throw new IllegalStateException("result write failed");
+            }
+            return delegate.insertResult(id, version, recommendation, json, at);
+        }
+
+        @Override
+        public int insertReceipt(UUID eventId, UUID id, Instant at) {
+            if (!failResultWrite && !failed) {
+                failed = true;
+                throw new IllegalStateException("receipt write failed");
+            }
+            return delegate.insertReceipt(eventId, id, at);
+        }
     }
 
     @Test

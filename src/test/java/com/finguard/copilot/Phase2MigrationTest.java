@@ -135,7 +135,7 @@ class Phase2MigrationTest {
                 FROM flyway_schema_history
                 WHERE success = TRUE
                 ORDER BY installed_rank
-                """)).containsExactly("1", "2", "3", "4");
+                """)).containsExactly("1", "2", "3", "4", "5", "6");
     }
 
     private Map<String, String> columns(String tableName) throws SQLException {

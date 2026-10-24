@@ -45,7 +45,13 @@
           "sourcePaths": {
             "type": "array",
             "minItems": 1,
-            "items": { "type": "string", "minLength": 1 }
+            "items": {
+              "type": "string",
+              "enum": [
+                "transaction.id", "transaction.accountId", "transaction.amount",
+                "transaction.currency", "reviewTask.ruleCode", "reviewTask.reasonCode"
+              ]
+            }
           }
         }
       }

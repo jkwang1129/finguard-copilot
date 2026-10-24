@@ -1,6 +1,7 @@
 package com.finguard.copilot.config;
 
 import java.net.URI;
+import java.math.BigDecimal;
 import java.time.Duration;
 
 import jakarta.validation.Valid;
@@ -20,17 +21,28 @@ public record CopilotProperties(
         @Valid @NotNull Embedding embedding,
         @Valid @NotNull Retrieval retrieval,
         @Valid @NotNull Dispatch dispatch,
-        @Valid @NotNull Jobs jobs
+        @Valid @NotNull Jobs jobs,
+        @Valid @NotNull Model model,
+        @Valid @NotNull Prompt prompt,
+        @Valid @NotNull Budget budget
 ) {
 
     @ConstructorBinding
     public CopilotProperties(Core core, Embedding embedding, Retrieval retrieval, Dispatch dispatch,
-                             Jobs jobs) {
+                             Jobs jobs, Model model, Prompt prompt, Budget budget) {
         this.core = core;
         this.embedding = embedding;
         this.retrieval = retrieval;
         this.dispatch = dispatch == null ? Dispatch.defaults() : dispatch;
         this.jobs = jobs == null ? Jobs.defaults() : jobs;
+        this.model = model == null ? Model.defaults() : model;
+        this.prompt = prompt == null ? Prompt.defaults() : prompt;
+        this.budget = budget == null ? Budget.defaults() : budget;
+    }
+
+    public CopilotProperties(Core core, Embedding embedding, Retrieval retrieval, Dispatch dispatch,
+                             Jobs jobs) {
+        this(core, embedding, retrieval, dispatch, jobs, Model.defaults(), Prompt.defaults(), Budget.defaults());
     }
 
     public CopilotProperties(Core core, Embedding embedding, Retrieval retrieval, Dispatch dispatch) {
@@ -39,6 +51,174 @@ public record CopilotProperties(
 
     public CopilotProperties(Core core, Embedding embedding, Retrieval retrieval) {
         this(core, embedding, retrieval, Dispatch.defaults(), Jobs.defaults());
+    }
+
+    public record Model(
+            String provider,
+            String modelId,
+            URI baseUrl,
+            SecretValue apiKey,
+            String chatCompletionsPath,
+            @Min(1) @Max(32000) @DefaultValue("32000") int inputTokenLimit,
+            @Min(1) @Max(2000) @DefaultValue("2000") int outputTokenLimit,
+            @DefaultValue("20s") Duration timeout,
+            String priceTableVersion,
+            String currency,
+            BigDecimal inputPricePerMillion,
+            BigDecimal outputPricePerMillion
+    ) {
+
+        public static final int DEFAULT_INPUT_TOKEN_LIMIT = 32000;
+        public static final int DEFAULT_OUTPUT_TOKEN_LIMIT = 2000;
+        public static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(20);
+        public static final String DEFAULT_PRICE_TABLE_VERSION = "unset";
+        public static final String DEFAULT_OPENAI_CHAT_COMPLETIONS_PATH = "/v1/chat/completions";
+        public static final String DEFAULT_ZHIPU_CHAT_COMPLETIONS_PATH = "/chat/completions";
+
+        @ConstructorBinding
+        public Model {
+            provider = provider == null ? "" : provider.trim();
+            modelId = modelId == null ? "" : modelId.trim();
+            apiKey = apiKey == null ? SecretValue.empty() : apiKey;
+            chatCompletionsPath = chatCompletionsPath == null || chatCompletionsPath.isBlank()
+                    ? defaultChatCompletionsPath(provider) : chatCompletionsPath.trim();
+            timeout = timeout == null ? DEFAULT_TIMEOUT : timeout;
+            priceTableVersion = priceTableVersion == null || priceTableVersion.isBlank()
+                    ? DEFAULT_PRICE_TABLE_VERSION : priceTableVersion.trim();
+            currency = currency == null || currency.isBlank() ? "USD" : currency.trim();
+            inputPricePerMillion = inputPricePerMillion == null ? BigDecimal.ZERO : inputPricePerMillion;
+            outputPricePerMillion = outputPricePerMillion == null ? BigDecimal.ZERO : outputPricePerMillion;
+            if (inputPricePerMillion.signum() < 0 || outputPricePerMillion.signum() < 0) {
+                throw new IllegalArgumentException("model prices must not be negative");
+            }
+        }
+
+        public Model(
+                String provider,
+                String modelId,
+                URI baseUrl,
+                SecretValue apiKey,
+                int inputTokenLimit,
+                int outputTokenLimit,
+                Duration timeout,
+                String priceTableVersion
+        ) {
+            this(provider, modelId, baseUrl, apiKey, null, inputTokenLimit, outputTokenLimit, timeout,
+                    priceTableVersion, "USD", BigDecimal.ZERO, BigDecimal.ZERO);
+        }
+
+        public Model(
+                String provider,
+                String modelId,
+                URI baseUrl,
+                SecretValue apiKey,
+                String chatCompletionsPath,
+                int inputTokenLimit,
+                int outputTokenLimit,
+                Duration timeout,
+                String priceTableVersion
+        ) {
+            this(provider, modelId, baseUrl, apiKey, chatCompletionsPath, inputTokenLimit, outputTokenLimit,
+                    timeout, priceTableVersion, "USD", BigDecimal.ZERO, BigDecimal.ZERO);
+        }
+
+        public static Model defaults() {
+            return new Model("", "", null, SecretValue.empty(), DEFAULT_INPUT_TOKEN_LIMIT,
+                    DEFAULT_OUTPUT_TOKEN_LIMIT, DEFAULT_TIMEOUT, DEFAULT_PRICE_TABLE_VERSION);
+        }
+
+        @AssertTrue(message = "model.chat-completions-path must be a relative HTTP path")
+        public boolean isSafeChatCompletionsPath() {
+            return chatCompletionsPath != null
+                    && chatCompletionsPath.startsWith("/")
+                    && !chatCompletionsPath.contains("?")
+                    && !chatCompletionsPath.contains("#")
+                    && !chatCompletionsPath.contains("://")
+                    && !chatCompletionsPath.contains("\\");
+        }
+
+        @AssertTrue(message = "model.base-url must be an absolute HTTP(S) URI without credentials, query, or fragment")
+        public boolean isSafeBaseUrl() {
+            if (baseUrl == null) {
+                return true;
+            }
+            boolean supportedScheme = "http".equalsIgnoreCase(baseUrl.getScheme())
+                    || "https".equalsIgnoreCase(baseUrl.getScheme());
+            return supportedScheme
+                    && baseUrl.getHost() != null
+                    && baseUrl.getUserInfo() == null
+                    && baseUrl.getQuery() == null
+                    && baseUrl.getFragment() == null;
+        }
+
+        @AssertTrue(message = "model.timeout must be positive")
+        public boolean hasPositiveTimeout() {
+            return timeout != null && !timeout.isZero() && !timeout.isNegative();
+        }
+
+        public void validateForRealProfile(String profile) {
+            requireText(provider, "finguard.copilot.model.provider");
+            requireText(modelId, "finguard.copilot.model.model-id");
+            if (baseUrl == null || !isSafeBaseUrl()) {
+                throw new IllegalStateException("finguard.copilot.model.base-url must be a safe HTTP(S) URL");
+            }
+            if (!apiKey.isPresent()) {
+                throw new IllegalStateException("finguard.copilot.model.api-key must be supplied for real model profile");
+            }
+            if (DEFAULT_PRICE_TABLE_VERSION.equals(priceTableVersion)) {
+                throw new IllegalStateException("finguard.copilot.model.price-table-version must be supplied for real model profile");
+            }
+            if (!isSafeChatCompletionsPath()) {
+                throw new IllegalStateException("finguard.copilot.model.chat-completions-path must be a relative HTTP path");
+            }
+            if ("real-qwen".equals(profile) && !"qwen".equalsIgnoreCase(provider)) {
+                throw new IllegalStateException("finguard.copilot.model.provider must be qwen for real-qwen profile");
+            }
+            if ("real-deepseek".equals(profile) && !"deepseek".equalsIgnoreCase(provider)) {
+                throw new IllegalStateException("finguard.copilot.model.provider must be deepseek for real-deepseek profile");
+            }
+            if ("real-zhipu".equals(profile) && !"zhipu".equalsIgnoreCase(provider)) {
+                throw new IllegalStateException("finguard.copilot.model.provider must be zhipu for real-zhipu profile");
+            }
+            if (!"qwen".equalsIgnoreCase(provider)
+                    && !"deepseek".equalsIgnoreCase(provider)
+                    && !"zhipu".equalsIgnoreCase(provider)) {
+                throw new IllegalStateException("finguard.copilot.model.provider must be qwen, deepseek, or zhipu");
+            }
+        }
+
+        private static String defaultChatCompletionsPath(String provider) {
+            return "zhipu".equalsIgnoreCase(provider)
+                    ? DEFAULT_ZHIPU_CHAT_COMPLETIONS_PATH : DEFAULT_OPENAI_CHAT_COMPLETIONS_PATH;
+        }
+
+        private static void requireText(String value, String field) {
+            if (value == null || value.isBlank()) {
+                throw new IllegalStateException(field + " must not be blank for real model profile");
+            }
+        }
+    }
+
+    public record Prompt(String version) {
+
+        public Prompt {
+            version = version == null || version.isBlank() ? "review-analysis-v1" : version.trim();
+        }
+
+        public static Prompt defaults() {
+            return new Prompt("review-analysis-v1");
+        }
+    }
+
+    public record Budget(
+            @Min(1) @Max(32000) @DefaultValue("32000") int maxInputTokens,
+            @Min(1) @Max(2000) @DefaultValue("2000") int maxOutputTokens,
+            @Min(1) @Max(1) @DefaultValue("1") int maxModelCalls
+    ) {
+
+        public static Budget defaults() {
+            return new Budget(32000, 2000, 1);
+        }
     }
 
     public record Core(

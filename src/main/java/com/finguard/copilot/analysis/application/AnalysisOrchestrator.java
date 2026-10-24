@@ -7,5 +7,13 @@ import com.finguard.copilot.context.FactSnapshot;
 
 public interface AnalysisOrchestrator {
 
+    default boolean requiresModelCall() {
+        return false;
+    }
+
     AnalysisResult analyze(UUID analysisId, FactSnapshot snapshot);
+
+    default AnalysisExecution execute(UUID analysisId, FactSnapshot snapshot) {
+        return AnalysisExecution.withoutModel(analyze(analysisId, snapshot));
+    }
 }
