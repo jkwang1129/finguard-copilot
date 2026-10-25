@@ -35,6 +35,7 @@ Workflow 尚未实现，不能把当前页面或 Stub 运行时表述为已经�
 - [精确依赖与兼容依据](docs/DEPENDENCIES.md)
 - [Phase 0 详细实施计划](docs/superpowers/plans/2026-08-20-phase-0-engineering-foundation.md)
 - [Phase 0 契约基础实施计划](docs/superpowers/plans/2026-08-23-phase-0-contract-foundation.md)
+- [Phase 3 历史实施计划（非当前任务清单）](docs/superpowers/plans/2026-08-27-phase-3-real-model-context-engineering.md)
 
 ## 工程验证
 
