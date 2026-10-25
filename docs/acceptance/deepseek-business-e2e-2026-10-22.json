@@ -1,0 +1,97 @@
+{
+  "runId": "20261022145508",
+  "startedAt": "2026-10-22T14:55:08.3462450+08:00",
+  "status": "PASSED",
+  "coreDatabase": "fg_core_e2e_20261022145508",
+  "copilotDatabase": "fg_copilot_e2e_20261022145508",
+  "rabbitVhost": "fg-e2e-20261022145508",
+  "qdrantContainer": "fg-e2e-qdrant-20261022145508",
+  "provider": "deepseek",
+  "model": "deepseek-flash",
+  "prompt": "review-analysis-v2",
+  "maxModelCalls": 1,
+  "embedding": "fixed-v1",
+  "checks": [
+    {
+      "passed": true,
+      "name": "Core health UP with real MySQL/RabbitMQ/Redis"
+    },
+    {
+      "passed": true,
+      "name": "Copilot real-deepseek profile health UP"
+    },
+    {
+      "passed": true,
+      "name": "Published knowledge retrieved from Qdrant and checksum-verified MySQL source"
+    },
+    {
+      "passed": true,
+      "name": "Reviewer JWT authenticated by Core"
+    },
+    {
+      "passed": true,
+      "name": "Core supplies actual sanitized task context"
+    },
+    {
+      "passed": true,
+      "name": "Unauthenticated Copilot request rejected with 401"
+    },
+    {
+      "passed": true,
+      "name": "ADMIN without REVIEWER rejected with 403"
+    },
+    {
+      "passed": true,
+      "name": "Analysis accepted through authenticated HTTP with 202"
+    },
+    {
+      "passed": true,
+      "name": "Identical Idempotency-Key returns the same analysis"
+    },
+    {
+      "passed": true,
+      "name": "Analysis reaches SUCCEEDED through Outbox/RabbitMQ/Worker/real model"
+    },
+    {
+      "passed": true,
+      "name": "Model result contains the published policy citation"
+    },
+    {
+      "passed": true,
+      "name": "Core business decision remains PENDING and version unchanged"
+    },
+    {
+      "passed": true,
+      "name": "Core business and audit table checksums unchanged"
+    },
+    {
+      "passed": true,
+      "name": "Exactly one model invocation ledger row persisted"
+    },
+    {
+      "passed": true,
+      "name": "Outbox published and Worker receipt persisted"
+    }
+  ],
+  "corePid": 17896,
+  "copilotPid": 59724,
+  "knowledge": {
+    "status": "PUBLISHED",
+    "citationPrecision": 1,
+    "documentId": "e2e-large-amount-policy",
+    "chunkCount": 1,
+    "retrievedChunk": "e2e-large-amount-policy:v1:0",
+    "scope": "synthetic smoke case, not semantic quality evaluation",
+    "embeddingVersion": "fixed-v1",
+    "indexVersion": "published-20261022145508",
+    "recallAtK": 1
+  },
+  "analysisId": "86ba1f3b-a2f5-4b74-9010-ce6e9c88a662",
+  "analysisStatus": "SUCCEEDED",
+  "failureCode": null,
+  "modelUsage": "SUCCESS\t1937\t617\t3048",
+  "recommendation": "CONFIRMED",
+  "citationCount": 1,
+  "servicesLeftRunning": false,
+  "finishedAt": "2026-10-22T14:55:58.2054774+08:00"
+}

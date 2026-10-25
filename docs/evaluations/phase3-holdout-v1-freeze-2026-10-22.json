@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-22",
+  "purpose": "Freeze independently authored holdout and labels before any model request",
+  "dataset_version": "phase3-holdout-v1",
+  "knowledge_index_version": "holdout-fixture-v1",
+  "provider": "deepseek",
+  "model": "deepseek-flash",
+  "prompt_version": "review-analysis-v2",
+  "evaluator_version": "exact-facts-citations-v3",
+  "sample_count": 12,
+  "expected_labels": {"CONFIRMED": 2, "IGNORED": 5, "INSUFFICIENT_EVIDENCE": 5},
+  "max_provider_calls": 12,
+  "already_consumed_in_closeout": 13,
+  "remaining_approved_calls": 12,
+  "automatic_retries": 0,
+  "authoring_context": "Isolated AI context with no access to candidate prompts, development data, historical model reports, or credentials",
+  "label_review": "Main agent checked all policies and labels before model calls; no human domain-expert validation is claimed",
+  "frozen_sha256": {
+    "tools/agent-evaluation/data/phase3-holdout-v1.jsonl": "fefe25a73f3279c99480069b75e6f0319db4d354896d26117cfc37b4c63f6310",
+    "tools/agent-evaluation/tests/test_holdout_dataset.py": "2dfae38d455af7ad7b6e7d20c591ba9ef7591c7965f0f128539017153d4af39c",
+    "docs/evaluations/phase3-holdout-v1-design.md": "86b6f1dade0224bf6f9c3e54498a45b59728483f095d844110a8af488789b6b9",
+    "src/main/resources/prompts/review-analysis-v2.txt": "f7cf1673e7d0a57fc0c9786611d22f9ae9c07f084867839f580b30f77ddbfb0c",
+    "src/main/java/com/finguard/copilot/model/adapter/openai/CompatibleChatModelGateway.java": "913240c7b73cb27a87609c603b6a017d11e4bad6e25b3deeaa2ac1a619cdfd63"
+  },
+  "scope": "Synthetic model contract/development holdout, not financial expert labels, production accuracy, or semantic retrieval evaluation. H03/H04 use hypothetical 18-decimal ledgers as numerical stress cases, not current Core MySQL amount storage examples.",
+  "post_result_policy": "Preserve labels, prompts, datasets and all failures unchanged; any future tuning requires a new development version and a new unseen holdout."
+}

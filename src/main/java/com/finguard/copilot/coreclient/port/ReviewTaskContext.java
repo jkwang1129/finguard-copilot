@@ -36,9 +36,13 @@ public record ReviewTaskContext(
 
         public ReviewTask {
             requirePositive(id, "id");
-            requirePositive(version, "version");
+            if (version < 0) {
+                throw new IllegalArgumentException("version must not be negative");
+            }
             requireText(status, "status");
-            requireText(ruleCode, "ruleCode");
+            if (ruleCode != null && ruleCode.isBlank()) {
+                throw new IllegalArgumentException("ruleCode must be null or non-blank");
+            }
             requireText(reasonCode, "reasonCode");
             requireNonNull(createdAt, "createdAt");
         }

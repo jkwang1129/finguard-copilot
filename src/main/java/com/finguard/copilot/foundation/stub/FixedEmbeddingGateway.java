@@ -24,12 +24,15 @@ public final class FixedEmbeddingGateway implements EmbeddingGateway {
     }
 
     @Override
-    public EmbeddingVector embed(String text) {
+    public EmbeddingVector embed(String text, String embeddingVersion) {
         if (text == null || text.isBlank()) {
             throw new IllegalArgumentException("text must not be blank");
         }
+        if (embeddingVersion == null || embeddingVersion.isBlank()) {
+            throw new IllegalArgumentException("embeddingVersion must not be blank");
+        }
 
-        byte[] digest = sha256(text);
+        byte[] digest = sha256(embeddingVersion + "\u0000" + text);
         double[] raw = new double[dimensions];
         double squaredNorm = 0.0;
         for (int index = 0; index < dimensions; index++) {

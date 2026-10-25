@@ -19,13 +19,41 @@ public final class InMemoryVectorStore implements VectorStore {
             .thenComparing(result -> result.document().id());
 
     private final Map<DocumentKey, VectorDocument> documents = new ConcurrentHashMap<>();
+    private final Map<String, Integer> indexDimensions = new ConcurrentHashMap<>();
+
+    @Override
+    public void createIndex(String indexVersion, int dimension) {
+        requireIndexVersion(indexVersion);
+        if (dimension < 1) {
+            throw new IllegalArgumentException("dimension must be positive");
+        }
+        Integer existing = indexDimensions.putIfAbsent(indexVersion, dimension);
+        if (existing != null && existing != dimension) {
+            throw new IllegalArgumentException("index dimension cannot change");
+        }
+    }
 
     @Override
     public void upsert(VectorDocument document) {
         if (document == null) {
             throw new IllegalArgumentException("document must not be null");
         }
+        createIndex(document.indexVersion(), document.embedding().dimension());
         documents.put(new DocumentKey(document.indexVersion(), document.id()), document);
+    }
+
+    @Override
+    public void upsert(String indexVersion, List<VectorDocument> documents) {
+        requireIndexVersion(indexVersion);
+        if (documents == null || documents.stream().anyMatch(document -> document == null)) {
+            throw new IllegalArgumentException("documents must not contain null");
+        }
+        documents.forEach(document -> {
+            if (!indexVersion.equals(document.indexVersion())) {
+                throw new IllegalArgumentException("document index version must match the target index");
+            }
+            upsert(document);
+        });
     }
 
     @Override
@@ -45,6 +73,14 @@ public final class InMemoryVectorStore implements VectorStore {
     @Override
     public void clear() {
         documents.clear();
+        indexDimensions.clear();
+    }
+
+    @Override
+    public void deleteIndex(String indexVersion) {
+        requireIndexVersion(indexVersion);
+        documents.keySet().removeIf(key -> key.indexVersion().equals(indexVersion));
+        indexDimensions.remove(indexVersion);
     }
 
     private VectorSearchResult toResult(VectorDocument document, EmbeddingVector queryEmbedding) {
@@ -74,5 +110,11 @@ public final class InMemoryVectorStore implements VectorStore {
     }
 
     private record DocumentKey(String indexVersion, String documentId) {
+    }
+
+    private static void requireIndexVersion(String indexVersion) {
+        if (indexVersion == null || indexVersion.isBlank()) {
+            throw new IllegalArgumentException("indexVersion must not be blank");
+        }
     }
 }
