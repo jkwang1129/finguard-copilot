@@ -92,6 +92,15 @@ class GetAnalysisServiceTest {
     }
 
     @Test
+    void successfulReadKeepsExactDecimalInHttpResultTree() {
+        when(coreClient.currentUser(TOKEN)).thenReturn(new CurrentUser("reviewer",Set.of("REVIEWER")));
+        when(runRepository.findByIdAndReviewer(ANALYSIS_ID,"reviewer")).thenReturn(Optional.of(new AnalysisView(
+                ANALYSIS_ID,AnalysisStatus.SUCCEEDED,null,"{\"businessEvidence\":[{\"amount\":99.999999999999999999}]}")));
+        assertThat(service.get(ANALYSIS_ID,TOKEN).result().get("businessEvidence").get(0).get("amount").decimalValue())
+                .isEqualByComparingTo("99.999999999999999999");
+    }
+
+    @Test
     void mapsMalformedSucceededResultToBoundedInternalError() {
         when(coreClient.currentUser(TOKEN)).thenReturn(new CurrentUser("reviewer", Set.of("REVIEWER")));
         when(runRepository.findByIdAndReviewer(ANALYSIS_ID, "reviewer"))

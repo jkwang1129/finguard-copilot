@@ -1,0 +1,1335 @@
+{
+  "schemaVersion": "p4-3-governance-baseline-v1",
+  "frozenAtUtc": "2026-11-02T11:30:18.479990+00:00",
+  "scope": "local dirty checkout; includes preserved earlier Phase4 changes; no commit, merge or release",
+  "copilot": {
+    "branch": "codex/phase-4-first-batch",
+    "head": "4f159937e88af374d6f264bb7c70040f1205cf2b",
+    "dirty": true
+  },
+  "core": {
+    "head": "d25770a6ae013266f34f87ac0aa48852f3af4098",
+    "clean": true
+  },
+  "sourceManifest": {
+    "algorithm": "SHA256 of sorted UTF8 lines: hash + two spaces + relative POSIX path + LF",
+    "sha256": "3d257fdc109e7aa139137354568f6a4d79f2241ccde2788450e78f3ad6dcf8e6",
+    "fileCount": 288,
+    "files": [
+      {
+        "path": "frontend/package-lock.json",
+        "sha256": "8e9bc2826449addba46cd3d1c0e61d9db5e510f3d728983488762c4706bfd45e"
+      },
+      {
+        "path": "frontend/package.json",
+        "sha256": "501e2ffe8fd312f12b158078dfc6e210138c5acfeaaef74f2c29723dbfee74c5"
+      },
+      {
+        "path": "pom.xml",
+        "sha256": "5933f95bb736482243a9227ed8fa5acd9392e270a60ebbf1df88ac8d225ef624"
+      },
+      {
+        "path": "scripts/e2e/PublishedKnowledgeSeed.java",
+        "sha256": "607ad69c661b5e6482cf52b65c13cf454cfcf4a27e33c9f80ff0847b969d6691"
+      },
+      {
+        "path": "scripts/e2e/local_model_stub.py",
+        "sha256": "34d779636a37eedd9593758415cf82faac86e888c47fab0ec64b549bcf53e3d4"
+      },
+      {
+        "path": "scripts/e2e/wait-rabbit-ack.ps1",
+        "sha256": "54b45031833774f6d52c432db0d353bf481d3c0a951b9f29f1654e293b6af88a"
+      },
+      {
+        "path": "scripts/import-model-environment.ps1",
+        "sha256": "8f14877a4d1d42560a56a3ba65c8e3ca4bacb0a83c3411de1b892dd494a9cd13"
+      },
+      {
+        "path": "scripts/run-business-e2e.ps1",
+        "sha256": "77e3587bb4a57009398b1dd8d731318180e34c54f2d0e144cf892f6df8fb1adf"
+      },
+      {
+        "path": "scripts/run-phase3-evaluation.ps1",
+        "sha256": "a73c41908384941e1ef782360aaa1ab127d35169bc500a2412cbcfa0ce8ffa9e"
+      },
+      {
+        "path": "scripts/run-quality-comparison.ps1",
+        "sha256": "1fb7ae3bb8273350ede6446bef7fa4fc9295eae896a2aa45f0c221c6a4a5b7e9"
+      },
+      {
+        "path": "scripts/verify.ps1",
+        "sha256": "4bdf80d3c0071cb60b72d9bce640faff2106039f1bb54b0d848174e9ab4fe814"
+      },
+      {
+        "path": "scripts/verify.sh",
+        "sha256": "3762729e4c7b751d5f5a78ed125f4d37199cf47e495009c913f297ac719f536e"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/FinGuardCopilotApplication.java",
+        "sha256": "07723fd47b2dc5977b92ecd85df7c6774dcde41513a9c1dec9e9ba901b8853bd"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/analysis/application/AnalysisExecution.java",
+        "sha256": "ffb5e276895c21a0a00873499adff3615d1f2c6530ebc06abe784e5c8b6cc76e"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/analysis/application/AnalysisOrchestrator.java",
+        "sha256": "7340265c16e88daafab8b828407b41bf3e51e42d39f634319f257ba430dcc7c3"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/analysis/application/AnalysisStateMachine.java",
+        "sha256": "ca28aa1522635567497388de652363686608333784a22715e2b0c9b3d8a98a3f"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/analysis/application/CreateAnalysisCommand.java",
+        "sha256": "7c94cd2b0ffaa485d3f453ac3cc7265ddac73edee465ac97fdd1714e7d7705f1"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/analysis/application/CreateAnalysisService.java",
+        "sha256": "adff352aab50199398094a3bdb96c82105cfc621cadac5bec2b29b1dc0e3df8b"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/analysis/application/DeterministicAnalysisOrchestrator.java",
+        "sha256": "c5e2268aee72ece0d5abcd76edc369bbfca7c1544e737a3178c603fda4ad3edd"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/analysis/application/GetAnalysisService.java",
+        "sha256": "de02cfdc3f2097f185ccfb6e26eaed9365fdb207446ef177c69ce3075b8e44c3"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/analysis/application/ModelAnalysisOrchestrator.java",
+        "sha256": "24b4f39b8619389761938266f523179ee035506d03130488c087e6f0943e0fe5"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/analysis/application/ModelInvocationException.java",
+        "sha256": "0d138fb4770644b0fd4fc4929f8ef568fea9a298678d69cf070d71d092388315"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/analysis/application/SubmitFeedbackService.java",
+        "sha256": "a33a403e2c781bf515186a1f1052a0dce9b3f4629e2cab4196bd33e4fb0bf6a1"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/analysis/domain/AnalysisRecommendation.java",
+        "sha256": "7800821b41c975d753bcc62a6b9e8577ba1f6e011379b38d6e1c2d6621185b5d"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/analysis/domain/AnalysisResult.java",
+        "sha256": "e12a5aafcee0d6e387fc3156cf85fadd5864ea1e2461551266ce023e1d571951"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/analysis/domain/AnalysisRun.java",
+        "sha256": "64245facc46ef821c3b2633672163891268c0a6648b145e1c6776e5860789725"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/analysis/domain/AnalysisStatus.java",
+        "sha256": "704becb256d0258aa11e3dea011605079253baa66231cdad5005cc2bccc94d77"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/analysis/persistence/AnalysisCreationStore.java",
+        "sha256": "6cb105e6e0881f72e813e5eb769a30626f97e08fa96d4fa6feb6f2df9ce06a1a"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/analysis/persistence/AnalysisRunRepository.java",
+        "sha256": "a572361bde14d4de07227e2e7627a4fe54ef68c6134d9539384626d7f484b599"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/analysis/persistence/IdempotencyCleanupJob.java",
+        "sha256": "a4bd0149cc377f07d4e81a8d8048eba17b6172c674ccf75736a214d46747b4af"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/analysis/persistence/JdbcAnalysisRunRepository.java",
+        "sha256": "7426aceeeded4f96ffcc7663d9a5cd33e05269634f6785b4f8a76ace4237a040"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/analysis/persistence/ReviewFeedbackRepository.java",
+        "sha256": "6a962c944e346a973c48c14567f434e09792b531b7a9b59f0c6dffb315cfaf4b"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/api/analysis/AnalysisAcceptedResponse.java",
+        "sha256": "40284224f679a11e95b9e18fe045a823fa6584ae298e19d9a6537b8812c7e066"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/api/analysis/AnalysisResponse.java",
+        "sha256": "acea401507226d3c2bd3e79f7732d942446adf3a827c7a68ea9de6ef402db472"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/api/analysis/CreateAnalysisRequest.java",
+        "sha256": "b02d3290291232a68fd0c77a03502294c1209d5315791e6849734361da5a63d7"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/api/analysis/ReviewAnalysisController.java",
+        "sha256": "7b364d703a9f59976499afda24c1c213c9bcb3500cce7f864567ae95ec1e245f"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/api/analysis/ReviewFeedbackController.java",
+        "sha256": "95f77bcd51131160a7741ff11ed5c1549df8ef60b19ef346774afce4e7c990e3"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/api/error/GlobalExceptionHandler.java",
+        "sha256": "76f792d2c2642778732af2d0f089dd6f50be6aa429f3aa9c1306b2b5e0614f1c"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/common/error/CopilotException.java",
+        "sha256": "d0243d5bada7ad77adab1018cd211cb780dc52900ed25746f53c11a1f2385238"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/common/error/ErrorCode.java",
+        "sha256": "f095105979fff9a334544dae286a3fe435112c5854de68e4fd9c38d374fa7b95"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/config/CopilotProperties.java",
+        "sha256": "16b9a96fca49f58c01b0db42a7ba3a37aaa457903f26bf6467391cac83e8103a"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/config/NumericGuardProperties.java",
+        "sha256": "e1404772bea9f793f3fbac5a99de2f1bf3680895aefb378de6ed81a20aa77d78"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/config/OpenApiConfiguration.java",
+        "sha256": "8dbd1f78cf2501bce2a877da450a335615afbb84a6b79a483a5f745bfb357b94"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/config/ReviewedPolicyProperties.java",
+        "sha256": "64e0f8d43ec5463a01a259a0be3965ac2f2a7049aff887241c80fea33792914e"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/config/SecretValue.java",
+        "sha256": "5c52101add6fb3b6dc0d531232aea3f99870897bde32a071b33bb7034ed454bd"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/context/ContextAssembler.java",
+        "sha256": "1264d1c22b79e879de2cb7b403dc0c3e123ec56e767eb183929e7ba347222055"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/context/FactSnapshot.java",
+        "sha256": "a83880adda9937b1429542d02d43a7c17f9f63dff0acca404637d4df98193933"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/context/PromptTemplate.java",
+        "sha256": "e6aec98ab2852ae4b9647801bfd1c29bd4a44c3d5c766a93d362a8dfd9a11273"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/context/SnapshotCodec.java",
+        "sha256": "a813ae0280f0a4cd0cf1f0c919203c044693de8af468593d7bb81172202398a6"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/context/SnapshotRetentionJob.java",
+        "sha256": "b8eddc6f926df3494a53a75561b85288b69775767348845707e24d5aa3e39fa3"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/context/TokenBudget.java",
+        "sha256": "b35c0db3c46ce6705187ac900c5d48890ce12feb8e3c2c66871d6c3de4051212"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/context/TokenEstimator.java",
+        "sha256": "2c2ef35762708a090115b56caf0ca175551aa8bf53b4842531027ee9e27e2bca"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/coreclient/http/CoreCurrentUserResponse.java",
+        "sha256": "8b9477f60aad132720b16e75882916f5e5f448e19624c9ecc58d21b3cf6ad639"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/coreclient/http/CoreHttpConfiguration.java",
+        "sha256": "7656032b2b3e7d16c2526c0f9e6180d3f9bfb2c1e29a01f4a5bf1a6163865cd2"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/coreclient/http/CoreReviewTaskContextResponse.java",
+        "sha256": "d55713837c17eec09d4c31182ae7de33a0b14418efab63df532953cf091baa19"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/coreclient/http/HttpCoreClient.java",
+        "sha256": "e57fa2a37c9f26bbe5229340d40247b19325767d41c33131f8d784a0b6fb1db9"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/coreclient/port/CoreClient.java",
+        "sha256": "d1fc36821457f56cdd74cacb9d3fa18de25354c01d361e40bce60dde9c412f41"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/coreclient/port/CoreClientException.java",
+        "sha256": "10cd495c8e0a7201d4a510ed0a5ca2e84291cec970427c77f5f84c66b41791b8"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/coreclient/port/CurrentUser.java",
+        "sha256": "4ca812b6f3321b5c666e05592ccd008b318edb08581b3e712adf2e861bfd5ac2"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/coreclient/port/ReviewTaskContext.java",
+        "sha256": "0658c72c25f104f5338d3e6755929010991d2db9a015baa3958ee227fa3fd0f5"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/dispatch/AnalysisRequestedMessage.java",
+        "sha256": "76b0df3c43289ebb8866a2a6af239ca501ee6dfc899268a2f1f460e4cf4e595f"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/dispatch/AnalysisWorker.java",
+        "sha256": "5d997a3366be4316f01f7586fc7fb7f04204b44f944772ff3d0865efcb9b7127"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/dispatch/OutboxCleanupJob.java",
+        "sha256": "b58b67249cdece24983c42ab258b4b6ab0131efbec39b4788b3903a927fe4cf8"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/dispatch/OutboxRelay.java",
+        "sha256": "79d7152b5f412c3731d52fd4f8fdf6ac30528c81537b8b5a58564634a656099f"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/dispatch/OutboxRepository.java",
+        "sha256": "b4f73caa9c8b9cf06c0f91fa114ee68194e50d3310d1e94e92c8a61378736497"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/dispatch/RabbitTopologyConfiguration.java",
+        "sha256": "d282c18e5856b20a60b1be9046e53dbff67b70180ff83516b1ec54f0d22c86fd"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/foundation/stub/FixedEmbeddingGateway.java",
+        "sha256": "65edf56e9fb69e2913133f81e5280433a2ae671ff7fb5ab3b66999133c3f3b02"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/foundation/stub/InMemoryVectorStore.java",
+        "sha256": "4dccd9c3037178c8d66f2acbca1d911a198f2aa5fed2bed67d1186b56dfaf577"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/foundation/stub/StubFoundationConfiguration.java",
+        "sha256": "18f74dbabd48832de599dd6d8184bfef4e428f244728d8e8ae34e64fd3efc9f9"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/foundation/stub/StubModelGateway.java",
+        "sha256": "7a64fb8629e9436fd79f45111fc007cffbcdcbe3060e9fa95146a96f4e4aac6b"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/governance/AnalysisAdmissionClosedException.java",
+        "sha256": "c179b29df2faafeabf39c02a239b0430d3aa47344e77d616c19fba07411e2172"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/governance/BudgetReservations.java",
+        "sha256": "b5e393f380a85511285904b3476e65828004915b0f63d143ead897fea801ca3e"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/governance/CallAdmission.java",
+        "sha256": "604463aadbc71c2c5eee6ddf102efca6a8f82218d46cc39e80a7bcff3a474774"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/governance/CanonicalJson.java",
+        "sha256": "fc3741dadeb6a1eb2e0b68435c0ab38985e65ed35ea17c2aa3143032c6ed8ec3"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/governance/ClaimedCallNotSentException.java",
+        "sha256": "18cd96cb5455ae0e0f328cead417ac5cd3b719e2c46b2d5839f2a0e5540f9760"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/governance/DeepseekTextTokenBound.java",
+        "sha256": "1dcc5ff1824320f848775f320a195b2f8ee4f1099a3dabd74488af9852fe4b01"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/governance/ExistingModelCallException.java",
+        "sha256": "e71391ec482af1cd0a807a4bb1ae6dcad3de0c56d8617c6225b3100dc0dc0a1d"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/governance/GovernanceProperties.java",
+        "sha256": "298bf5514f1167376763b9a22473f5197c2db72d3352954cfeabe8aaceef6a48"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/governance/ModelCallPreflight.java",
+        "sha256": "a671abd00d869fb14c8c0872979e3b086e28fb6aae26a53a000e42eb5ce05264"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/governance/PermitProperties.java",
+        "sha256": "9fc3eef3279a20172519b5c7beab49002b15daf9f43aadd4f464ae0c401c1568"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/governance/RedisProviderPermits.java",
+        "sha256": "1b815a14d082920d264a10c219a27c7fb62b1ca79e0d6e769eb9155b882c9613"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/governance/RunManifestService.java",
+        "sha256": "c0a8eda1bceae4ead203cdc14061d991cf34d98354a0232d54519b3e3ca4346d"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/governance/VersionedArtifactStore.java",
+        "sha256": "2642fdd6b1422d40cbac4d82bf6b3707ae760b566a9a8102d5ad3ede10b429c2"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/guardrail/AnalysisOutputSchemaValidator.java",
+        "sha256": "a49d6429361cb584f093d9d98f2412d8211d56d475f6c2c12e66c33e4e27475d"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/guardrail/CoreLargeAmountFactGuard.java",
+        "sha256": "108267a796bc8be82a1b19a8de2bda4d9f1061824dec3631b56e3865632e2eb2"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/guardrail/CoreLargeAmountPolicyGuard.java",
+        "sha256": "fcfd1c658ce5d746ed598c040eec0cdb5bb0a7a1e0511b5fe9fdef193b41f98b"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/guardrail/FactConsistencyValidator.java",
+        "sha256": "23b143eb303ccc626c362f9871b90ce4f1d607d085fc6c30eb8d956228b89566"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/guardrail/NumericThresholdGuard.java",
+        "sha256": "9ce4fdd26015045e1c1e73198d8f3575b018b31ba2d6b977f73f062bec1a1479"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/guardrail/ReviewedPolicyGuard.java",
+        "sha256": "635b7ea6fce28b782a7939a15da15943a8a963b7e83077bb44b783afb73036c1"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/guardrail/UntrustedInstructionGuard.java",
+        "sha256": "e9ef143a90cf7650a67cf765b0d26a0c8ec6639b26510160ed887047a45cea33"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/knowledge/domain/KnowledgeChunk.java",
+        "sha256": "16efff567bcd21feeeb14b8b7ef7d01eac00f7d4861629b4677a58fa7a00d2e8"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/knowledge/domain/KnowledgeCitation.java",
+        "sha256": "2d890cb4266388bd5b77122661bd33b9d4a37ec5df9cb2412b33bd3545e10e94"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/knowledge/domain/KnowledgeDocument.java",
+        "sha256": "8809110579e47a4857a82ae115778469f0f1525f14f5d0c0f18d3c58e5bd03d4"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/knowledge/domain/KnowledgeIndexStatus.java",
+        "sha256": "13b1d122fe41c7a35c4e4f71cc1768f177c89e22a5507a27edc24167072c2cf3"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/knowledge/domain/KnowledgeIndexVersion.java",
+        "sha256": "03d652db1b234e0907c198247d3a27b7bbf9bc140e3e7f254260da0816f69d5d"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/knowledge/domain/KnowledgeSourceType.java",
+        "sha256": "7fc4a23b3748b5637e0ccea848d6f80f850275abcd2c73a895c5be48239c53f8"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/knowledge/index/KnowledgeIndexBuildService.java",
+        "sha256": "c43ff0ba186e009731dbd0060a86bf9e868dd96d3aaa7d17446fb4c8497b763d"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/knowledge/index/KnowledgeIndexChangeService.java",
+        "sha256": "b3b15f6258f45ed7b44e4a1234695da90ca2ab3fa85ee088a0acf32489349cc0"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/knowledge/index/KnowledgeIndexEvaluationService.java",
+        "sha256": "2e640ebaf6f38863dbf24f4dd65f45a4394d3c8f86a37cfe0d4473f88adb55d1"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/knowledge/index/KnowledgeIndexPublicationException.java",
+        "sha256": "ddcaa9170c6451a9c47c3b9b13ce14fcc4e89ee06f925e9f44f8240dea53f251"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/knowledge/index/KnowledgeIndexPublicationService.java",
+        "sha256": "52900e9854421041048eee3f9d8d9d5b39c1793af743ee65306e32577a010586"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/knowledge/index/KnowledgeIndexRollbackService.java",
+        "sha256": "c2bc6df77669262b692f3eb525b8cea64dc74caeca0a0fdc04d02f3870278d1d"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/knowledge/index/PublicationThresholds.java",
+        "sha256": "f58b83db55f5d0974ce7e8a3975efbf71b1e04536c601618424ccbcad3978334"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/knowledge/index/RagCase.java",
+        "sha256": "c2cd41aaeca35691e7eb81089242b2c0d1079bc19daeaada3d8d1df3d87893cd"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/knowledge/index/RagEvaluationResult.java",
+        "sha256": "5fe4c9506e0e237696c4ca677a183dcc739691f7d281bab140593321fe32b292"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/knowledge/ingest/CanonicalDocument.java",
+        "sha256": "65559a7bfb0a294605f80182b1532718cba44dd2addaab34432670ffbea4e2af"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/knowledge/ingest/DocumentChunker.java",
+        "sha256": "b231eb4d327d5cb72f8a9f317ca0005d00626c267fe70a377935b87586c554d6"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/knowledge/ingest/DocumentCleaner.java",
+        "sha256": "c5c49d5af0fee277a3f9b3778df879da64e0e69ef38616cb0ab2d9b33592af86"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/knowledge/ingest/KnowledgeAdmissionPolicy.java",
+        "sha256": "f9050191c25abd5676f04b3768d71af0eb02e12df34bb99fc81b97cbcfb42af6"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/knowledge/ingest/KnowledgeDocumentRequest.java",
+        "sha256": "c5cfc4637945b078e53a09cf813f7b6ed22a66372c691eafb2998c55c45d909f"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/knowledge/ingest/KnowledgeIngestionService.java",
+        "sha256": "afbedd6aad30317dd70f046719a20573d6993fb7649a48ff36e917acdfbdc6c1"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/knowledge/persistence/JdbcKnowledgeDocumentRepository.java",
+        "sha256": "eb5a6b933cba31ad59792b0979c092bb3d85347a0537516e1f2a87d5999f4723"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/knowledge/persistence/JdbcKnowledgeIndexRepository.java",
+        "sha256": "daf1d06b0748ef96069ebdb739886133e106f0565cebe8719082467c0ecce33b"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/knowledge/persistence/KnowledgeDocumentRepository.java",
+        "sha256": "b44f5ce21ab6db18b645c114e2b5c17098743ee67543c942a91c848c10f9da65"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/knowledge/persistence/KnowledgeIndexRepository.java",
+        "sha256": "6391ae14e4150a7a0569d7b8a80a49c3761e5f7cbde0cbbadacd9fbae64e28a1"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/knowledge/port/EmbeddingGateway.java",
+        "sha256": "16a3ddf99ada08d6542fb58c0913d21a503538929e205944a40893c14f0dc41d"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/knowledge/port/EmbeddingVector.java",
+        "sha256": "9776c7b12d822468ed1ad0b57ea09f619c03d7ab6a9ff0715da4763a6d21c445"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/knowledge/port/VectorDocument.java",
+        "sha256": "d8c00cc1c99df6bb2b67228d8acf9253a11441f01f673ff77d3d601693688ade"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/knowledge/port/VectorSearchQuery.java",
+        "sha256": "6361abb175f8efe90938ea9a97b3e027760e803769f20eaff738b3be40a71a51"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/knowledge/port/VectorSearchResult.java",
+        "sha256": "0465517a847877d5076bd3538486a2943388c4dbe0d8e36a5b484c546d692664"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/knowledge/port/VectorStore.java",
+        "sha256": "ec10489f3bd3d44127c92de729d232c2a7e5a34a546ee4bd4d5e8ec013c951ae"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/knowledge/qdrant/QdrantClient.java",
+        "sha256": "a4eaedff54f854ffbd8c3b0b6bdb2bd0b27fdf4a68d3d0b2e78a341810992d13"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/knowledge/qdrant/QdrantConfiguration.java",
+        "sha256": "5a78956674b5bb9c9ff2e6d086a7e6586cc687b13e8ca3861fcbaaadc6500f5c"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/knowledge/qdrant/QdrantException.java",
+        "sha256": "f8529fdfbae5a68e11891075b22f8be1fef4ab48ec19151347e903428ee1a439"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/knowledge/qdrant/QdrantHttpClient.java",
+        "sha256": "7b4eba246db1cf3f16178b83b20ac59aa2b5074145d0b283c3b093a395b6674e"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/knowledge/qdrant/QdrantVectorStore.java",
+        "sha256": "5fdae4d0caa8daa5232609162a4a3f9c4aa3f46e8f9ea2e38e74d8032daac2ff"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/knowledge/retrieval/CitationValidationException.java",
+        "sha256": "8f9d1b8854d7ee4c147798e5f9914ae22e2d9aec71758af8b22ac1145a77ecae"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/knowledge/retrieval/KnowledgeCitationValidator.java",
+        "sha256": "72c07b6ae5df3229707f702c8fd9192c8c63fa74541f1decf2e3fdd674edcd89"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/knowledge/retrieval/KnowledgeEvidence.java",
+        "sha256": "6d04a7051dd92075d9e646ba25cda33a4c80d24ded09c0a06f82b42f30c47052"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/knowledge/retrieval/KnowledgeRetrievalException.java",
+        "sha256": "97902290262bfd65c7da93093ff16a13756772d1b8090c1d0696bf8a881d7a03"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/knowledge/retrieval/KnowledgeRetrievalService.java",
+        "sha256": "132d4fc3273dcf56a3b32539eac80d69f5d71589ca510472a35fdc9177a70cd8"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/model/adapter/openai/CompatibleChatModelGateway.java",
+        "sha256": "1a11d44de5bf367176a1bb364c1537062967db526887f995d1e2fe9576848d7d"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/model/adapter/openai/CompatibleChatRequestPayload.java",
+        "sha256": "6b57d082d83051316cf61b89ba76db20a39d1e9d24b7bbaddab994718fb3dfbd"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/model/adapter/openai/OpenAiCompatibleResponse.java",
+        "sha256": "918537ec6efe07c229a9b7326e87f884e56c5fdfdebafc12eac0fdda066fc02e"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/model/config/RealModelConfiguration.java",
+        "sha256": "b09ddee851d515fea87b23c8652f78bd484c068f65313e4794fd362d23398b1d"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/model/port/ModelGateway.java",
+        "sha256": "d499309b40bb0dc0d7f919627cf045e203972f77bbdd48d421667677b3c96a13"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/model/port/ModelRequest.java",
+        "sha256": "eaa3b7446dad5da4596e64326a4aa63c71eca796b898f2726132a01140bda6ce"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/model/port/ModelResponse.java",
+        "sha256": "95befbb4b315dd77b420f82e52b9b48dc9d31e6e41a1841f2f6c203a4abd1634"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/model/port/ModelUsage.java",
+        "sha256": "efd344fbe1932b42397f2cacb078740fcdd0dc85bf97b5b01b278fdd658bec69"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/model/port/ProviderCallEvidence.java",
+        "sha256": "b77993d53ac9be0d26410719272267eb8275b88c901b92e9e7134419ff45e137"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/model/validation/StructuredAnalysisParser.java",
+        "sha256": "0b009412662f2add4dc5c765c3dddd438ef1b0faf7ed88ae02bde62f4cafad49"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/usage/ModelCallReservations.java",
+        "sha256": "4ceb47dff784be5499283ae34fd9077c771b6eabfe0ecdee4533ad6dea02d54e"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/usage/ModelCostCalculator.java",
+        "sha256": "ecd77568ef1318f54f532f31453c4603f6db6b9dafe8c13a0379f16551483915"
+      },
+      {
+        "path": "src/main/java/com/finguard/copilot/usage/ModelUsageRecorder.java",
+        "sha256": "7d07c9b02a4a2d96ddb9107f10b2c4ce9f4d9c02c5633807716328d2b12f4dda"
+      },
+      {
+        "path": "src/main/resources/application.yml",
+        "sha256": "7bc034df45f62f5dca2666b3ae564d0c98433d6e91f58ef71da1a45725668106"
+      },
+      {
+        "path": "src/main/resources/db/migration/V10__reserve_and_settle_model_budget.sql",
+        "sha256": "ec436e6790564341ae8e0e6340b04f23407c798ab6852beafd8136f233aad998"
+      },
+      {
+        "path": "src/main/resources/db/migration/V1__create_analysis_run.sql",
+        "sha256": "fa27c6e000e355a80eb58943b68c55b17296e7c9e63c8dba6160b3baa9bfc7e5"
+      },
+      {
+        "path": "src/main/resources/db/migration/V2__create_phase1_fact_loop_tables.sql",
+        "sha256": "313c0307df6e74258f91eee4b1ada0c3a7df8f1c09958660fdfce723c8f6f1bc"
+      },
+      {
+        "path": "src/main/resources/db/migration/V3__create_phase2_knowledge_tables.sql",
+        "sha256": "4f14af11ff7e085b34dd86df177acdae28ef31577cbfa2d26dfab7e34f43b70e"
+      },
+      {
+        "path": "src/main/resources/db/migration/V4__add_knowledge_index_evaluation.sql",
+        "sha256": "34bc91f7eca41555af4d7712712d86a75f21a69a1ed6432196bada85431e4b97"
+      },
+      {
+        "path": "src/main/resources/db/migration/V5__create_model_usage_ledger.sql",
+        "sha256": "379be03b5a52122b1ffa972e06c361dfeed238d981a28f7ba2ac7df9c67746ad"
+      },
+      {
+        "path": "src/main/resources/db/migration/V6__reserve_model_call.sql",
+        "sha256": "c12c353f766d94e783df1366edb73332d1c554cc31f86fb4cc07e84bf381e16a"
+      },
+      {
+        "path": "src/main/resources/db/migration/V7__create_review_feedback.sql",
+        "sha256": "fc58d1770587ad8276d93e906c7b7c52f38c23661689dc6aa995b4885e2b1eab"
+      },
+      {
+        "path": "src/main/resources/db/migration/V8__preserve_exact_analysis_json.sql",
+        "sha256": "f4ba227eb4b66cb75d73ebf533a5a1a7cf1ec75774413af893712f1e9bffc67d"
+      },
+      {
+        "path": "src/main/resources/db/migration/V9__freeze_model_run_manifest.sql",
+        "sha256": "ea961b30a88c5d53a0111a1cd9f0e5d37f4b5129666fd629ab103ed6571ad3af"
+      },
+      {
+        "path": "src/main/resources/knowledge/large-amount-review-policy-v1.txt",
+        "sha256": "c8d9d5c66c395c6727e9d23e92c8c0b4ffc972fef25eb680eec252dcc69e065e"
+      },
+      {
+        "path": "src/main/resources/prompts/review-analysis-v1.txt",
+        "sha256": "8f3763052724771866664f90d5569b1ffdcd3bce32c6e00e262866a00389c53e"
+      },
+      {
+        "path": "src/main/resources/prompts/review-analysis-v2.txt",
+        "sha256": "f7cf1673e7d0a57fc0c9786611d22f9ae9c07f084867839f580b30f77ddbfb0c"
+      },
+      {
+        "path": "src/main/resources/schema/analysis-output-v1.schema.json",
+        "sha256": "4f17b09e461c950130b9f647ccbfc433b29b2cf0903d091c48bd78c5ee389f20"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/FinGuardCopilotApplicationTests.java",
+        "sha256": "ecfb575cc75a378c05fb15bdd7d8de684379da0a5af8d300877298355a0445a4"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/MigrationTest.java",
+        "sha256": "0040fb5e6c93b5e7e716223dd1e0119585cc4f71d6394c026d51f3e627753308"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/Phase1MigrationTest.java",
+        "sha256": "518646c11cb77d745fdc74f48767d443880941ac812799c6561c4c4ac0174b32"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/Phase2MigrationTest.java",
+        "sha256": "bcd485a902f83ac4bc0c69701e86f30a6e94d86ffacb4de5b1d5f550ff991044"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/analysis/Phase2CitationIntegrationTest.java",
+        "sha256": "934b1957f3220a33893a0520d23e29bc034fea55bda7dc5f22cf99a5f6bc60a7"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/analysis/application/AnalysisStateMachineTest.java",
+        "sha256": "752f3899369dff4307b185f1235d518ff9eaf09f0eaddadd1803f4744767d13d"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/analysis/application/CreateAnalysisServiceTest.java",
+        "sha256": "83b45aed4116e99c43dfc083cc52a7db3cc07e70eb801f1677558312b5e6fd16"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/analysis/application/DeterministicAnalysisOrchestratorTest.java",
+        "sha256": "5b7e64dea0641bb3566547cfcebd808b1f6e4bf6d12d2f0e4236c6963639f10d"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/analysis/application/GetAnalysisServiceTest.java",
+        "sha256": "7bcb69b57f6159c28f1d393e4dcbaf77e43830ffc73ce54654cf461953da2d0d"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/analysis/application/ModelAnalysisOrchestratorTest.java",
+        "sha256": "f9c30835f5cee4b3f0d95f903d792d217677d4d86d40d1eff0e2a3a9d218d8fa"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/analysis/application/SubmitFeedbackServiceTest.java",
+        "sha256": "6f3db58fd87501271c85182cbffdb8e4af9e2353d30e806ee0fb81ea95a21528"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/analysis/persistence/AnalysisCreationStoreIntegrationTest.java",
+        "sha256": "c22884877a5c957aafa1f43d3e0c7f7558ffeed2c32d521c146c84e6ac1dc179"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/analysis/persistence/AnalysisIdempotencyIntegrationTest.java",
+        "sha256": "5115887edb1d2484aa4205bd800e1cc1f641602bc86a8e76d0e61eddcd03ca57"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/analysis/persistence/IdempotencyCleanupJobIntegrationTest.java",
+        "sha256": "83869fa3143397f6221e4f324835a3b02a486925640f7c6a1645cd1115e28892"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/analysis/persistence/ReviewFeedbackRepositoryIntegrationTest.java",
+        "sha256": "8262489142c77cb0e345fe80d557630f69b1eadbf617ac2550d51b0fe1b482a8"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/api/analysis/ReviewAnalysisControllerTest.java",
+        "sha256": "05e10f61c58867bcaf2da5c730af5a01ffa011a76fdfa84c9b1af55994b2fac8"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/api/analysis/ReviewFeedbackControllerTest.java",
+        "sha256": "8c4636c27e3b8d8de00aff7bdd766aa98f1c4a25beb04f497001819b8c171e33"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/api/error/GlobalExceptionHandlerTest.java",
+        "sha256": "472a9e08ab78159bebdce2a0065132f53f7f6f25e368dfee5c3fa091a25da457"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/config/CopilotPropertiesTest.java",
+        "sha256": "940503abfc036d781cbf01833748fc12f00cd716d348002544b8b52fffb637e2"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/config/RealModelPropertiesTest.java",
+        "sha256": "ae4b7c3ece329a035ebd60d1900fb83630552d1ab0ac6167e32d9c879cf94560"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/context/ContextAssemblerTest.java",
+        "sha256": "fe93f5090c3f0cabccba734006e5d8ee86bc3ca6274415ceebd38bdfeb3e1e00"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/context/ExactJsonMigrationIntegrationTest.java",
+        "sha256": "0e1d10628e81b76d6642d60873c8f7f626f24969d9cef3c0427317741388ea8c"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/context/SnapshotCodecTest.java",
+        "sha256": "9e1575ef3f3a721019749aad4c2fea412fb4c3bc2358e3d32908f9fbd4aa7926"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/context/SnapshotRetentionJobIntegrationTest.java",
+        "sha256": "9f6664712edca70f2a9edf5b13cc3a29b74df344d87fb2da61fb7fd0c68190ac"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/coreclient/http/HttpCoreClientTest.java",
+        "sha256": "bd58a4c9084ebfa8b1e0f02827b11ceea66b89710d8be1b204fc4be246437c9d"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/coreclient/http/HttpCoreClientTimeoutTest.java",
+        "sha256": "678cad36d1da37d427f2ed57e0e5f81a49f74949eb142c2871f50f3469283c8c"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/dispatch/AnalysisWorkerIntegrationTest.java",
+        "sha256": "edea78e0e286383ab53f41178668a72490b28c54ccf31bb529b2ac30459c6b71"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/dispatch/AnalysisWorkerModelUsageTest.java",
+        "sha256": "038b7cc3c76a374ba817989fe515f1921a82567f5897a46be76d30880b5570ba"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/dispatch/DispatchFailureDispositionTest.java",
+        "sha256": "dbb26f72d9706ae52fbe29b71f72f8e551183f684f236bbac772a1df60161548"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/dispatch/OutboxCleanupJobIntegrationTest.java",
+        "sha256": "85d67b7fd32af2e015d5db55b8c77565a02b8d05b60ca4dced430e58a2d5c337"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/dispatch/OutboxRelayIntegrationTest.java",
+        "sha256": "7f119f7c9aa588b5b038db18c0922f96f0827b9ca7e9bfcb68a8cac34c5e9100"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/dispatch/Phase1FailureRecoveryIntegrationTest.java",
+        "sha256": "1dc2164bbf0eed1a83108c810586e8b43e9c27118d5d5c2f8fb1280c50b94059"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/dispatch/Phase4WorkerComparisonIntegrationTest.java",
+        "sha256": "eb281d24f0ecbf421ed326745a4dc5fd492ef05d2e70090d04057da5280d18d0"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/foundation/stub/FixedEmbeddingGatewayTest.java",
+        "sha256": "17e252513759804ae7f9ef275d8959ffa6e3e4ed244c9f33f38e5daf57e1e346"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/foundation/stub/InMemoryVectorStoreTest.java",
+        "sha256": "7ff3f3472efbc1714fca14a3ed26427cc589aa23b585a751f48a0b539a80d1e9"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/foundation/stub/StubFoundationConfigurationTest.java",
+        "sha256": "fb0037cedc8833ed9ea9e1433d1e4447edc5625624205bbb078b09c801154dc7"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/foundation/stub/StubModelGatewayTest.java",
+        "sha256": "9ea933e32a1e78ecd8005c44d72b26748f8aca960d06ff9636a8819960f290c7"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/governance/BudgetReservationsIntegrationTest.java",
+        "sha256": "e85e6719b0f0cab33abc284051d0cad7e009cd6ffe05e6153e88ea5483570e30"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/governance/CallAdmissionTest.java",
+        "sha256": "34dacd9b312f7c5cfbee87a4365e5d49ee76786d00e03987c702ec3a2447bb3c"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/governance/GovernanceDatabaseFixtures.java",
+        "sha256": "d098ae8368d35875dcbfb980c75eb4d8fca0f2a930eebf4b29da2bdf5cd49023"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/governance/GovernedWorkerRaceIntegrationTest.java",
+        "sha256": "4d9e53f78c28ead7abf3756f5ffa8ce877177c9f6b774ce496fd9caa804b9499"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/governance/RedisProviderPermitsIntegrationTest.java",
+        "sha256": "0d5a1a62afd068006c2bd1b372d36093724b64fa3a06015d3fbc1b8a1f523c56"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/governance/RunManifestServiceTest.java",
+        "sha256": "7afbed30c62c4970ee1256df72093d2eb2ded99fe1059a75c41225bbedec0667"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/governance/VersionedArtifactStoreIntegrationTest.java",
+        "sha256": "4bc2fba56a151015292bb2123cf02499cd3335849e78f1eb72c8121cf5280138"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/guardrail/AnalysisOutputSchemaValidatorTest.java",
+        "sha256": "b45cfa016b2ebaa1b400f73da5668f5cfda8f8b8c2420e682d333169a92bb7db"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/guardrail/CoreLargeAmountFactGuardTest.java",
+        "sha256": "5fd54a3591f8af7deef7d229bd08f35ba6deda4d3d66a32d22019101be019b63"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/guardrail/CoreLargeAmountPolicyGuardTest.java",
+        "sha256": "0cc2687508e6497bc6566140685d8bb9751103aed7945f46bb030a16241ecceb"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/guardrail/FactConsistencyValidatorTest.java",
+        "sha256": "b05e4106e7a038939c7e7ec07c95c762ae07e2a56ed8a0bf0f60363ccf9eb157"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/guardrail/NumericThresholdGuardTest.java",
+        "sha256": "4602473ede221da8f0313666b06bae76aa7d0870c113db0df5d2c4c5cd53b143"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/guardrail/Phase4HoldoutNumericGuardTest.java",
+        "sha256": "22953010ee556306c8c981014c7fcbeaf83796368bf22e6c2ac4ca2eae909be0"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/guardrail/ReviewedPolicyGuardTest.java",
+        "sha256": "afa79c488222a483fe945eeaca926f0b5d810cbeac595e72028ca8a2db5bd280"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/guardrail/UntrustedInstructionGuardTest.java",
+        "sha256": "449cb0628433c05f063b59defccb8165d0019447dd81d0bf578dc182e7b330ef"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/knowledge/domain/KnowledgeDomainTest.java",
+        "sha256": "b8c36a21f481cdd9b9396897890ab6652dc88576f40886d032349b90fb2ae653"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/knowledge/index/KnowledgeIndexBuildServiceTest.java",
+        "sha256": "c68e0ef2323f0d1e9fcba091908b93469cb19b0639d42d751469a7ea9df24bee"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/knowledge/index/KnowledgeIndexChangeIntegrationTest.java",
+        "sha256": "2551a5ab8d334f29c52a52734a06ff5df6151469c33a0efacc77ce32638aad1a"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/knowledge/index/KnowledgeIndexChangeServiceTest.java",
+        "sha256": "1ca055021cbbc0f665345dc3985d146a0cfcfb60afbf116037db71b3544aa442"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/knowledge/index/KnowledgeIndexEvaluationServiceTest.java",
+        "sha256": "a57440c632a9cf464258d410c9d53aa7fd5354e646244c5ff7d8e3aa4a66dce4"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/knowledge/index/KnowledgeIndexFailureIsolationTest.java",
+        "sha256": "c8e79937764f21417f5848345d9431dfd9dc496e0671f292926f12e667c4fe55"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/knowledge/index/KnowledgeIndexIntegrationTest.java",
+        "sha256": "2a7b40c2b2725e84944df21fe8c0c687b173b30ae819833ea4e4fa0cf85d8b2b"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/knowledge/index/KnowledgeIndexPublicationServiceTest.java",
+        "sha256": "36294455410b5b1dc70fa00d04d17f1d22d192639175a2d24a5ab9b5863eeb36"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/knowledge/index/KnowledgeIndexRollbackServiceTest.java",
+        "sha256": "eee33d037d1ab05dbb020da33136577e5d50de2c079fd3af2bc13fb99882dd5e"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/knowledge/index/LargeAmountPolicyFlowIntegrationTest.java",
+        "sha256": "67b8dbb1551cdcbda920bcdbce13e6a0590e984b28b6053dabce115ced33f079"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/knowledge/ingest/DocumentChunkerTest.java",
+        "sha256": "204767b916ae24777b3f86b6c47159f1eab780d4a9b647e276d115c3d9653ca5"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/knowledge/ingest/DocumentCleanerTest.java",
+        "sha256": "2169085a0d05322ea3e7f7a93f66e86d2e21ee644f54692dfc1347ccbf460169"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/knowledge/ingest/KnowledgeDynamicFactRejectionTest.java",
+        "sha256": "34b5c2039a30c3a8a4b06318851b793b7d610c1ba94e7be9757a55d4b9690a54"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/knowledge/ingest/KnowledgeIngestionServiceTest.java",
+        "sha256": "3286ce45e4f018864a1451060608f41fac09a3a4d4ec4798a0aac858e0911c3b"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/knowledge/qdrant/QdrantHttpClientTest.java",
+        "sha256": "718d01cc6026220da88d74b01c27d1187652650b88807d91877326c9c88401e8"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/knowledge/qdrant/QdrantVectorStoreIntegrationTest.java",
+        "sha256": "9b93794a898ead802c0ed70866ed848b6ea664dd01ac95e5487212e6129d1d13"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/knowledge/qdrant/QdrantVectorStoreTest.java",
+        "sha256": "20f92ccac328349e5326b47b51ebeb522466e96efa41780bed7e155b08e94dab"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/knowledge/retrieval/KnowledgeCitationValidatorTest.java",
+        "sha256": "a1ece937e79fc432a8a99c80e853b75253347c70b4f6e15703355aeae743cf8d"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/knowledge/retrieval/KnowledgeRetrievalServiceTest.java",
+        "sha256": "ea745abf9258415549bba73581290505681a1a72870bc2b39b32cdce7e5d07a8"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/model/adapter/openai/CompatibleChatModelGatewayTest.java",
+        "sha256": "89ecf9faf345283ed97c587e462c2bd71a42db8c45902e324d65a1234f74725f"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/model/validation/StructuredAnalysisParserTest.java",
+        "sha256": "8595adcf267fa0ba0e8f8e711476e918abacc1af9cab3f3695bee43087c7d361"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/port/PortContractTest.java",
+        "sha256": "fe6c018cb2937f5f8af9f1bd921874087cdf0c2291c19f9f4c8f195e49d5bd74"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/usage/ModelCostCalculatorTest.java",
+        "sha256": "b531b1f280394993e74b88021079e57d055e70abf23d492492c7afc7334540e3"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/usage/ModelUsageRecorderIntegrationTest.java",
+        "sha256": "197760b3d91907c0e36f409bc1d3c3f4bc0bfa4bd826dd331cc1d62390177d38"
+      },
+      {
+        "path": "src/test/java/com/finguard/copilot/usage/ModelUsageRecorderTest.java",
+        "sha256": "2f9c81176f4f0165a2669c8b2162373760787470983e170c08e78a1a6c647662"
+      },
+      {
+        "path": "src/test/resources/application.properties",
+        "sha256": "a265dd4644a3e7ed4496732171b5ad28c355da1c59b36129112af670679bcc35"
+      },
+      {
+        "path": "tools/agent-evaluation/.python-version",
+        "sha256": "7b55f8e67b5623c4bef3fa691288da9437d79d3aba156de48d481db32ac7d16d"
+      },
+      {
+        "path": "tools/agent-evaluation/README.md",
+        "sha256": "863c89488cce0db23e3a9192a9e7c05754c1adb9f6e4b60b57c77bb69a2f324c"
+      },
+      {
+        "path": "tools/agent-evaluation/data/phase3-golden.jsonl",
+        "sha256": "3f0a428a17572f279941e940397acc74f42c2276e1cdebf630a4eb84e3ef2ad7"
+      },
+      {
+        "path": "tools/agent-evaluation/data/phase3-holdout-v1.jsonl",
+        "sha256": "fefe25a73f3279c99480069b75e6f0319db4d354896d26117cfc37b4c63f6310"
+      },
+      {
+        "path": "tools/agent-evaluation/data/phase3-quality-v2.jsonl",
+        "sha256": "809080600c18407e0a86c39c45ef5304d10ecff6256ad829ea7fbe6c969db01d"
+      },
+      {
+        "path": "tools/agent-evaluation/data/phase4-holdout-v1.jsonl",
+        "sha256": "eb9146eb4c2325018b27963a2c62e0ce6a8847d00032a6fe3b91e325aaa5d3d2"
+      },
+      {
+        "path": "tools/agent-evaluation/data/phase4-worker-v2.jsonl",
+        "sha256": "a1aa55d0d29907a73d40ca3f1131464f418bbe0ca452cec7f6baa36fa555d420"
+      },
+      {
+        "path": "tools/agent-evaluation/data/phase4-worker-v3.jsonl",
+        "sha256": "8e63b6d2b76fde26c724815366c35038ec2e2e03277029207dc4826cf9ab006b"
+      },
+      {
+        "path": "tools/agent-evaluation/data/rag_cases.jsonl",
+        "sha256": "972b0e5c69b2823bfd3f3c591fdb3d233553a32eea7fb2be10ce62b58a7f03f5"
+      },
+      {
+        "path": "tools/agent-evaluation/pyproject.toml",
+        "sha256": "11837447c0c2727db7d2cb14709704782543ad75a5a0369efc7d76374551c551"
+      },
+      {
+        "path": "tools/agent-evaluation/src/finguard_agent_evaluation/__init__.py",
+        "sha256": "9d8644404e360bf2a15a169d42ab7122f6d63758d8c039a0547d6acb4026f510"
+      },
+      {
+        "path": "tools/agent-evaluation/src/finguard_agent_evaluation/dataset.py",
+        "sha256": "591abde21481a2f973e4c5da05027d61f6c3e769ea95edfec55bf52ac6f5eea0"
+      },
+      {
+        "path": "tools/agent-evaluation/src/finguard_agent_evaluation/diagnostic_v4.py",
+        "sha256": "0793edc56b94b43c5a35b55b894d06a986cc9eccb65b69477d2121edc64bacce"
+      },
+      {
+        "path": "tools/agent-evaluation/src/finguard_agent_evaluation/metrics.py",
+        "sha256": "9fba3cd9ea2aedf71b3513db284c3b47f9eefdbf7338b4249d387fe6e3a554c9"
+      },
+      {
+        "path": "tools/agent-evaluation/src/finguard_agent_evaluation/models.py",
+        "sha256": "257274e87a61f36b1b7646a72d763d135eb83190b62536babba32955d27c6d17"
+      },
+      {
+        "path": "tools/agent-evaluation/src/finguard_agent_evaluation/phase4_cli.py",
+        "sha256": "439dfa846da91dd6ce8d14699ef7f0447a22b091c4cb808a926f0d1459199cb7"
+      },
+      {
+        "path": "tools/agent-evaluation/src/finguard_agent_evaluation/phase4_holdout.py",
+        "sha256": "34b0fe6a1b51a915d1f1419efd9e141259051be9d948ec5153953780f92ae97a"
+      },
+      {
+        "path": "tools/agent-evaluation/src/finguard_agent_evaluation/phase4_judge.py",
+        "sha256": "7efa20521508f061e9f58536860370eb27ec968dbf6e6963f234c9d476c2caa0"
+      },
+      {
+        "path": "tools/agent-evaluation/src/finguard_agent_evaluation/phase4_provider_judge.py",
+        "sha256": "daddecc87676d9aabd564d2b263cce4c48647608f24445e836cdb510a1d942e0"
+      },
+      {
+        "path": "tools/agent-evaluation/src/finguard_agent_evaluation/phase4_reference.py",
+        "sha256": "661eec41dd1e5138239af6a0388aa810f6ffe3981388e46b92956332141d8313"
+      },
+      {
+        "path": "tools/agent-evaluation/src/finguard_agent_evaluation/phase4_reference_runner.py",
+        "sha256": "f84ab462a4223aee2aba5f900712171033aa2a6504acf04a76ba6471a2ed1f71"
+      },
+      {
+        "path": "tools/agent-evaluation/src/finguard_agent_evaluation/phase4_report.py",
+        "sha256": "0940e1ef8704827cf18b65521ece06c7cb3e3907a80dae5b256db5e2743cd132"
+      },
+      {
+        "path": "tools/agent-evaluation/src/finguard_agent_evaluation/phase4_rules.py",
+        "sha256": "c2f3cedf08db290a171340d072f32f81e8dfe23c64e5f272f6b0e01a3ed07559"
+      },
+      {
+        "path": "tools/agent-evaluation/src/finguard_agent_evaluation/phase4_worker_comparison.py",
+        "sha256": "25850f7856158b40949452bc4217eab41ccb5db3a6b516c02e98916761cb6c6a"
+      },
+      {
+        "path": "tools/agent-evaluation/src/finguard_agent_evaluation/rag_cases.py",
+        "sha256": "ddac1616e9cb97bce291835d1652a76c5fd6eede597ba208be2c86ed2605d98b"
+      },
+      {
+        "path": "tools/agent-evaluation/src/finguard_agent_evaluation/rag_metrics.py",
+        "sha256": "4f7efbd65039870f86c75f4f5424aac438668067b88a8436b7018fca53366467"
+      },
+      {
+        "path": "tools/agent-evaluation/src/finguard_agent_evaluation/report.py",
+        "sha256": "7d7aa9917757988c581f8aebded68dd27b12bb48739d62be7785b5630e33c677"
+      },
+      {
+        "path": "tools/agent-evaluation/src/finguard_agent_evaluation/runner.py",
+        "sha256": "f9c19d7d9f7eddc132e5180ae966dc55df4d35b9ac80791ee940a1637519147d"
+      },
+      {
+        "path": "tools/agent-evaluation/tests/test_business_e2e_plan.py",
+        "sha256": "15c0cc6b1bff4ba8ee4973f327541d2dfac6ab1a6ab722478793cfae6e49af9b"
+      },
+      {
+        "path": "tools/agent-evaluation/tests/test_business_e2e_redelivery.py",
+        "sha256": "82d10c7d32b09ea31066b3477d41c9eb2f2a03f0ccaa36f2c9e493bc3d9f388f"
+      },
+      {
+        "path": "tools/agent-evaluation/tests/test_business_e2e_stub.py",
+        "sha256": "1522b74e7a40f2a96ac77ea2178fa785fa3d4a16181c5cc769c4da79ee343194"
+      },
+      {
+        "path": "tools/agent-evaluation/tests/test_dataset.py",
+        "sha256": "8d619f037793a74d91462234cbd7c285811c6108776bec57325579e2f14fc048"
+      },
+      {
+        "path": "tools/agent-evaluation/tests/test_diagnostic_v4.py",
+        "sha256": "c12ab17aab11be7c8b77b17bd0b39f484855b3a8b9a8b6c0f448aca25c6c7bff"
+      },
+      {
+        "path": "tools/agent-evaluation/tests/test_holdout_dataset.py",
+        "sha256": "2dfae38d455af7ad7b6e7d20c591ba9ef7591c7965f0f128539017153d4af39c"
+      },
+      {
+        "path": "tools/agent-evaluation/tests/test_metrics.py",
+        "sha256": "ff4a26bf1a890b41034b6300264515c3b6cb492119c31ef95313aebd8c6b0e09"
+      },
+      {
+        "path": "tools/agent-evaluation/tests/test_model_environment.py",
+        "sha256": "39a0cff112fe86bd0da5860c96a88561fa86897629f77a104ec8214c5cf2b869"
+      },
+      {
+        "path": "tools/agent-evaluation/tests/test_phase3_dataset.py",
+        "sha256": "cad79c3dfc9786c0c13d423f2edc3aebea4f368f52bfa90c31d588f4b88c88b6"
+      },
+      {
+        "path": "tools/agent-evaluation/tests/test_phase4_cli.py",
+        "sha256": "8d8b11dad0d28563cdbb84742d1f799caa17fc18d5e5ac043d10523d85a02c26"
+      },
+      {
+        "path": "tools/agent-evaluation/tests/test_phase4_holdout_dataset.py",
+        "sha256": "7d443c6e8c3540e5c3d07c466bd5d7a05665d0fb21d0eb5120376db79c4a7c99"
+      },
+      {
+        "path": "tools/agent-evaluation/tests/test_phase4_judge.py",
+        "sha256": "8d802c0992dd0d6115f84512ad7161314458924b82d8f0d45ba195298cd494c0"
+      },
+      {
+        "path": "tools/agent-evaluation/tests/test_phase4_provider_judge.py",
+        "sha256": "5ac4a865c02dbc091a2840f22dc97476720c0d77fe6e74262f7d626e342067ec"
+      },
+      {
+        "path": "tools/agent-evaluation/tests/test_phase4_reference.py",
+        "sha256": "b5efb78393434badedf82c4f0084fd5bab0117dfde69a1eff6acf3c0d66529ae"
+      },
+      {
+        "path": "tools/agent-evaluation/tests/test_phase4_reference_runner.py",
+        "sha256": "5a5d020e5a8e7877fbd651bfbe953d3a346dff20789cc592bc0c03e463ea9165"
+      },
+      {
+        "path": "tools/agent-evaluation/tests/test_phase4_report.py",
+        "sha256": "5720df7189eb6f8b2cc82ab5e45a142353477f821446b20a97e71e1351c091da"
+      },
+      {
+        "path": "tools/agent-evaluation/tests/test_phase4_rules.py",
+        "sha256": "020239ba30da7cff370a451b82d75af713b8839f2b88958730d8d2e3f1a2a7b5"
+      },
+      {
+        "path": "tools/agent-evaluation/tests/test_phase4_worker_comparison.py",
+        "sha256": "14a1daa3bf1158066d6bedf0db1669c1b6bd6c6b008bc57d0fee8dd65f6b2c34"
+      },
+      {
+        "path": "tools/agent-evaluation/tests/test_quality_contract.py",
+        "sha256": "62412e18a498c25c905bc9c60b41d0b7b0beac53bd3b616c8ce760b7c32daaa1"
+      },
+      {
+        "path": "tools/agent-evaluation/tests/test_rag_metrics.py",
+        "sha256": "f65743b511031711d02785aee08c03031bc4e24e182cf1a7a972ad14343638d0"
+      },
+      {
+        "path": "tools/agent-evaluation/tests/test_report.py",
+        "sha256": "96ad11ec3e56bb0f720a59b18d00b16d2b5116684da36e35a86e8cffa1b22729"
+      },
+      {
+        "path": "tools/agent-evaluation/tests/test_runner.py",
+        "sha256": "e3822283cea7c12d3e26c12803bc1f520d2949cbe088e4ae84c517a70fe65887"
+      },
+      {
+        "path": "tools/agent-evaluation/uv.lock",
+        "sha256": "c0a23c2c2d0a9f5a1527a5cb3a56f37f5a873835ddc98a35fb9376114882c7b8"
+      }
+    ]
+  },
+  "documents": [
+    {
+      "path": "TASKS.md",
+      "sha256": "500906440bb6f3934ab2dfef7691954d22d9f7ad635a5af2ad40b824f7005ce9"
+    },
+    {
+      "path": "README.md",
+      "sha256": "9f968e5ab0e7cc4b09ce5f5fb69be8211e92f7f819da77a904280e18c82bcf72"
+    },
+    {
+      "path": "docs/ARCHITECTURE.md",
+      "sha256": "bf11cd0403086a7c512c1c7d4a0b28d7c42e3ebf5c0f5e8e37997c02555a7ad2"
+    },
+    {
+      "path": "docs/DEPENDENCIES.md",
+      "sha256": "aa13175e395d3e8e500f824275dc678e800f29cd445a795d38fa0831ce360269"
+    },
+    {
+      "path": "docs/PHASE4_TASK_PLAN.md",
+      "sha256": "58d7268044a8f63b04c7512edd861adc7906b56f625bd500da1f63343456fbb7"
+    },
+    {
+      "path": "docs/contracts/phase4-3-call-budget-v1.md",
+      "sha256": "fc88ce8651debfd9f35b63ef41fed5c35dd902a04604fab51ff083dc8a530feb"
+    },
+    {
+      "path": "docs/contracts/phase4-3-deepseek-input-bound-v1.md",
+      "sha256": "5fcae03e1e9252feb44dd88429d89d98e1277cfea9b52c34f79114be64e45e6c"
+    },
+    {
+      "path": "docs/adr/0012-phase4-call-reservation-and-budget.md",
+      "sha256": "6c7c24551339df6246f65ca108ad5b7063282b09376696e98bb73e15105705bf"
+    },
+    {
+      "path": "docs/operations/phase4-3-governance.md",
+      "sha256": "0cdd705cdd34f88096403f92c1fb3bf38285294c2ad6f97c5bd22953f4302c07"
+    },
+    {
+      "path": "docs/superpowers/plans/2026-11-02-p4-3-governance.md",
+      "sha256": "600f61ea96f6c67d1729763a20cca23bc9c676a7bc309c59639340d0d2e569d2"
+    },
+    {
+      "path": "docs/acceptance/2026-11-02-p4-3-governance.md",
+      "sha256": "9f615c294715860a8e4e2ef739f586dd31b15f20c0dffa34849418b820ae0d57"
+    },
+    {
+      "path": "docs/acceptance/p4-3-governance/budget.json",
+      "sha256": "ff435e7adf58a2cfcf7bbc419117db0e0fc769628b1d37572ac8b2ab141c9cc0"
+    },
+    {
+      "path": "docs/acceptance/p4-3-governance/expenses.json",
+      "sha256": "04e38efe8c46fc4bddd243ae358ea436c300cd4210a4e8370316515b718e42e8"
+    },
+    {
+      "path": "docs/acceptance/p4-3-governance/fact.json",
+      "sha256": "ad4bdf7a0c85e0a7794f29892d9fc5f473ab470406a29f7353c942fdbd712427"
+    },
+    {
+      "path": "docs/acceptance/p4-3-governance/first-real-before-correlation.json",
+      "sha256": "ed5b0d58a44ad0c6e5c50a3687e2561a3214adbfe31cd5f247f7d6cf014eeded"
+    },
+    {
+      "path": "docs/acceptance/p4-3-governance/missing.json",
+      "sha256": "6adf2ad1788987d501435e38675ed97cf53e998bfc0ae04274fef3ebc2f6842f"
+    },
+    {
+      "path": "docs/acceptance/p4-3-governance/normal.json",
+      "sha256": "ce9127e90785ef5ab16a3f2d6debc2a9622a6604cdeb6868ff7aaddcdbda5b4c"
+    },
+    {
+      "path": "docs/acceptance/p4-3-governance/policy.json",
+      "sha256": "a04cf672f51be46717886f61fc2a82ffacd8522502942c2536c6aee93d84eda0"
+    },
+    {
+      "path": "docs/acceptance/p4-3-governance/real.json",
+      "sha256": "55037bd041e0eb23ab847e49468212bfc6921da3ba729ccb65242d43d747ad95"
+    },
+    {
+      "path": "docs/acceptance/p4-3-governance/redis.json",
+      "sha256": "6882af7d20d05791f214f02ec8a5f4309256b0b41be3250fc52516b9a2657f1d"
+    },
+    {
+      "path": "docs/acceptance/p4-3-governance/test-evidence.json",
+      "sha256": "4af6ebdba3fac9fef2b892f23950fa33bf2c7bd79bcac6e32c7f9321fae1030c"
+    }
+  ],
+  "jars": {
+    "copilot": {
+      "sha256": "591f6e0d37724128df146a6f6d82033546b4a65d1833de064354e27cef15ab5a",
+      "localPath": "C:\\Users\\王俊凯\\.codex\\worktrees\\phase4-first-batch\\finguard-copilot\\target\\finguard-copilot-0.0.1-SNAPSHOT.jar"
+    },
+    "core": {
+      "sha256": "40dba283f5fdbbd38e0c6b55761718689c000ffa82f21e0262a3b5a384549b08",
+      "localPath": "C:\\dev\\worktrees\\finguard-core-phase1\\target\\finguard-core-0.0.1-SNAPSHOT.jar"
+    }
+  },
+  "smokeRuns": {
+    "normal": {
+      "runId": "20261102191322",
+      "path": "docs/acceptance/p4-3-governance/normal.json",
+      "sha256": "ce9127e90785ef5ab16a3f2d6debc2a9622a6604cdeb6868ff7aaddcdbda5b4c",
+      "checks": 26,
+      "calls": 1,
+      "analysisStatus": "SUCCEEDED"
+    },
+    "policy": {
+      "runId": "20261102191424",
+      "path": "docs/acceptance/p4-3-governance/policy.json",
+      "sha256": "a04cf672f51be46717886f61fc2a82ffacd8522502942c2536c6aee93d84eda0",
+      "checks": 26,
+      "calls": 1,
+      "analysisStatus": "FAILED"
+    },
+    "fact": {
+      "runId": "20261102191539",
+      "path": "docs/acceptance/p4-3-governance/fact.json",
+      "sha256": "ad4bdf7a0c85e0a7794f29892d9fc5f473ab470406a29f7353c942fdbd712427",
+      "checks": 26,
+      "calls": 1,
+      "analysisStatus": "FAILED"
+    },
+    "missing": {
+      "runId": "20261102191644",
+      "path": "docs/acceptance/p4-3-governance/missing.json",
+      "sha256": "6adf2ad1788987d501435e38675ed97cf53e998bfc0ae04274fef3ebc2f6842f",
+      "checks": 26,
+      "calls": 1,
+      "analysisStatus": "FAILED"
+    },
+    "budget": {
+      "runId": "20261102191749",
+      "path": "docs/acceptance/p4-3-governance/budget.json",
+      "sha256": "ff435e7adf58a2cfcf7bbc419117db0e0fc769628b1d37572ac8b2ab141c9cc0",
+      "checks": 24,
+      "calls": 0,
+      "analysisStatus": "FAILED"
+    },
+    "redis": {
+      "runId": "20261102191854",
+      "path": "docs/acceptance/p4-3-governance/redis.json",
+      "sha256": "6882af7d20d05791f214f02ec8a5f4309256b0b41be3250fc52516b9a2657f1d",
+      "checks": 24,
+      "calls": 0,
+      "analysisStatus": "FAILED"
+    },
+    "real": {
+      "runId": "20261102192517",
+      "path": "docs/acceptance/p4-3-governance/real.json",
+      "sha256": "55037bd041e0eb23ab847e49468212bfc6921da3ba729ccb65242d43d747ad95",
+      "checks": 24,
+      "calls": 1,
+      "analysisStatus": "SUCCEEDED"
+    }
+  },
+  "remaining": [
+    "real human Judge calibration",
+    "real embeddings and broad RAG quality",
+    "qualified real fallback",
+    "reference N319/N321 misses",
+    "production deployment/scale acceptance",
+    "P4-4 traces and unified unknown-call metrics"
+  ]
+}

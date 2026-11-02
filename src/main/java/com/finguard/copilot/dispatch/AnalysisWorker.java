@@ -215,7 +215,17 @@ public class AnalysisWorker {
         ModelPreflight preflight;
         try {
             preflight = transactions.execute(status -> prepareModelCall(message));
+        } catch (CopilotException rejected) {
+            if(orchestrator.managesModelReservation()) return recoverUnownedPreparation(message,attempt,rejected.code().name(),
+                    rejected.code()!=ErrorCode.FACT_VALIDATION_FAILED && rejected.code()!=ErrorCode.OUTPUT_SCHEMA_INVALID && rejected.code()!=ErrorCode.MODEL_OUTPUT_INVALID);
+            if(rejected.code()==ErrorCode.FACT_VALIDATION_FAILED || rejected.code()==ErrorCode.OUTPUT_SCHEMA_INVALID
+                    || rejected.code()==ErrorCode.MODEL_OUTPUT_INVALID) {
+                transactions.executeWithoutResult(status->markDeterministicFailure(message,rejected.code().name(),now()));
+                return WorkerOutcome.FAILED_GUARDRAIL;
+            }
+            return recoverAfterWorkerFailure(message,attempt,false);
         } catch (RuntimeException exception) {
+            if(orchestrator.managesModelReservation()) return recoverUnownedPreparation(message,attempt,"MODEL_PREPARATION_UNAVAILABLE",true);
             return recoverAfterWorkerFailure(message, attempt, false);
         }
         if (preflight == null) {
@@ -226,8 +236,11 @@ public class AnalysisWorker {
         }
         boolean newlyReserved;
         try {
-            newlyReserved = reservations.reserve(message.analysisId(), now());
+            newlyReserved = orchestrator.managesModelReservation()
+                    ? reservations.reservedAt(message.analysisId()).isEmpty()
+                    : reservations.reserve(message.analysisId(), now());
         } catch (RuntimeException exception) {
+            if(orchestrator.managesModelReservation()) return recoverUnownedPreparation(message,attempt,"MODEL_PREPARATION_UNAVAILABLE",true);
             return recoverAfterWorkerFailure(message, attempt, false);
         }
         if (!newlyReserved) {
@@ -236,6 +249,12 @@ public class AnalysisWorker {
         AnalysisExecution execution;
         try {
             execution = orchestrator.execute(message.analysisId(), preflight.snapshot());
+        } catch (com.finguard.copilot.governance.AnalysisAdmissionClosedException closed) {
+            return WorkerOutcome.NOOP;
+        } catch (com.finguard.copilot.governance.ExistingModelCallException existing) {
+            return dispositionForReservedCall(message,attempt);
+        } catch (com.finguard.copilot.governance.ClaimedCallNotSentException notSent) {
+            return terminalModelDisposition(message,notSent.code().name());
         } catch (ModelInvocationException exception) {
             try {
                 recordFailure(message.analysisId(), exception);
@@ -243,8 +262,17 @@ public class AnalysisWorker {
                 LOG.warn("model failure usage could not be recorded for analysis {}: {}",
                         message.analysisId(), ledgerFailure.getClass().getSimpleName());
             }
-            return terminalModelDisposition(message, exception.errorCode().name());
+            return terminalModelDisposition(message, exception.errorCode().name(),exception.usage());
+        } catch (CopilotException exception) {
+            if(orchestrator.managesModelReservation()) return recoverUnownedPreparation(message,attempt,exception.code().name(),
+                    exception.code()==ErrorCode.MODEL_CAPACITY_UNAVAILABLE);
+            if(exception.code()==ErrorCode.MODEL_CONFIGURATION_INVALID || exception.code()==ErrorCode.MODEL_BUDGET_EXCEEDED)
+                return terminalModelDisposition(message,exception.code().name());
+            if(exception.code()==ErrorCode.MODEL_CAPACITY_UNAVAILABLE)
+                return terminalModelDisposition(message,exception.code().name());
+            return terminalModelDisposition(message,"MODEL_CALL_OUTCOME_UNKNOWN");
         } catch (RuntimeException exception) {
+            if(orchestrator.managesModelReservation()) return recoverUnownedPreparation(message,attempt,"MODEL_PREPARATION_UNAVAILABLE",true);
             LOG.warn("reserved model execution failed for analysis {}: {}",
                     message.analysisId(), exception.getClass().getSimpleName());
             return terminalModelDisposition(message, "MODEL_CALL_OUTCOME_UNKNOWN");
@@ -260,12 +288,15 @@ public class AnalysisWorker {
                 LOG.warn("rejected model usage could not be recorded for analysis {}: {}",
                         message.analysisId(), ledgerFailure.getClass().getSimpleName());
             }
+            // A usage write can roll back while the provider has already charged.
+            // Persist that uncertainty before making the failure/receipt final.
+            orchestrator.modelCallOutcomeUnknown(message.analysisId(),execution.usage());
             try {
                 transactions.executeWithoutResult(status ->
                         markDeterministicFailure(message, ErrorCode.FACT_VALIDATION_FAILED.name(), now()));
                 return WorkerOutcome.FAILED_GUARDRAIL;
             } catch (RuntimeException persistenceFailure) {
-                return terminalModelDisposition(message, "MODEL_CALL_OUTCOME_UNKNOWN");
+                return terminalModelDisposition(message, "MODEL_CALL_OUTCOME_UNKNOWN",execution.usage());
             }
         }
         try {
@@ -273,8 +304,35 @@ public class AnalysisWorker {
             WorkerOutcome outcome = transactions.execute(status -> finishModelCall(message, validated));
             return outcome == null ? WorkerOutcome.NOOP : outcome;
         } catch (RuntimeException exception) {
-            return terminalModelDisposition(message, "MODEL_CALL_OUTCOME_UNKNOWN");
+            return terminalModelDisposition(message, "MODEL_CALL_OUTCOME_UNKNOWN",execution.usage());
         }
+    }
+
+    private WorkerOutcome recoverUnownedPreparation(AnalysisRequestedMessage message,int attempt,String failureCode,boolean retryable) {
+        if(retryable && attempt<properties.dispatch().workerMaxAttempts()) {
+            try {
+                if(reservations.reservedAt(message.analysisId()).isPresent()) return dispositionForReservedCall(message,attempt);
+                publishWithConfirm(RabbitTopologyConfiguration.RETRY_EXCHANGE,message,attempt+1);
+                return WorkerOutcome.RETRIED;
+            } catch(RuntimeException unavailable) { /* The locked terminal decision below remains safe. */ }
+        }
+        try {
+            WorkerOutcome decision=transactions.execute(status->{
+                var work=runs.findForWork(message.analysisId()).orElse(null);
+                if(work==null) return WorkerOutcome.NOOP;
+                if(stateMachine.isTerminal(work.status())) {
+                    if(!runs.hasReceipt(message.eventId())) insertReceipt(message,now());
+                    return WorkerOutcome.NOOP;
+                }
+                // Same analysis lock and current slot read as budget admission.
+                // Never make another worker's active call terminal.
+                if(reservations.reservedAt(message.analysisId()).isPresent()) return null;
+                publishWithConfirm(RabbitTopologyConfiguration.DLX_EXCHANGE,message,attempt);
+                markRetryExhausted(message,failureCode);
+                return WorkerOutcome.DEAD_LETTERED;
+            });
+            return decision==null?dispositionForReservedCall(message,attempt):decision;
+        } catch(RuntimeException unavailable) {return WorkerOutcome.PUBLISH_FAILED;}
     }
 
     private ModelPreflight prepareModelCall(AnalysisRequestedMessage message) {
@@ -294,6 +352,7 @@ public class AnalysisWorker {
         if (work.resultJson() != null && !work.resultJson().isBlank()) {
             AnalysisResult stored = schemaValidator.validate(work.resultJson());
             factValidator.validate(message.analysisId(), snapshot, stored);
+            orchestrator.validateStoredResult(snapshot,stored);
             completeForwardTransitions(message.analysisId(), work.status(), now);
             insertReceipt(message, now);
             return new ModelPreflight(null, WorkerOutcome.COMPLETED_FROM_STORED_RESULT);
@@ -321,7 +380,10 @@ public class AnalysisWorker {
     private WorkerOutcome dispositionForReservedCall(AnalysisRequestedMessage message, int attempt) {
         Instant reservedAt = reservations.reservedAt(message.analysisId())
                 .orElseThrow(() -> new IllegalStateException("model call reservation vanished"));
-        if (now().isBefore(reservedAt.plus(properties.model().timeout()).plusSeconds(30))) {
+        var recoveryWindow=properties.model().timeout().multipliedBy(2).plusSeconds(30);
+        long maximumProbes=Math.max(properties.dispatch().workerMaxAttempts(),
+                recoveryWindow.toMillis()/RabbitTopologyConfiguration.RETRY_QUEUE_TTL.toMillis()+3);
+        if (attempt<maximumProbes && now().isBefore(reservedAt.plus(recoveryWindow))) {
             try {
                 publishWithConfirm(RabbitTopologyConfiguration.RETRY_EXCHANGE, message, attempt + 1);
                 return WorkerOutcome.RETRIED;
@@ -336,6 +398,11 @@ public class AnalysisWorker {
     }
 
     private WorkerOutcome terminalModelDisposition(AnalysisRequestedMessage message, String failureCode) {
+        return terminalModelDisposition(message,failureCode,null);
+    }
+    private WorkerOutcome terminalModelDisposition(AnalysisRequestedMessage message,String failureCode,com.finguard.copilot.model.port.ModelUsage usage) {
+        if(usage==null) orchestrator.modelCallOutcomeUnknown(message.analysisId());
+        else orchestrator.modelCallOutcomeUnknown(message.analysisId(),usage);
         boolean dlqConfirmed = true;
         try {
             publishWithConfirm(RabbitTopologyConfiguration.DLX_EXCHANGE, message, 1);
@@ -400,6 +467,7 @@ public class AnalysisWorker {
             if (work.resultJson() != null && !work.resultJson().isBlank()) {
                 AnalysisResult stored = schemaValidator.validate(work.resultJson());
                 factValidator.validate(message.analysisId(), snapshot, stored);
+                orchestrator.validateStoredResult(snapshot,stored);
                 completeForwardTransitions(message.analysisId(), work.status(), now);
                 insertReceipt(message, now);
                 return WorkerOutcome.COMPLETED_FROM_STORED_RESULT;

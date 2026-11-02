@@ -50,7 +50,7 @@ REVIEWER 携带 Core JWT 和 reviewTaskId 创建分析
 ```text
 POST /api/copilot/review-analyses
 GET  /api/copilot/review-analyses/{analysisId}
-POST /api/copilot/review-analyses/{analysisId}/feedback
+PUT  /api/copilot/review-analyses/{analysisId}/feedback
 ```
 
 创建分析使用异步语义：身份验证和 Core 上下文捕获成功后返回 `202 Accepted` 与
@@ -113,7 +113,7 @@ production-like 部署按路线图继续增加，不伪装成 MVP 已完成能�
   Prompt。
 - Copilot 不共享 Core 的 JWT 签名密钥。身份与角色由 Core 的 `/api/auth/me` 确认。
 - 异步模型任务开始前，Copilot 已同步捕获必要的脱敏事实快照，随后丢弃 JWT。
-- 事实快照只包含生成解释所需的最少字段，使用独立数据表/JSON 列保存，默认保留 30 天；
+- 事实快照只包含生成解释所需的最少字段，使用独立数据表的精确 JSON 文本列保存（V8，保留 JSON_VALID 约束），默认保留 30 天；
   原始 CSV、密码、密钥和完整账户资料不得复制。
 - 用户问题和知识文档都视为不可信数据，不能覆盖系统指令或工具策略。
 - 日志不得记录完整 Prompt、JWT、模型密钥或未脱敏事实快照。

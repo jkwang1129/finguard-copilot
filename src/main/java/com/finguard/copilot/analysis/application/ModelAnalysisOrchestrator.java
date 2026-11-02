@@ -17,6 +17,11 @@ import com.finguard.copilot.common.error.ErrorCode;
 import com.finguard.copilot.config.CopilotProperties;
 import com.finguard.copilot.context.ContextAssembler;
 import com.finguard.copilot.context.FactSnapshot;
+import com.finguard.copilot.guardrail.NumericThresholdGuard;
+import com.finguard.copilot.guardrail.ReviewedPolicyGuard;
+import com.finguard.copilot.guardrail.CoreLargeAmountFactGuard;
+import com.finguard.copilot.guardrail.CoreLargeAmountPolicyGuard;
+import com.finguard.copilot.guardrail.UntrustedInstructionGuard;
 import com.finguard.copilot.model.port.ModelGateway;
 import com.finguard.copilot.model.port.ModelRequest;
 import com.finguard.copilot.model.port.ModelResponse;
@@ -33,6 +38,10 @@ public final class ModelAnalysisOrchestrator implements AnalysisOrchestrator {
         return true;
     }
 
+    @Override public boolean managesModelReservation() {return preflight!=null && preflight.managesReservation();}
+    @Override public void modelCallOutcomeUnknown(UUID id) {if(preflight!=null) preflight.outcomeUnknown(id);}
+    @Override public void modelCallOutcomeUnknown(UUID id,ModelUsage usage) {if(preflight!=null) preflight.outcomeUnknown(id,usage);}
+
     private static final org.slf4j.Logger LOG = org.slf4j.LoggerFactory.getLogger(ModelAnalysisOrchestrator.class);
 
     private static final String OUTPUT_SCHEMA_RESOURCE = "/schema/analysis-output-v1.schema.json";
@@ -45,7 +54,10 @@ public final class ModelAnalysisOrchestrator implements AnalysisOrchestrator {
     private final CopilotProperties.Budget budget;
     private final KnowledgeRetrievalService retrievalService;
     private final int retrievalTopK;
+    private final NumericThresholdGuard numericThresholdGuard;
+    private final ReviewedPolicyGuard reviewedPolicyGuard;
     private final String outputSchemaJson;
+    private final com.finguard.copilot.governance.ModelCallPreflight preflight;
 
     public ModelAnalysisOrchestrator(
             ModelGateway modelGateway,
@@ -66,6 +78,35 @@ public final class ModelAnalysisOrchestrator implements AnalysisOrchestrator {
             KnowledgeRetrievalService retrievalService,
             int retrievalTopK
     ) {
+        this(modelGateway, contextAssembler, parser, model, budget, retrievalService, retrievalTopK,
+                new NumericThresholdGuard(List.of()));
+    }
+
+    public ModelAnalysisOrchestrator(
+            ModelGateway modelGateway,
+            ContextAssembler contextAssembler,
+            StructuredAnalysisParser parser,
+            CopilotProperties.Model model,
+            CopilotProperties.Budget budget,
+            KnowledgeRetrievalService retrievalService,
+            int retrievalTopK,
+            NumericThresholdGuard numericThresholdGuard
+    ) {
+        this(modelGateway,contextAssembler,parser,model,budget,retrievalService,retrievalTopK,numericThresholdGuard,
+                new ReviewedPolicyGuard(List.of()));
+    }
+
+    public ModelAnalysisOrchestrator(ModelGateway modelGateway,ContextAssembler contextAssembler,
+            StructuredAnalysisParser parser,CopilotProperties.Model model,CopilotProperties.Budget budget,
+            KnowledgeRetrievalService retrievalService,int retrievalTopK,NumericThresholdGuard numericThresholdGuard,
+            ReviewedPolicyGuard reviewedPolicyGuard) {
+        this(modelGateway,contextAssembler,parser,model,budget,retrievalService,retrievalTopK,numericThresholdGuard,reviewedPolicyGuard,null);
+    }
+
+    public ModelAnalysisOrchestrator(ModelGateway modelGateway,ContextAssembler contextAssembler,
+            StructuredAnalysisParser parser,CopilotProperties.Model model,CopilotProperties.Budget budget,
+            KnowledgeRetrievalService retrievalService,int retrievalTopK,NumericThresholdGuard numericThresholdGuard,
+            ReviewedPolicyGuard reviewedPolicyGuard,com.finguard.copilot.governance.ModelCallPreflight preflight) {
         this.modelGateway = Objects.requireNonNull(modelGateway, "modelGateway must not be null");
         this.contextAssembler = Objects.requireNonNull(contextAssembler, "contextAssembler must not be null");
         this.parser = Objects.requireNonNull(parser, "parser must not be null");
@@ -76,7 +117,12 @@ public final class ModelAnalysisOrchestrator implements AnalysisOrchestrator {
             throw new IllegalArgumentException("retrievalTopK must be positive");
         }
         this.retrievalTopK = retrievalTopK;
+        this.numericThresholdGuard = Objects.requireNonNull(numericThresholdGuard, "numericThresholdGuard must not be null");
+        this.reviewedPolicyGuard = Objects.requireNonNull(reviewedPolicyGuard);
+        if(reviewedPolicyGuard.ruleCodes().stream().anyMatch(numericThresholdGuard.ruleCodes()::contains))
+            throw new IllegalArgumentException("one rule cannot have multiple directional authority types");
         this.outputSchemaJson = loadOutputSchema();
+        this.preflight=preflight;
     }
 
     @Override
@@ -88,7 +134,14 @@ public final class ModelAnalysisOrchestrator implements AnalysisOrchestrator {
     public AnalysisExecution execute(UUID analysisId, FactSnapshot snapshot) {
         Objects.requireNonNull(analysisId, "analysisId must not be null");
         Objects.requireNonNull(snapshot, "snapshot must not be null");
-        List<KnowledgeEvidence> evidence = retrievePolicyEvidence(snapshot);
+        KnowledgeRetrievalService.RetrievalBatch batch=null;
+        if(preflight!=null) {
+            if(retrievalService==null) throw com.finguard.copilot.governance.RunManifestService.rejected("published index retrieval unavailable");
+            try {
+                batch=retrievalService.retrieveBatch(snapshot.facts().reviewTask().ruleCode()+" "+snapshot.facts().reviewTask().reasonCode(),retrievalTopK);
+            } catch(KnowledgeRetrievalException e) {throw com.finguard.copilot.governance.RunManifestService.rejected("published index retrieval failed");}
+        }
+        List<KnowledgeEvidence> evidence = batch==null?retrievePolicyEvidence(snapshot):batch.evidence();
         ContextAssembler.AssembledContext assembled = retrievalService == null
                 ? contextAssembler.assemble(snapshot.facts(), List.of(), defaultReviewerInput(snapshot))
                 : contextAssembler.assembleRetrieved(snapshot.facts(), evidence, defaultReviewerInput(snapshot));
@@ -103,6 +156,10 @@ public final class ModelAnalysisOrchestrator implements AnalysisOrchestrator {
                 0d,
                 promptVersion,
                 modelConfigurationVersion);
+        if(preflight!=null) {
+            request=preflight.prepare(analysisId,snapshot,request,assembled.retainedEvidence(),batch.indexVersion());
+            modelConfigurationVersion=request.modelConfigurationVersion();
+        }
         ModelResponse response;
         Instant started = Instant.now();
         try {
@@ -113,6 +170,8 @@ public final class ModelAnalysisOrchestrator implements AnalysisOrchestrator {
         } catch (RuntimeException exception) {
             throw failure(ErrorCode.MODEL_UNAVAILABLE, modelConfigurationVersion, promptVersion,
                     new ModelUsage(0, 0, elapsedSince(started)), "FAILURE");
+        } finally {
+            if(preflight!=null) preflight.afterCall(analysisId);
         }
         if (response == null) {
             throw failure(ErrorCode.MODEL_OUTPUT_INVALID, modelConfigurationVersion, promptVersion,
@@ -125,13 +184,41 @@ public final class ModelAnalysisOrchestrator implements AnalysisOrchestrator {
                 throw new CopilotException(ErrorCode.MODEL_OUTPUT_INVALID,
                         "model output analysis id does not match request");
             }
-            validateKnowledgeCitations(result, assembled);
+            validatePolicy(snapshot,result,assembled);
             return new AnalysisExecution(result, response.provider(), modelConfigurationVersion,
                     assembled.promptVersion(), response.usage());
         } catch (CopilotException exception) {
             LOG.warn("Model result rejected: code={}, reason={}", exception.code(), exception.getMessage());
             throw failure(exception.code(), modelConfigurationVersion, promptVersion,
                     response.usage(), "FAILURE");
+        }
+    }
+
+    @Override
+    public void validateStoredResult(FactSnapshot snapshot,AnalysisResult result) {
+        Objects.requireNonNull(snapshot);Objects.requireNonNull(result);
+        // Worker has already checked schema and immutable facts. A citation-free refusal
+        // makes no directional or policy claim and requires no live knowledge service.
+        if(result.recommendation()==AnalysisRecommendation.INSUFFICIENT_EVIDENCE && result.policyCitations().isEmpty()) return;
+        var evidence=retrievePolicyEvidence(snapshot);
+        var assembled=contextAssembler.assembleRetrieved(snapshot.facts(),evidence,defaultReviewerInput(snapshot));
+        validatePolicy(snapshot,result,assembled);
+    }
+
+    private void validatePolicy(FactSnapshot snapshot,AnalysisResult result,ContextAssembler.AssembledContext assembled) {
+        validateKnowledgeCitations(result,assembled);
+        new UntrustedInstructionGuard().validate(assembled.sections().get("reviewerInput"),assembled.retainedEvidence(),result.recommendation());
+        new CoreLargeAmountFactGuard().validate(snapshot.facts(),result.recommendation());
+        new CoreLargeAmountPolicyGuard().validate(snapshot.facts(),result,assembled.retainedEvidence());
+        if(result.recommendation()==AnalysisRecommendation.INSUFFICIENT_EVIDENCE) return;
+        String rule=snapshot.facts().reviewTask().ruleCode();
+        if(rule==null) throw new CopilotException(ErrorCode.FACT_VALIDATION_FAILED,"directional output requires a reviewed rule");
+        if("LARGE_AMOUNT".equals(rule)) {
+            if(assembled.retainedEvidence().size()!=1) throw new CopilotException(ErrorCode.FACT_VALIDATION_FAILED,"unreviewed additional Core policy evidence");
+        } else if(numericThresholdGuard.ruleCodes().contains(rule)) {
+            numericThresholdGuard.validate(snapshot.facts(),result,assembled.retainedEvidence());
+        } else {
+            reviewedPolicyGuard.validate(snapshot.facts(),result,assembled.retainedEvidence());
         }
     }
 

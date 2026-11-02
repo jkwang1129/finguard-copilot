@@ -55,6 +55,26 @@ class SnapshotCodecTest {
     }
 
     @Test
+    void exactDecimalCanonicalBytesAndLegacyNumericSnapshotStillVerify() throws Exception {
+        byte[] legacy=EXPECTED_CANONICAL_JSON.getBytes(StandardCharsets.UTF_8);
+        byte[] legacyHash=MessageDigest.getInstance("SHA-256").digest(legacy);
+        var facts=codec.decodeAndVerify(legacy,legacyHash);
+        var legacySnapshot=new FactSnapshot(1,facts,facts.capturedAt(),facts.capturedAt().plus(Duration.ofDays(30)),legacyHash);
+        assertThat(codec.canonicalBytes(legacySnapshot)).isEqualTo(legacy);
+        var transaction=facts.transaction();
+        var precise=new ReviewTaskContext(facts.reviewTask(),new ReviewTaskContext.Transaction(transaction.id(),transaction.accountId(),
+                new BigDecimal("99.999999999999999999"),transaction.currency(),transaction.occurredAt(),transaction.sourceType()),
+                facts.reconciliation(),facts.riskFacts(),facts.accountSummary(),facts.capturedAt());
+        var snapshot=codec.capture(precise);
+        assertThat(new String(codec.canonicalBytes(snapshot),StandardCharsets.UTF_8))
+                .contains("\"amount\":99.999999999999999999");
+        assertThat(codec.decodeAndVerify(codec.canonicalBytes(snapshot),snapshot.sha256()).transaction().amount())
+                .isEqualByComparingTo("99.999999999999999999");
+        assertThatThrownBy(()->codec.decodeAndVerify(EXPECTED_CANONICAL_JSON.replace("120000","120001")
+                .getBytes(StandardCharsets.UTF_8),legacyHash)).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
     void captureUsesSchemaOneAndExpiresExactlyThirtyDaysAfterCapture() {
         FactSnapshot snapshot = codec.capture(context(List.of(
                 new RiskFact("A_CODE", "A_VALUE", "RULE")

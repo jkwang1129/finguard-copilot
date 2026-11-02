@@ -48,6 +48,7 @@ public final class ModelUsageRecorder {
     private final ModelCostCalculator.PriceTable priceTable;
     private final Clock clock;
     private final MeterRegistry meterRegistry;
+    private final com.finguard.copilot.governance.BudgetReservations budgets;
 
     public ModelUsageRecorder(JdbcTemplate jdbc, ModelCostCalculator.PriceTable priceTable) {
         this(jdbc, new TransactionTemplate(new DataSourceTransactionManager(jdbc.getDataSource())),
@@ -61,12 +62,18 @@ public final class ModelUsageRecorder {
             Clock clock,
             MeterRegistry meterRegistry
     ) {
+        this(jdbc,transactions,priceTable,clock,meterRegistry,null);
+    }
+
+    public ModelUsageRecorder(JdbcTemplate jdbc,TransactionTemplate transactions,ModelCostCalculator.PriceTable priceTable,
+            Clock clock,MeterRegistry meterRegistry,com.finguard.copilot.governance.BudgetReservations budgets) {
         this.jdbc = Objects.requireNonNull(jdbc, "jdbc must not be null");
         this.transactions = Objects.requireNonNull(transactions, "transactions must not be null");
         this.calculator = new ModelCostCalculator();
         this.priceTable = Objects.requireNonNull(priceTable, "priceTable must not be null");
         this.clock = Objects.requireNonNull(clock, "clock must not be null");
         this.meterRegistry = meterRegistry;
+        this.budgets=budgets;
     }
 
     public void record(
@@ -82,6 +89,10 @@ public final class ModelUsageRecorder {
         requireText(promptVersion, 128, "promptVersion");
         if (analysisId == null || usage == null || !OUTCOMES.contains(outcome)) {
             throw new IllegalArgumentException("model usage record is invalid");
+        }
+        if(budgets!=null && budgets.hasReservation(analysisId)) {
+            recordGoverned(analysisId,provider,modelConfigurationVersion,promptVersion,usage,outcome);
+            return;
         }
         ModelCostCalculator.MoneyAmount cost = calculator.estimate(usage, priceTable);
         Instant createdAt = clock.instant();
@@ -101,6 +112,37 @@ public final class ModelUsageRecorder {
                 Timestamp.from(createdAt)));
         recordMetrics(provider, modelConfigurationVersion, outcome, usage, cost);
     }
+
+    private void recordGoverned(UUID id,String provider,String modelVersion,String prompt,ModelUsage usage,String outcome) {
+        var cost=transactions.execute(ignored->{
+            var frozen=budgets.frozen(id);
+            if(!frozen.provider().equals(provider) || !frozen.manifest().path("model").path("version").asText().equals(modelVersion) ||
+                    !frozen.manifest().path("prompt").path("version").asText().equals(prompt))
+                throw com.finguard.copilot.governance.RunManifestService.rejected("usage metadata does not match frozen run");
+            if(!budgets.settle(id,usage)) return new GovernedAccounting(null,false,false);
+            boolean newLedger=jdbc.queryForList("SELECT analysis_id FROM model_usage_ledger WHERE analysis_id=? FOR UPDATE",
+                    JdbcAnalysisRunRepository.uuidBytes(id)).isEmpty();
+            var amount=com.finguard.copilot.governance.BudgetReservations.cost(frozen.price(),usage.inputTokens(),usage.outputTokens());
+            String insert=INSERT.substring(0,INSERT.indexOf("ON DUPLICATE KEY UPDATE"))+"ON DUPLICATE KEY UPDATE analysis_id=analysis_id";
+            jdbc.update(insert,JdbcAnalysisRunRepository.uuidBytes(id),provider,modelVersion,prompt,usage.inputTokens(),usage.outputTokens(),
+                    usage.latency().toMillis(),amount,frozen.price().currency(),frozen.price().version(),outcome,Timestamp.from(clock.instant()));
+            Integer matches=jdbc.queryForObject("""
+                    SELECT COUNT(*) FROM model_usage_ledger WHERE analysis_id=? AND provider=? AND model_configuration_version=?
+                    AND prompt_version=? AND input_tokens=? AND output_tokens=? AND estimated_cost=? AND currency=? AND price_table_version=? AND outcome=?
+                    """,Integer.class,JdbcAnalysisRunRepository.uuidBytes(id),provider,modelVersion,prompt,usage.inputTokens(),usage.outputTokens(),
+                    amount,frozen.price().currency(),frozen.price().version(),outcome);
+            if(matches!=1) throw com.finguard.copilot.governance.RunManifestService.rejected("immutable usage ledger conflict");
+            return new GovernedAccounting(new ModelCostCalculator.MoneyAmount(amount,frozen.price().currency()),true,newLedger);
+        });
+        if(cost==null || !cost.verified()) {
+            if("SUCCESS".equals(outcome)) throw new com.finguard.copilot.common.error.CopilotException(
+                    com.finguard.copilot.common.error.ErrorCode.SERVICE_UNAVAILABLE,"model accounting requires reconciliation");
+            return;
+        }
+        if(cost.firstWrite()) recordMetrics(provider,modelVersion,outcome,usage,cost.amount());
+    }
+
+    private record GovernedAccounting(ModelCostCalculator.MoneyAmount amount,boolean verified,boolean firstWrite) {}
 
     private void recordMetrics(
             String provider,

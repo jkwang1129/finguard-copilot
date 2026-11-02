@@ -30,7 +30,8 @@ public class GetAnalysisService {
     ) {
         this.coreClient = coreClient;
         this.runRepository = runRepository;
-        this.objectMapper = objectMapper;
+        this.objectMapper = objectMapper.copy()
+                .enable(com.fasterxml.jackson.databind.DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS);
     }
 
     public AnalysisResponse get(UUID analysisId, String bearerToken) {

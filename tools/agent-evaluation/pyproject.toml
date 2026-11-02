@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Offline evaluation contracts and dataset tooling for FinGuard Copilot"
 requires-python = ">=3.12,<3.13"
 dependencies = [
+    "langgraph>=1.0,<2",
     "pandas>=2.3,<3",
     "pydantic>=2.12,<3",
 ]

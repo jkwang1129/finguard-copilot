@@ -51,7 +51,7 @@ public class JdbcAnalysisRunRepository implements AnalysisRunRepository {
             FROM analysis_run r
             LEFT JOIN analysis_result ar ON ar.analysis_id = r.id
             WHERE r.id = :analysisId
-              AND r.reviewer_username = :reviewerUsername
+              AND BINARY r.reviewer_username = BINARY :reviewerUsername
             """;
 
     private static final String FIND_WORK = """
@@ -81,7 +81,7 @@ public class JdbcAnalysisRunRepository implements AnalysisRunRepository {
     private static final String INSERT_RESULT = """
             INSERT INTO analysis_result (
                 analysis_id, schema_version, recommendation, result_json, created_at
-            ) VALUES (?, ?, ?, CAST(? AS JSON), ?)
+            ) VALUES (?, ?, ?, ?, ?)
             """;
 
     private static final String INSERT_RECEIPT = """

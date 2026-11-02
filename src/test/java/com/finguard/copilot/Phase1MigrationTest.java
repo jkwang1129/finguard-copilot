@@ -86,7 +86,7 @@ class Phase1MigrationTest {
         assertThat(columns("analysis_input_snapshot")).containsExactlyEntriesOf(linkedMap(
                 "analysis_id", "binary(16)|NO",
                 "schema_version", "int unsigned|NO",
-                "facts_json", "json|YES",
+                "facts_json", "longtext|YES",
                 "facts_sha256", "binary(32)|NO",
                 "captured_at", "datetime(6)|NO",
                 "expires_at", "datetime(6)|NO",
@@ -96,7 +96,7 @@ class Phase1MigrationTest {
                 "analysis_id", "binary(16)|NO",
                 "schema_version", "int unsigned|NO",
                 "recommendation", "varchar(32)|NO",
-                "result_json", "json|NO",
+                "result_json", "longtext|NO",
                 "created_at", "datetime(6)|NO"
         ));
         assertThat(columns("outbox_event")).containsExactlyEntriesOf(linkedMap(

@@ -352,6 +352,37 @@ class AnalysisWorkerIntegrationTest {
         return eventId(analysisId, "primary");
     }
 
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.CsvSource({"false,false","true,false","false,true","true,true"})
+    void storedRecoveryAuthorizesDirectionAndPreservesRefusal(boolean modelPath,boolean refusal) throws Exception {
+        var accepted=createAnalysisService.create(new CreateAnalysisCommand(101,"stored-"+modelPath+"-"+refusal),REVIEWER_TOKEN);
+        var id=accepted.analysisId();
+        var conservative=productionOrchestrator.analyze(id,new SnapshotCodec().capture(context(101)));
+        var unsafe=new com.finguard.copilot.analysis.domain.AnalysisResult(1,id,conservative.reviewTaskSummary(),
+                conservative.riskRuleExplanation(),conservative.businessEvidence(),refusal?List.of():List.of(
+                new com.finguard.copilot.analysis.domain.AnalysisResult.PolicyCitation("old-unreviewed","v1","Document","Synthetic old unapproved policy")),
+                refusal?com.finguard.copilot.analysis.domain.AnalysisRecommendation.INSUFFICIENT_EVIDENCE:
+                        com.finguard.copilot.analysis.domain.AnalysisRecommendation.CONFIRMED,"fixture",List.of(),List.of());
+        runRepository.insertResult(id,1,unsafe.recommendation().name(),objectMapper.writeValueAsString(unsafe),CAPTURED_AT);
+        var noCall=new AnalysisOrchestrator(){
+            public boolean requiresModelCall(){return modelPath;}
+            public com.finguard.copilot.analysis.domain.AnalysisResult analyze(UUID ignored,com.finguard.copilot.context.FactSnapshot snapshot){
+                throw new AssertionError("Stored-result recovery must never invoke a model");
+            }
+        };
+        var rabbit=mock(RabbitTemplate.class);
+        doAnswer(invocation->{invocation.<CorrelationData>getArgument(4).getFuture().complete(new CorrelationData.Confirm(true,null));return null;})
+                .when(rabbit).convertAndSend(anyString(),anyString(),any(AnalysisRequestedMessage.class),any(MessagePostProcessor.class),any(CorrelationData.class));
+        var guarded=new AnalysisWorker(runRepository,new SnapshotCodec(),noCall,schemaValidator,factValidator,transactions,
+                rabbit,objectMapper,copilotProperties,java.time.Clock.systemUTC(),usageRecorder,reservations);
+        var outcome=guarded.process(new AnalysisRequestedMessage(1,eventId(id),id,CAPTURED_AT),1);
+        assertThat(runRepository.findByIdAndReviewer(id,"worker-reviewer").orElseThrow().status())
+                .isEqualTo(refusal?com.finguard.copilot.analysis.domain.AnalysisStatus.SUCCEEDED:
+                        com.finguard.copilot.analysis.domain.AnalysisStatus.FAILED);
+        if(refusal) assertThat(outcome).isEqualTo(AnalysisWorker.WorkerOutcome.COMPLETED_FROM_STORED_RESULT);
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM model_call_reservation WHERE analysis_id=UUID_TO_BIN(?)",Integer.class,id.toString())).isZero();
+    }
+
     private static UUID eventId(UUID analysisId, String deliveryOrder) {
         return UUID.nameUUIDFromBytes(("00000000-0000-0000-0000-000000000001:" + deliveryOrder + ":" + analysisId)
                 .getBytes(java.nio.charset.StandardCharsets.UTF_8));

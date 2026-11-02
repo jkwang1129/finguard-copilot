@@ -7,6 +7,17 @@ param(
     [ValidateSet('deepseek','qwen','zhipu')][string]$Provider,
     [string]$ModelId,
     [string]$EnvironmentFile = (Join-Path (Split-Path -Parent $PSScriptRoot) '.env.local'),
+    [ValidateRange(0.00000001,10)][decimal]$SmokeBudgetCny = 0.10,
+    [Nullable[decimal]]$InputPricePerMillionCny,
+    [Nullable[decimal]]$OutputPricePerMillionCny,
+    [string]$PriceTableVersion,
+    [switch]$LocalModelStub,
+    [switch]$IsolatedRedis,
+    [switch]$ExpectPolicyRejection,
+    [switch]$ExpectFactRejection,
+    [switch]$ExpectMissingPolicy,
+    [switch]$ExpectBudgetRejection,
+    [switch]$ExpectRedisFailure,
     [switch]$PlanOnly,
     [switch]$KeepRunning
 )
@@ -14,7 +25,17 @@ $ErrorActionPreference = 'Stop'
 $initialEnvironment = @{}
 Get-ChildItem Env: | ForEach-Object { $initialEnvironment[$_.Name] = $_.Value }
 $root = Split-Path -Parent $PSScriptRoot
-. (Join-Path $PSScriptRoot 'import-model-environment.ps1') -Path $EnvironmentFile
+if (-not $LocalModelStub) { . (Join-Path $PSScriptRoot 'import-model-environment.ps1') -Path $EnvironmentFile }
+if ($LocalModelStub) {
+    $env:COPILOT_MODEL_PROVIDER='deepseek'; $env:COPILOT_MODEL_API_KEY='local-test-only'
+    $env:COPILOT_MODEL_BASE_URL='http://127.0.0.1:18765'; $env:COPILOT_MODEL_ID='local-test-stub'
+    $Provider='deepseek'; $ModelId='local-test-stub'
+    $env:P4_STUB_RECOMMENDATION=if ($ExpectPolicyRejection) { 'IGNORED' } else { 'CONFIRMED' }
+}
+if (($ExpectPolicyRejection -or $ExpectFactRejection -or $ExpectMissingPolicy -or $ExpectBudgetRejection -or $ExpectRedisFailure) -and -not $LocalModelStub) { throw 'Rejection scenarios require LocalModelStub' }
+if ((@($ExpectPolicyRejection,$ExpectFactRejection,$ExpectMissingPolicy,$ExpectBudgetRejection,$ExpectRedisFailure) | Where-Object { $_ }).Count -gt 1) { throw 'Choose one rejection scenario' }
+$expectedCalls=if ($ExpectBudgetRejection -or $ExpectRedisFailure) { 0 } else { 1 }
+if ($LocalModelStub) { $env:P4_SEED_OTHER_POLICY = if ($ExpectMissingPolicy) { 'true' } else { 'false' } }
 $credentialProvider = $env:COPILOT_MODEL_PROVIDER
 if (-not $Provider) { $Provider = if ($credentialProvider) { $credentialProvider.ToLowerInvariant() } else { 'deepseek' } }
 if ($credentialProvider -and $Provider -ne $credentialProvider.ToLowerInvariant()) {
@@ -27,6 +48,7 @@ $providerBaseUrls = @{
 }
 if (-not $providerBaseUrls.ContainsKey($Provider)) { throw 'Unsupported credential provider.' }
 $modelBaseUrl = $providerBaseUrls[$Provider]
+if ($LocalModelStub) { $modelBaseUrl = 'http://127.0.0.1:18765' }
 if ($env:COPILOT_MODEL_BASE_URL -and $env:COPILOT_MODEL_BASE_URL.TrimEnd('/') -ne $modelBaseUrl) {
     throw 'Configured model base URL does not match the provider allowlist.'
 }
@@ -37,28 +59,58 @@ if (-not $ModelId) {
 }
 $profile = "real-$Provider"
 $promptVersion = if ($env:COPILOT_PROMPT_VERSION) { $env:COPILOT_PROMPT_VERSION } else { 'review-analysis-v2' }
+$customPrice = $PSBoundParameters.ContainsKey('InputPricePerMillionCny') -or $PSBoundParameters.ContainsKey('OutputPricePerMillionCny') -or $PSBoundParameters.ContainsKey('PriceTableVersion')
+if ($customPrice -and ($null -eq $InputPricePerMillionCny -or $null -eq $OutputPricePerMillionCny -or [string]::IsNullOrWhiteSpace($PriceTableVersion))) {
+    throw 'Price override requires both CNY rates and PriceTableVersion'
+}
+if ($LocalModelStub) {
+    $InputPricePerMillionCny=0; $OutputPricePerMillionCny=0; $PriceTableVersion='smoke-fixture-zero-v1'
+    if ($ExpectBudgetRejection) { $InputPricePerMillionCny=2; $OutputPricePerMillionCny=8; $PriceTableVersion='smoke-fixture-priced-v1' }
+} elseif (-not $customPrice -and $Provider -eq 'deepseek' -and $ModelId -eq 'deepseek-flash') {
+    # Official 2026-11-02 peak/cache-miss CNY rates; no tools/search calls in this smoke.
+    $InputPricePerMillionCny=2; $OutputPricePerMillionCny=8; $PriceTableVersion='smoke-deepseek-flash-20261102-peak-cny'
+}
+$estimatedUpperBoundCny=$null
+if ($null -ne $InputPricePerMillionCny -and $null -ne $OutputPricePerMillionCny) {
+    if ($InputPricePerMillionCny -lt 0 -or $OutputPricePerMillionCny -lt 0 -or
+            (-not $LocalModelStub -and ($InputPricePerMillionCny -eq 0 -or $OutputPricePerMillionCny -eq 0))) { throw 'Real model CNY rates must be positive' }
+    $estimatedUpperBoundCny=(32000*$InputPricePerMillionCny+2000*$OutputPricePerMillionCny)/1000000
+    if ($estimatedUpperBoundCny -gt $SmokeBudgetCny) { throw 'Conservative reservation exceeds smoke budget' }
+}
 if ($PlanOnly) {
     @{provider=$Provider;model=$ModelId;profile=$profile;baseUrl=$modelBaseUrl;
       chatCompletionsPath='/chat/completions';prompt=$promptVersion;maxModelCalls=1;
-      coreRoot=$CoreRoot;scope='isolated synthetic business E2E, fixed embeddings; not semantic quality'} | ConvertTo-Json -Compress
+      coreRoot=$CoreRoot;currency='CNY';priceTableVersion=$PriceTableVersion;smokeBudgetCny=$SmokeBudgetCny;
+      estimatedUpperBoundCny=$estimatedUpperBoundCny;
+      fixture=[bool]$LocalModelStub;expectedCalls=$expectedCalls;
+      scope='isolated synthetic business E2E, fixed embeddings; not semantic quality'} | ConvertTo-Json -Compress
     foreach ($entry in @(Get-ChildItem Env:)) {
         if (-not $initialEnvironment.ContainsKey($entry.Name)) { [Environment]::SetEnvironmentVariable($entry.Name,$null,'Process') }
     }
     foreach ($name in $initialEnvironment.Keys) { [Environment]::SetEnvironmentVariable($name,$initialEnvironment[$name],'Process') }
     return
 }
+if ($null -eq $estimatedUpperBoundCny) { throw 'Live smoke requires reviewed CNY price override for this model' }
 $runId = Get-Date -Format 'yyyyMMddHHmmss'
 $coreDb = "fg_core_e2e_$runId"
 $copilotDb = "fg_copilot_e2e_$runId"
 $vhost = "fg-e2e-$runId"
 $qdrant = "fg-e2e-qdrant-$runId"
+$isolatedRedisContainer = "fg-e2e-redis-$runId"
+$redisStarted = $false
 $output = Join-Path $root "target\business-e2e\$runId"
 New-Item -ItemType Directory -Path $output -Force | Out-Null
 $reportPath = Join-Path $output 'report.json'
 $report = [ordered]@{ runId=$runId; startedAt=[DateTimeOffset]::Now.ToString('o'); status='RUNNING';
     coreDatabase=$coreDb; copilotDatabase=$copilotDb; rabbitVhost=$vhost;
     qdrantContainer=$qdrant; provider=$Provider; model=$ModelId; prompt=$promptVersion;
-    maxModelCalls=1; embedding='fixed-v1'; checks=@() }
+    maxModelCalls=1; embedding='fixed-v1'; currency='CNY';priceTableVersion=$PriceTableVersion;
+    fixture=[bool]$LocalModelStub;expectedCalls=$expectedCalls;
+    harnessSha256=(Get-FileHash $PSCommandPath -Algorithm SHA256).Hash.ToLowerInvariant();
+    smokeBudgetCny=$SmokeBudgetCny;estimatedUpperBoundCny=$estimatedUpperBoundCny;
+    inputPricePerMillionCny=$InputPricePerMillionCny;outputPricePerMillionCny=$OutputPricePerMillionCny;
+    copilotJarSha256=(Get-FileHash (Join-Path $root 'target\finguard-copilot-0.0.1-SNAPSHOT.jar') -Algorithm SHA256).Hash.ToLowerInvariant();
+    coreJarSha256=(Get-FileHash (Join-Path $CoreRoot 'target\finguard-core-0.0.1-SNAPSHOT.jar') -Algorithm SHA256).Hash.ToLowerInvariant(); checks=@() }
 $processes = @()
 $qdrantStarted = $false
 function Check([string]$Name, [bool]$Passed) {
@@ -78,11 +130,11 @@ function Sql([string]$Query) {
     if ($LASTEXITCODE -ne 0) { throw 'MySQL acceptance query failed' }
     return ($result -join "`n")
 }
-function Health([string]$Url, [Diagnostics.Process]$Process) {
+function Health([string]$Url, [Diagnostics.Process]$Process, [string]$ExpectedStatus='UP') {
     $deadline = [DateTime]::UtcNow.AddSeconds(120)
     while ([DateTime]::UtcNow -lt $deadline) {
         if ($Process.HasExited) { throw 'Service exited during startup; inspect the run-specific service log' }
-        try { if ((Invoke-RestMethod "$Url/actuator/health" -TimeoutSec 3).status -eq 'UP') { return } } catch { }
+        try { if ((Invoke-RestMethod "$Url/actuator/health" -TimeoutSec 5 -SkipHttpErrorCheck).status -eq $ExpectedStatus) { return } } catch { }
         Start-Sleep -Seconds 1
     }
     throw "Health check timed out: $Url"
@@ -107,8 +159,22 @@ function Http-Status([string]$Method,[string]$Url,[hashtable]$Headers,[string]$B
 }
 try {
     if (-not $env:COPILOT_MODEL_API_KEY) { throw 'Set COPILOT_MODEL_API_KEY in the current process before running' }
-    foreach ($port in @(8080,8081,6333)) {
+    $ports = @(8080,8081,6333); if ($LocalModelStub) { $ports += 18765 }; if ($LocalModelStub -or $IsolatedRedis) { $ports += 16380 }
+    foreach ($port in $ports) {
         if (Get-NetTCPConnection -State Listen -LocalPort $port -ErrorAction SilentlyContinue) { throw "Port $port is already occupied" }
+    }
+    if ($LocalModelStub) {
+        $python = (Get-Command python.exe -ErrorAction Stop).Source
+        $stub = Start-Process -FilePath $python -ArgumentList @((Join-Path $PSScriptRoot 'e2e\local_model_stub.py')) `
+            -WorkingDirectory $root -WindowStyle Hidden -PassThru `
+            -RedirectStandardOutput (Join-Path $output 'stub.log') -RedirectStandardError (Join-Path $output 'stub.stderr.log')
+        $processes += $stub
+    }
+    if ($LocalModelStub -or $IsolatedRedis) {
+        & docker run -d --name $isolatedRedisContainer -p '127.0.0.1:16380:6379' -e REDIS_PASSWORD=isolated-test-only redis:8.2.8-alpine redis-server --requirepass isolated-test-only | Out-Null
+        if ($LASTEXITCODE -ne 0) { throw 'Isolated Redis start failed' }
+        $redisStarted = $true
+        $RedisContainer = $isolatedRedisContainer
     }
     $mysql = Container-Environment $MysqlContainer
     $rabbit = Container-Environment $RabbitContainer
@@ -128,7 +194,7 @@ try {
     $env:RABBITMQ_HOST='127.0.0.1'; $env:RABBITMQ_PORT='5672'
     $env:RABBITMQ_USERNAME=$rabbit.RABBITMQ_DEFAULT_USER; $env:RABBITMQ_PASSWORD=$rabbit.RABBITMQ_DEFAULT_PASS
     $env:RABBITMQ_VIRTUAL_HOST=$vhost
-    $env:REDIS_HOST='127.0.0.1'; $env:REDIS_PORT='6380'; $env:REDIS_PASSWORD=$redis.REDIS_PASSWORD
+    $env:REDIS_HOST='127.0.0.1'; $env:REDIS_PORT=if ($LocalModelStub -or $IsolatedRedis) { '16380' } else { '6380' }; $env:REDIS_PASSWORD=$redis.REDIS_PASSWORD
     $random = New-Object byte[] 32
     [Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($random)
     $env:JWT_SECRET_BASE64=[Convert]::ToBase64String($random)
@@ -149,17 +215,29 @@ try {
     $env:SPRING_RABBITMQ_USERNAME=$rabbit.RABBITMQ_DEFAULT_USER
     $env:SPRING_RABBITMQ_PASSWORD=$rabbit.RABBITMQ_DEFAULT_PASS; $env:SPRING_RABBITMQ_VIRTUAL_HOST=$vhost
     $env:COPILOT_MODEL_PROVIDER=$Provider; $env:COPILOT_MODEL_ID=$ModelId
+    $env:COPILOT_REDIS_HOST=$env:REDIS_HOST; $env:COPILOT_REDIS_PORT=if ($ExpectRedisFailure) { '1' } else { $env:REDIS_PORT }; $env:COPILOT_REDIS_PASSWORD=$env:REDIS_PASSWORD
+    $env:COPILOT_GOVERNANCE_FIXTURE_MODE=if ($LocalModelStub) { 'true' } else { 'false' }
+    $env:COPILOT_MAX_CALL_CNY=$SmokeBudgetCny.ToString([Globalization.CultureInfo]::InvariantCulture)
+    $env:COPILOT_MAX_GLOBAL_DAILY_CNY=if ($ExpectBudgetRejection) { '0.00000001' } else { '10' }
     $env:COPILOT_MODEL_BASE_URL=$modelBaseUrl; $env:COPILOT_PROMPT_VERSION=$promptVersion
     $env:COPILOT_MODEL_CHAT_COMPLETIONS_PATH='/chat/completions'
     $env:COPILOT_MODEL_TIMEOUT='60s'; $env:COPILOT_MAX_MODEL_CALLS='1'
-    $env:COPILOT_PRICE_TABLE_VERSION='e2e-unpriced-v1'
+    $env:COPILOT_MAX_INPUT_TOKENS='32000'; $env:COPILOT_MAX_OUTPUT_TOKENS='2000'
+    $env:COPILOT_MODEL_INPUT_TOKEN_LIMIT='32000'; $env:COPILOT_MODEL_OUTPUT_TOKEN_LIMIT='2000'
+    $env:COPILOT_PRICE_TABLE_VERSION=$PriceTableVersion; $env:COPILOT_MODEL_CURRENCY='CNY'
+    $env:COPILOT_MODEL_INPUT_PRICE_PER_MILLION=$InputPricePerMillionCny.ToString([Globalization.CultureInfo]::InvariantCulture)
+    $env:COPILOT_MODEL_OUTPUT_PRICE_PER_MILLION=$OutputPricePerMillionCny.ToString([Globalization.CultureInfo]::InvariantCulture)
     $env:FINGUARD_CORE_BASE_URL='http://127.0.0.1:8080'
     $env:COPILOT_QDRANT_ENDPOINT='http://127.0.0.1:6333'
     $env:COPILOT_QDRANT_COLLECTION_PREFIX="e2e-$runId"
     $env:COPILOT_EMBEDDING_VERSION='fixed-v1'; $env:E2E_INDEX_VERSION="published-$runId"
     $copilot = Start-Java 'copilot' $root (Join-Path $root 'target\finguard-copilot-0.0.1-SNAPSHOT.jar')
-    $processes += $copilot; Health 'http://127.0.0.1:8081' $copilot
-    Check "Copilot $profile profile health UP" $true
+    $expectedHealth=if ($ExpectRedisFailure) { 'DOWN' } else { 'UP' }
+    $processes += $copilot; Health 'http://127.0.0.1:8081' $copilot $expectedHealth
+    Check "Copilot $profile profile health $expectedHealth" $true
+    $report.flywayVersion=Sql "SELECT version FROM $copilotDb.flyway_schema_history WHERE success=1 ORDER BY installed_rank DESC LIMIT 1;"
+    Check 'Current V10 governance and exact JSON text schema is active' ($report.flywayVersion -eq '10' -and
+        (Sql "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema='$copilotDb' AND table_name IN ('analysis_input_snapshot','analysis_result') AND column_name IN ('facts_json','result_json') AND data_type='longtext';") -eq '2')
     $report.corePid=$core.Id; $report.copilotPid=$copilot.Id
     $java = Join-Path $env:JAVA_HOME 'bin\java.exe'
     $classpath = (Join-Path $root 'target\classes')+';'+(Get-Content -Raw (Join-Path $root 'target\e2e-classpath.txt')).Trim()
@@ -167,6 +245,7 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Knowledge build/evaluation/publication failed; inspect knowledge-seed.stderr.log' }
     $report.knowledge = ($seed | Select-Object -Last 1) | ConvertFrom-Json
     Check 'Published knowledge retrieved from Qdrant and checksum-verified MySQL source' ($report.knowledge.status -eq 'PUBLISHED')
+    $observedAmount = if ($ExpectFactRejection) { '110000.10' } else { '120000.10' }
     $null = Sql @"
 USE $coreDb;
 INSERT INTO accounts(account_no,account_name,account_type) VALUES('E2E-SYNTHETIC','Synthetic acceptance account','BANK');
@@ -184,7 +263,7 @@ INSERT INTO reconciliation_results(reconciliation_job_id,csv_transaction_id,resu
  VALUES(@job,@tx,'UNMATCHED','NONE','NO_CANDIDATE');
 SET @result=LAST_INSERT_ID();
 INSERT INTO risk_hits(reconciliation_result_id,rule_code,reason_code,observed_amount,threshold_amount,reason_summary)
- VALUES(@result,'LARGE_AMOUNT','AMOUNT_AT_OR_ABOVE_THRESHOLD',120000.10,100000.00,'Synthetic threshold reached');
+ VALUES(@result,'LARGE_AMOUNT','AMOUNT_AT_OR_ABOVE_THRESHOLD',$observedAmount,100000.00,'Synthetic threshold reached');
 INSERT INTO review_tasks(source_type,risk_hit_id) VALUES('RISK_HIT',LAST_INSERT_ID());
 "@
     $taskId = [long](Sql "SELECT id FROM $coreDb.review_tasks LIMIT 1;")
@@ -214,15 +293,93 @@ INSERT INTO review_tasks(source_type,risk_hit_id) VALUES('RISK_HIT',LAST_INSERT_
         $result=Invoke-RestMethod "$url/$analysisId" -Headers $headers
     } while ($result.status -notin @('SUCCEEDED','FAILED') -and [DateTime]::UtcNow -lt $deadline)
     $report.analysisStatus=$result.status; $report.failureCode=$result.failureCode
+    if ($LocalModelStub) {
+        $report.actualModelHttpCalls=[int](Invoke-RestMethod 'http://127.0.0.1:18765/_calls').calls
+        Check 'Actual fixture HTTP calls match admission decision' ($report.actualModelHttpCalls -eq $expectedCalls)
+    }
     $report.modelUsage = Sql "SELECT outcome,input_tokens,output_tokens,latency_ms FROM $copilotDb.model_usage_ledger;"
-    Check 'Analysis reaches SUCCEEDED through Outbox/RabbitMQ/Worker/real model' ($result.status -eq 'SUCCEEDED')
-    Check 'Model result contains the published policy citation' ($result.result.policyCitations.documentId -contains 'e2e-large-amount-policy')
+    if ($expectedCalls -eq 1) {
+        $report.modelAccounting = (Sql "SELECT JSON_OBJECT('provider',provider,'modelVersion',model_configuration_version,'promptVersion',prompt_version,'inputTokens',input_tokens,'outputTokens',output_tokens,'currency',currency,'priceTableVersion',price_table_version,'estimatedCost',CAST(estimated_cost AS CHAR)) FROM $copilotDb.model_usage_ledger;") | ConvertFrom-Json
+        Check 'Model ledger uses the frozen CNY price table and stays within smoke budget' (
+            $report.modelAccounting.currency -eq 'CNY' -and $report.modelAccounting.priceTableVersion -eq $PriceTableVersion -and
+            [decimal]$report.modelAccounting.estimatedCost -le $SmokeBudgetCny)
+    } else { $report.modelAccounting=$null }
+    $report.manifest = (Sql "SELECT JSON_OBJECT('sha256',manifest_sha256,'modelVersion',JSON_UNQUOTE(JSON_EXTRACT(manifest_json,'$.model.version')),'priceVersion',JSON_UNQUOTE(JSON_EXTRACT(manifest_json,'$.price.version')),'indexVersion',JSON_UNQUOTE(JSON_EXTRACT(manifest_json,'$.index.version')),'inputUpperBound',JSON_EXTRACT(manifest_json,'$.inputUpperBound'),'reservedEstimateCny',JSON_UNQUOTE(JSON_EXTRACT(manifest_json,'$.reservedEstimateCny')),'fixture',JSON_EXTRACT(manifest_json,'$.fixture')) FROM $copilotDb.model_run_manifest;") | ConvertFrom-Json
+    Check 'Immutable manifest binds this model price and published index' (
+        (Sql "SELECT COUNT(*) FROM $copilotDb.model_run_manifest;") -eq '1' -and
+        $report.manifest.priceVersion -eq $PriceTableVersion -and $report.manifest.indexVersion -eq $env:E2E_INDEX_VERSION -and
+        $report.manifest.modelVersion.StartsWith('p4-model-'))
+    if ($expectedCalls -eq 1) {
+        $report.budget=(Sql "SELECT JSON_OBJECT('status',status,'reservedCny',CAST(reserved_cny AS CHAR),'settledCny',CAST(settled_cny AS CHAR)) FROM $copilotDb.model_budget_reservation;") | ConvertFrom-Json
+        Check 'Budget is settled once and all holds released' ($report.budget.status -eq 'SETTLED' -and
+            $report.manifest.modelVersion -eq $report.modelAccounting.modelVersion -and
+            [decimal]$report.budget.settledCny -eq [decimal]$report.modelAccounting.estimatedCost -and
+            (Sql "SELECT COUNT(*) FROM $copilotDb.model_budget_account WHERE held_cny<>0;") -eq '0' -and
+            (Sql "SELECT COUNT(*) FROM $copilotDb.model_budget_event WHERE event_type='SETTLED';") -eq '1')
+    } else {
+        $report.budget=$null
+        $expectedFailure=if ($ExpectBudgetRejection) { 'MODEL_BUDGET_EXCEEDED' } else { 'MODEL_CAPACITY_UNAVAILABLE' }
+        Check 'Admission reaches the expected failed terminal state without charge' ($result.status -eq 'FAILED' -and $result.failureCode -eq $expectedFailure -and
+            (Sql "SELECT COUNT(*) FROM $copilotDb.model_budget_reservation;") -eq '0')
+    }
+    if ($expectedCalls -eq 0) {
+        Check 'Admission rejected without a usable result' ((Sql "SELECT COUNT(*) FROM $copilotDb.analysis_result;") -eq '0')
+    } elseif ($ExpectPolicyRejection -or $ExpectFactRejection -or $ExpectMissingPolicy) {
+        Check 'Incorrect directional recommendation reaches failed terminal state' ($result.status -eq 'FAILED' -and $result.failureCode -eq 'FACT_VALIDATION_FAILED')
+        Check 'Rejected recommendation is not persisted as result' ((Sql "SELECT COUNT(*) FROM $copilotDb.analysis_result;") -eq '0')
+    } else {
+        Check 'Analysis reaches SUCCEEDED through Outbox/RabbitMQ/Worker' ($result.status -eq 'SUCCEEDED')
+        Check 'Model result contains the published policy citation' ($result.result.policyCitations.documentId -contains 'finguard-large-amount-review-policy')
+    }
     Check 'Core business decision remains PENDING and version unchanged' ((Sql "SELECT CONCAT(status,':',version,':',COALESCE(reviewed_by,0),':',COALESCE(decision_note,'')) FROM $coreDb.review_tasks WHERE id=$taskId;") -eq $before)
     Check 'Core business and audit table checksums unchanged' ((Sql ('CHECKSUM TABLE '+($coreTables -join ','))) -eq $fingerprintBefore)
-    Check 'Exactly one model invocation ledger row persisted' ((Sql "SELECT COUNT(*) FROM $copilotDb.model_usage_ledger;") -eq '1')
+    Check 'Invocation ledger count matches actual admission' ((Sql "SELECT COUNT(*) FROM $copilotDb.model_usage_ledger;") -eq [string]$expectedCalls)
+    Check 'Durable model call claim count matches actual admission' ((Sql "SELECT COUNT(*) FROM $copilotDb.model_call_reservation;") -eq [string]$expectedCalls)
+    $report.providerEvidence=(Sql "SELECT JSON_OBJECT('count',COUNT(*),'requestIdAvailable',MAX(CHAR_LENGTH(JSON_UNQUOTE(JSON_EXTRACT(details_json,'$.providerRequestIdSha256')))=64),'returnedModelAvailable',MAX(CHAR_LENGTH(JSON_UNQUOTE(JSON_EXTRACT(details_json,'$.returnedModelSha256')))=64),'httpStatus',MAX(JSON_EXTRACT(details_json,'$.httpStatus'))) FROM $copilotDb.model_budget_event WHERE event_type='PROVIDER_RESPONSE';") | ConvertFrom-Json
+    Check 'Provider correlation evidence is persisted without raw response' ($report.providerEvidence.count -eq $expectedCalls -and
+        ($expectedCalls -eq 0 -or ($report.providerEvidence.requestIdAvailable -eq 1 -and $report.providerEvidence.returnedModelAvailable -eq 1)))
     Check 'Outbox published and Worker receipt persisted' ((Sql "SELECT COUNT(*) FROM $copilotDb.outbox_event o JOIN $copilotDb.analysis_message_receipt r ON r.event_id=o.id WHERE o.published_at IS NOT NULL;") -eq '1')
+    $ledgerBefore=Sql "CHECKSUM TABLE $copilotDb.model_usage_ledger;"
+    $governanceBefore=Sql "CHECKSUM TABLE $copilotDb.model_run_manifest,$copilotDb.model_budget_account,$copilotDb.model_budget_reservation,$copilotDb.model_budget_event;"
+    $payload=Sql "SELECT CAST(payload_json AS CHAR) FROM $copilotDb.outbox_event LIMIT 1;"
+    $rabbitBasic=[Convert]::ToBase64String([Text.Encoding]::UTF8.GetBytes($rabbit.RABBITMQ_DEFAULT_USER+':'+$rabbit.RABBITMQ_DEFAULT_PASS))
+    $rabbitHeaders=@{Authorization='Basic '+$rabbitBasic}
+    $encodedVhost=[Uri]::EscapeDataString($vhost)
+    . (Join-Path $PSScriptRoot 'e2e/wait-rabbit-ack.ps1')
+    $queueUrl="http://127.0.0.1:15672/api/queues/$encodedVhost/finguard.copilot.analysis.request.v1"
+    # Establish the initial ACK before publishing; stale management statistics
+    # for the first delivery must not be mistaken for the duplicate's ACK.
+    $initialAcks=if ($ExpectRedisFailure) { 3 } else { 1 }
+    $beforeQueue=Wait-RabbitAck -QueueUrl $queueUrl -Headers $rabbitHeaders -MinimumAck $initialAcks
+    $dlqUrl="http://127.0.0.1:15672/api/queues/$encodedVhost/finguard.copilot.analysis.dlq.v1"
+    $expectedDeadLetters=if ($result.status -eq 'FAILED') { 1 } else { 0 }
+    $dlqDeadline=[DateTime]::UtcNow.AddSeconds(30)
+    do {
+        $beforeDlq=Invoke-RestMethod $dlqUrl -Headers $rabbitHeaders -TimeoutSec 5
+        if ($beforeDlq.messages -eq $expectedDeadLetters) { break }
+        Start-Sleep -Milliseconds 500
+    } while ([DateTime]::UtcNow -lt $dlqDeadline)
+    Check 'Initial dead-letter depth matches the terminal outcome' ($beforeDlq.messages -eq $expectedDeadLetters)
+    $published=Invoke-RestMethod "http://127.0.0.1:15672/api/exchanges/$encodedVhost/finguard.copilot.analysis.v1/publish" `
+        -Method Post -Headers $rabbitHeaders -ContentType 'application/json' -Body (@{properties=@{content_type='application/json'};
+        routing_key='analysis.requested';payload=$payload;payload_encoding='string'}|ConvertTo-Json -Depth 4)
+    Check 'Duplicate terminal event routed through actual RabbitMQ exchange' ([bool]$published.routed)
+    $queue=Wait-RabbitAck -QueueUrl $queueUrl -Headers $rabbitHeaders -MinimumAck ([long]$beforeQueue.message_stats.ack+1)
+    $dlq=Invoke-RestMethod $dlqUrl -Headers $rabbitHeaders -TimeoutSec 5
+    $report.rabbitRedelivery=@{ackBefore=[long]$beforeQueue.message_stats.ack;ackAfter=[long]$queue.message_stats.ack;
+        ready=$queue.messages_ready;unacknowledged=$queue.messages_unacknowledged;
+        deadLetterBefore=$beforeDlq.messages;deadLetterMessages=$dlq.messages}
+    Check 'Duplicate ACK observed without new ledger write, receipt or call claim' ($dlq.messages -eq $beforeDlq.messages -and
+        (Sql "CHECKSUM TABLE $copilotDb.model_run_manifest,$copilotDb.model_budget_account,$copilotDb.model_budget_reservation,$copilotDb.model_budget_event;") -eq $governanceBefore -and
+        (Sql "CHECKSUM TABLE $copilotDb.model_usage_ledger;") -eq $ledgerBefore -and
+        (Sql "SELECT COUNT(*) FROM $copilotDb.analysis_message_receipt;") -eq '1' -and
+        (Sql "SELECT COUNT(*) FROM $copilotDb.model_call_reservation;") -eq [string]$expectedCalls)
+    if ($LocalModelStub) {
+        $report.actualModelHttpCallsAfterDuplicate=[int](Invoke-RestMethod 'http://127.0.0.1:18765/_calls').calls
+        Check 'Duplicate event did not issue another fixture HTTP request' ($report.actualModelHttpCallsAfterDuplicate -eq $expectedCalls)
+    }
     $report.recommendation=$result.result.recommendation
-    $report.citationCount=@($result.result.policyCitations).Count
+    $report.citationCount=if ($null -eq $result.result) { 0 } else { @($result.result.policyCitations).Count }
     $report.status='PASSED'
 } catch {
     $report.status='FAILED'
@@ -232,6 +389,7 @@ INSERT INTO review_tasks(source_type,risk_hit_id) VALUES('RISK_HIT',LAST_INSERT_
     if (-not $KeepRunning) {
         foreach ($process in $processes) { if (-not $process.HasExited) { Stop-Process -Id $process.Id -Force } }
         if ($qdrantStarted) { & docker stop $qdrant 2>$null | Out-Null }
+        if ($redisStarted) { & docker stop $isolatedRedisContainer 2>$null | Out-Null }
         $report.servicesLeftRunning=$false
     } else { $report.servicesLeftRunning=$true }
     $report.finishedAt=[DateTimeOffset]::Now.ToString('o')

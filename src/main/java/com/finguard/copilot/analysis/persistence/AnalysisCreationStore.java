@@ -73,7 +73,7 @@ public class AnalysisCreationStore {
             ) VALUES (
                 :analysisId,
                 :schemaVersion,
-                CAST(:factsJson AS JSON),
+                :factsJson,
                 :factsSha256,
                 :capturedAt,
                 :expiresAt,

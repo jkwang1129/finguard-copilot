@@ -1,0 +1,15 @@
+{
+  "author_sha256": "8dcff2bfd57488789449f4c2402b86e5a5b6046503081489e3110bda3778aa71",
+  "category_counts": {
+    "all": 6,
+    "conflict": 6,
+    "injection": 6,
+    "single": 6
+  },
+  "count": 24,
+  "dataset_sha256": "8e63b6d2b76fde26c724815366c35038ec2e2e03277029207dc4826cf9ab006b",
+  "label_source": "isolated AI, not human/expert",
+  "parser_source_sha256": "f9c19d7d9f7eddc132e5180ae966dc55df4d35b9ac80791ee940a1637519147d",
+  "purpose": "independent synthetic fix verification; no prompt/model tuning from these cases",
+  "reference_source_sha256": "25850f7856158b40949452bc4217eab41ccb5db3a6b516c02e98916761cb6c6a"
+}

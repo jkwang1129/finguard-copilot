@@ -34,10 +34,17 @@ public class FinGuardCopilotApplication {
     }
 
     @Bean
+    com.finguard.copilot.governance.BudgetReservations budgetReservations(JdbcTemplate jdbc,
+            TransactionTemplate transactions,com.finguard.copilot.usage.ModelCallReservations calls) {
+        return new com.finguard.copilot.governance.BudgetReservations(jdbc,transactions,calls,java.time.Clock.systemUTC());
+    }
+
+    @Bean
     ModelUsageRecorder modelUsageRecorder(
             JdbcTemplate jdbc,
             CopilotProperties properties,
-            MeterRegistry meterRegistry
+            MeterRegistry meterRegistry,
+            com.finguard.copilot.governance.BudgetReservations budgets
     ) {
         CopilotProperties.Model model = properties.model();
         return new ModelUsageRecorder(jdbc,
@@ -45,7 +52,7 @@ public class FinGuardCopilotApplication {
                 new ModelCostCalculator.PriceTable(
                         model.priceTableVersion(), model.currency(), model.inputPricePerMillion(),
                         model.outputPricePerMillion()),
-                java.time.Clock.systemUTC(), meterRegistry);
+                java.time.Clock.systemUTC(), meterRegistry,budgets);
     }
 
     @Bean

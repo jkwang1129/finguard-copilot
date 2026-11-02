@@ -1,0 +1,172 @@
+{
+  "runId": "20261102191749",
+  "startedAt": "2026-11-02T19:17:49.7451515+08:00",
+  "status": "PASSED",
+  "coreDatabase": "fg_core_e2e_20261102191749",
+  "copilotDatabase": "fg_copilot_e2e_20261102191749",
+  "rabbitVhost": "fg-e2e-20261102191749",
+  "qdrantContainer": "fg-e2e-qdrant-20261102191749",
+  "provider": "deepseek",
+  "model": "local-test-stub",
+  "prompt": "review-analysis-v2",
+  "maxModelCalls": 1,
+  "embedding": "fixed-v1",
+  "currency": "CNY",
+  "priceTableVersion": "smoke-fixture-priced-v1",
+  "fixture": true,
+  "expectedCalls": 0,
+  "harnessSha256": "77e3587bb4a57009398b1dd8d731318180e34c54f2d0e144cf892f6df8fb1adf",
+  "smokeBudgetCny": 0.1,
+  "estimatedUpperBoundCny": 0.08,
+  "inputPricePerMillionCny": 2.0,
+  "outputPricePerMillionCny": 8.0,
+  "copilotJarSha256": "591f6e0d37724128df146a6f6d82033546b4a65d1833de064354e27cef15ab5a",
+  "coreJarSha256": "40dba283f5fdbbd38e0c6b55761718689c000ffa82f21e0262a3b5a384549b08",
+  "checks": [
+    {
+      "name": "Core health UP with real MySQL/RabbitMQ/Redis",
+      "passed": true
+    },
+    {
+      "name": "Copilot real-deepseek profile health UP",
+      "passed": true
+    },
+    {
+      "name": "Current V10 governance and exact JSON text schema is active",
+      "passed": true
+    },
+    {
+      "name": "Published knowledge retrieved from Qdrant and checksum-verified MySQL source",
+      "passed": true
+    },
+    {
+      "name": "Reviewer JWT authenticated by Core",
+      "passed": true
+    },
+    {
+      "name": "Core supplies actual sanitized task context",
+      "passed": true
+    },
+    {
+      "name": "Unauthenticated Copilot request rejected with 401",
+      "passed": true
+    },
+    {
+      "name": "ADMIN without REVIEWER rejected with 403",
+      "passed": true
+    },
+    {
+      "name": "Analysis accepted through authenticated HTTP with 202",
+      "passed": true
+    },
+    {
+      "name": "Identical Idempotency-Key returns the same analysis",
+      "passed": true
+    },
+    {
+      "name": "Actual fixture HTTP calls match admission decision",
+      "passed": true
+    },
+    {
+      "name": "Immutable manifest binds this model price and published index",
+      "passed": true
+    },
+    {
+      "name": "Admission reaches the expected failed terminal state without charge",
+      "passed": true
+    },
+    {
+      "name": "Admission rejected without a usable result",
+      "passed": true
+    },
+    {
+      "name": "Core business decision remains PENDING and version unchanged",
+      "passed": true
+    },
+    {
+      "name": "Core business and audit table checksums unchanged",
+      "passed": true
+    },
+    {
+      "name": "Invocation ledger count matches actual admission",
+      "passed": true
+    },
+    {
+      "name": "Durable model call claim count matches actual admission",
+      "passed": true
+    },
+    {
+      "name": "Provider correlation evidence is persisted without raw response",
+      "passed": true
+    },
+    {
+      "name": "Outbox published and Worker receipt persisted",
+      "passed": true
+    },
+    {
+      "name": "Initial dead-letter depth matches the terminal outcome",
+      "passed": true
+    },
+    {
+      "name": "Duplicate terminal event routed through actual RabbitMQ exchange",
+      "passed": true
+    },
+    {
+      "name": "Duplicate ACK observed without new ledger write, receipt or call claim",
+      "passed": true
+    },
+    {
+      "name": "Duplicate event did not issue another fixture HTTP request",
+      "passed": true
+    }
+  ],
+  "flywayVersion": "10",
+  "corePid": 16040,
+  "copilotPid": 8804,
+  "knowledge": {
+    "documentId": "finguard-large-amount-review-policy",
+    "citationPrecision": 1.0,
+    "status": "PUBLISHED",
+    "recallAtK": 1.0,
+    "indexVersion": "published-20261102191749",
+    "embeddingVersion": "fixed-v1",
+    "scope": "synthetic smoke case, not semantic quality evaluation",
+    "retrievedChunk": "finguard-large-amount-review-policy:v1:0",
+    "chunkCount": 1
+  },
+  "analysisId": "3d83c7e0-9306-47f9-b5ba-42894eb1be99",
+  "analysisStatus": "FAILED",
+  "failureCode": "MODEL_BUDGET_EXCEEDED",
+  "actualModelHttpCalls": 0,
+  "modelUsage": "",
+  "modelAccounting": null,
+  "manifest": {
+    "sha256": "47d8e4003698f52e4ab02f9feffd23fee4c0dbd3c0365b7966dafbab5d3000b2",
+    "fixture": true,
+    "indexVersion": "published-20261102191749",
+    "modelVersion": "p4-model-a4e105408b945a82d440a3791533c2c7d0b9b3064dc02d6e60d35b7e65e372d3",
+    "priceVersion": "smoke-fixture-priced-v1",
+    "inputUpperBound": 9702,
+    "reservedEstimateCny": "0.03540400"
+  },
+  "budget": null,
+  "providerEvidence": {
+    "count": 0,
+    "httpStatus": null,
+    "requestIdAvailable": null,
+    "returnedModelAvailable": null
+  },
+  "rabbitRedelivery": {
+    "unacknowledged": 0,
+    "deadLetterMessages": 1,
+    "ready": 0,
+    "ackBefore": 1,
+    "ackAfter": 2,
+    "deadLetterBefore": 1
+  },
+  "actualModelHttpCallsAfterDuplicate": 0,
+  "recommendation": null,
+  "citationCount": 0,
+  "servicesLeftRunning": false,
+  "finishedAt": "2026-11-02T19:18:53.5552567+08:00"
+}

@@ -28,8 +28,13 @@ public final class CompatibleChatModelGateway implements ModelGateway {
     private final CopilotProperties.Model model;
     private final ObjectMapper objectMapper;
     private final RestClient restClient;
+    private final java.util.function.Consumer<com.finguard.copilot.model.port.ProviderCallEvidence> evidence;
 
     public CompatibleChatModelGateway(CopilotProperties.Model model, RestClient.Builder restClientBuilder) {
+        this(model,restClientBuilder,ignored->{});
+    }
+    public CompatibleChatModelGateway(CopilotProperties.Model model,RestClient.Builder restClientBuilder,
+            java.util.function.Consumer<com.finguard.copilot.model.port.ProviderCallEvidence> evidence) {
         this.model = Objects.requireNonNull(model, "model must not be null");
         if (!model.apiKey().isPresent()) {
             throw new IllegalArgumentException("model api key must be configured");
@@ -38,6 +43,7 @@ public final class CompatibleChatModelGateway implements ModelGateway {
             throw new IllegalArgumentException("model base URL must be safe");
         }
         this.objectMapper = new ObjectMapper();
+        this.evidence=Objects.requireNonNull(evidence);
         this.restClient = Objects.requireNonNull(restClientBuilder, "restClientBuilder must not be null")
                 .baseUrl(model.baseUrl().toString())
                 .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + model.apiKey().value())
@@ -50,15 +56,18 @@ public final class CompatibleChatModelGateway implements ModelGateway {
         Instant started = Instant.now();
         try {
             JsonNode payload = requestPayload(request);
-            String responseBody = restClient.post()
+            var entity = restClient.post()
                     .uri(model.chatCompletionsPath())
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(payload)
                     .retrieve()
-                    .body(String.class);
+                    .toEntity(String.class);
+            String responseBody=entity.getBody();
+            observe(request,responseBody,entity.getHeaders(),entity.getStatusCode().value(),started);
             return response(objectMapper.readValue(responseBody, OpenAiCompatibleResponse.class),
                     Duration.between(started, Instant.now()));
         } catch (RestClientResponseException exception) {
+            observe(request,exception.getResponseBodyAsString(),exception.getResponseHeaders(),exception.getStatusCode().value(),started);
             throw upstreamFailure(exception.getStatusCode().value());
         } catch (ResourceAccessException exception) {
             throw new CopilotException(ErrorCode.MODEL_TIMEOUT, "model provider timed out");
@@ -67,38 +76,27 @@ public final class CompatibleChatModelGateway implements ModelGateway {
         }
     }
 
+    private void observe(ModelRequest request,String body,HttpHeaders headers,int status,Instant started) {
+        JsonNode parsed=objectMapper.createObjectNode();
+        if(body!=null) try {parsed=objectMapper.readTree(body);} catch(JsonProcessingException ignored) { /* Metadata may be unavailable. */ }
+        if(parsed==null) parsed=objectMapper.createObjectNode();
+        String providerId=parsed.path("id").isTextual()?parsed.path("id").asText():null;
+        if(providerId==null && headers!=null) providerId=headers.getFirst("x-request-id");
+        String returnedModel=parsed.path("model").isTextual()?parsed.path("model").asText():null;
+        JsonNode input=parsed.path("usage").path("prompt_tokens"),output=parsed.path("usage").path("completion_tokens");
+        evidence.accept(new com.finguard.copilot.model.port.ProviderCallEvidence(request.requestId(),model.provider(),metadataHash(providerId),metadataHash(returnedModel),
+                status,input.isIntegralNumber()&&input.canConvertToLong()?input.longValue():null,
+                output.isIntegralNumber()&&output.canConvertToLong()?output.longValue():null,Math.max(0,Duration.between(started,Instant.now()).toMillis())));
+    }
+    private String metadataHash(String value) {
+        if(value==null || value.isBlank() || value.length()>512) return null;
+        try {return java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256").digest(value.getBytes(java.nio.charset.StandardCharsets.UTF_8)));}
+        catch(java.security.NoSuchAlgorithmException e){throw new IllegalStateException(e);}
+    }
+
     private JsonNode requestPayload(ModelRequest request) throws JsonProcessingException {
-        ObjectNode payload = objectMapper.createObjectNode();
-        payload.put("model", model.modelId());
-        ArrayNode messages = payload.putArray("messages");
-        messages.addObject().put("role", "system").put("content",
-                request.systemInstruction() + "\nOUTPUT_SCHEMA\n" + request.outputSchemaJson());
-        messages.addObject().put("role", "user").put("content", request.context());
-        payload.put("max_tokens", Math.min(request.maxOutputTokens(), model.outputTokenLimit()));
-        payload.put("temperature", effectiveTemperature(request.temperature()));
-        if ("deepseek".equalsIgnoreCase(model.provider())) {
-            payload.putObject("thinking").put("type", "disabled");
-        }
-
-        ObjectNode responseFormat = payload.putObject("response_format");
-        if ("qwen".equalsIgnoreCase(model.provider()) || "deepseek".equalsIgnoreCase(model.provider())) {
-            responseFormat.put("type", "json_object");
-        } else {
-            responseFormat.put("type", "json_schema");
-            ObjectNode jsonSchema = responseFormat.putObject("json_schema");
-            jsonSchema.put("name", "review_analysis");
-            jsonSchema.set("schema", objectMapper.readTree(request.outputSchemaJson()));
-        }
-        return payload;
+        return CompatibleChatRequestPayload.create(model,request);
     }
-
-    private double effectiveTemperature(double requested) {
-        if ("zhipu".equalsIgnoreCase(model.provider()) && requested == 0d) {
-            return 0.01d;
-        }
-        return requested;
-    }
-
     private ModelResponse response(OpenAiCompatibleResponse response, Duration latency) {
         if (response == null || response.choices() == null || response.choices().isEmpty()
                 || response.choices().get(0) == null || response.choices().get(0).message() == null

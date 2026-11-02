@@ -1,0 +1,13 @@
+{
+  "author_sha256": "524ac37cd669cc7d2cacbdf6191bc282881676cd7ae4208dcae021375f0f109e",
+  "category_counts": {
+    "all": 4,
+    "conflict": 4,
+    "injection": 4,
+    "single": 4
+  },
+  "count": 16,
+  "dataset_sha256": "a1aa55d0d29907a73d40ca3f1131464f418bbe0ca452cec7f6baa36fa555d420",
+  "label_source": "isolated AI author, not human",
+  "reference_source_sha256": "0473599ab881da31ad549a8e009ae0252c727da1ab8dc272e1cb0c2a6f101960"
+}

@@ -51,6 +51,87 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 class AnalysisWorkerModelUsageTest {
 
+    @Test void reservedCallRecoveryHasAnAttemptBoundEvenIfClockStalls() {
+        var codec=new SnapshotCodec();var snapshot=codec.capture(facts());
+        var runs=mock(AnalysisRunRepository.class);
+        when(runs.findForWork(ANALYSIS_ID)).thenReturn(Optional.of(new AnalysisRunRepository.WorkView(
+                ANALYSIS_ID,AnalysisStatus.CONTEXT_READY,null,new String(codec.canonicalBytes(snapshot),StandardCharsets.UTF_8),snapshot.sha256(),null)));
+        when(runs.updateStatus(any(),any(),any(),any(),any())).thenReturn(1);
+        var model=mock(AnalysisOrchestrator.class);when(model.requiresModelCall()).thenReturn(true);when(model.managesModelReservation()).thenReturn(true);
+        var reservations=mock(ModelCallReservations.class);when(reservations.reservedAt(ANALYSIS_ID)).thenReturn(Optional.of(CAPTURED_AT));
+        var transactions=mock(TransactionTemplate.class);
+        doAnswer(invocation->invocation.<org.springframework.transaction.support.TransactionCallback<?>>getArgument(0).doInTransaction(null)).when(transactions).execute(any());
+        doAnswer(invocation->{invocation.<java.util.function.Consumer<org.springframework.transaction.TransactionStatus>>getArgument(0).accept(null);return null;})
+                .when(transactions).executeWithoutResult(any());
+        var worker=new AnalysisWorker(runs,codec,model,new AnalysisOutputSchemaValidator(),new FactConsistencyValidator(),transactions,
+                confirmedRabbit(),new ObjectMapper(),properties(),Clock.fixed(CAPTURED_AT,ZoneOffset.UTC),mock(ModelUsageRecorder.class),reservations);
+        assertThat(worker.process(new AnalysisRequestedMessage(1,EVENT_ID,ANALYSIS_ID,CAPTURED_AT),Integer.MAX_VALUE))
+                .isEqualTo(AnalysisWorker.WorkerOutcome.DEAD_LETTERED);
+        verify(model,never()).execute(any(),any());
+    }
+
+    @Test
+    void capacityLossAfterCommittedClaimIsTerminalWithoutAnotherRetry() {
+        var codec=new SnapshotCodec();var snapshot=codec.capture(facts());
+        var runs=mock(AnalysisRunRepository.class);
+        when(runs.findForWork(ANALYSIS_ID)).thenReturn(Optional.of(new AnalysisRunRepository.WorkView(
+                ANALYSIS_ID,AnalysisStatus.CONTEXT_READY,null,new String(codec.canonicalBytes(snapshot),StandardCharsets.UTF_8),snapshot.sha256(),null)));
+        when(runs.updateStatus(any(),any(),any(),any(),any())).thenReturn(1);
+        var model=mock(AnalysisOrchestrator.class);when(model.requiresModelCall()).thenReturn(true);when(model.managesModelReservation()).thenReturn(true);
+        when(model.execute(eq(ANALYSIS_ID),any())).thenThrow(new com.finguard.copilot.governance.ClaimedCallNotSentException(ErrorCode.MODEL_CAPACITY_UNAVAILABLE));
+        var reservations=mock(ModelCallReservations.class);
+        when(reservations.reservedAt(ANALYSIS_ID)).thenReturn(Optional.empty(),Optional.of(CAPTURED_AT));
+        var transactions=mock(TransactionTemplate.class);
+        doAnswer(invocation->invocation.<org.springframework.transaction.support.TransactionCallback<?>>getArgument(0).doInTransaction(null)).when(transactions).execute(any());
+        doAnswer(invocation->{invocation.<java.util.function.Consumer<org.springframework.transaction.TransactionStatus>>getArgument(0).accept(null);return null;})
+                .when(transactions).executeWithoutResult(any());
+        var recorder=mock(ModelUsageRecorder.class);var rabbit=confirmedRabbit();
+        var worker=new AnalysisWorker(runs,codec,model,new AnalysisOutputSchemaValidator(),new FactConsistencyValidator(),transactions,
+                rabbit,new ObjectMapper(),properties(),Clock.fixed(CAPTURED_AT,ZoneOffset.UTC),recorder,reservations);
+        assertThat(worker.process(new AnalysisRequestedMessage(1,EVENT_ID,ANALYSIS_ID,CAPTURED_AT),1)).isEqualTo(AnalysisWorker.WorkerOutcome.DEAD_LETTERED);
+        org.mockito.Mockito.verifyNoInteractions(recorder);
+        verify(rabbit,never()).convertAndSend(eq(RabbitTopologyConfiguration.RETRY_EXCHANGE),anyString(),any(),any(MessagePostProcessor.class),any(CorrelationData.class));
+    }
+
+    @Test
+    void numericGuardRejectionRecordsUsageAndNeverStoresResult() {
+        SnapshotCodec codec = new SnapshotCodec();
+        FactSnapshot snapshot = codec.capture(facts());
+        AnalysisRunRepository runs = mock(AnalysisRunRepository.class);
+        when(runs.findForWork(ANALYSIS_ID)).thenReturn(Optional.of(new AnalysisRunRepository.WorkView(
+                ANALYSIS_ID, AnalysisStatus.CONTEXT_READY, null,
+                new String(codec.canonicalBytes(snapshot), StandardCharsets.UTF_8), snapshot.sha256(), null)));
+        when(runs.updateStatus(any(), any(), any(), any(), any())).thenReturn(1);
+        AnalysisOrchestrator model = mock(AnalysisOrchestrator.class);
+        when(model.requiresModelCall()).thenReturn(true);
+        ModelUsage usage = new ModelUsage(120, 25, Duration.ofMillis(42));
+        when(model.execute(eq(ANALYSIS_ID), any(FactSnapshot.class)))
+                .thenThrow(new ModelInvocationException(ErrorCode.FACT_VALIDATION_FAILED, "qwen",
+                        "model-v1", "prompt-v1", usage, "FAILURE"));
+        ModelCallReservations reservations = mock(ModelCallReservations.class);
+        when(reservations.reserve(eq(ANALYSIS_ID), any())).thenReturn(true);
+        ModelUsageRecorder recorder = mock(ModelUsageRecorder.class);
+        TransactionTemplate transactions = mock(TransactionTemplate.class);
+        doAnswer(invocation -> invocation.<org.springframework.transaction.support.TransactionCallback<?>>getArgument(0)
+                .doInTransaction(null)).when(transactions).execute(any());
+        doAnswer(invocation -> {
+            invocation.<java.util.function.Consumer<org.springframework.transaction.TransactionStatus>>getArgument(0)
+                    .accept(null);
+            return null;
+        }).when(transactions).executeWithoutResult(any());
+        AnalysisWorker worker = new AnalysisWorker(runs, codec, model, new AnalysisOutputSchemaValidator(),
+                new FactConsistencyValidator(), transactions, confirmedRabbit(), new ObjectMapper(), properties(),
+                Clock.fixed(CAPTURED_AT, ZoneOffset.UTC), recorder, reservations);
+
+        assertThat(worker.process(new AnalysisRequestedMessage(1, EVENT_ID, ANALYSIS_ID, CAPTURED_AT), 1))
+                .isEqualTo(AnalysisWorker.WorkerOutcome.DEAD_LETTERED);
+        verify(recorder).record(ANALYSIS_ID, "qwen", "model-v1", "prompt-v1", usage, "FAILURE");
+        verify(runs).updateStatus(ANALYSIS_ID, AnalysisStatus.CONTEXT_READY, AnalysisStatus.FAILED,
+                "FACT_VALIDATION_FAILED", CAPTURED_AT);
+        verify(runs).insertReceipt(EVENT_ID, ANALYSIS_ID, CAPTURED_AT);
+        verify(runs, never()).insertResult(any(), any(Integer.class), anyString(), anyString(), any());
+    }
+
     @Test
     void committedReservationPreventsSecondPaidCallAfterResultWriteFails() {
         SnapshotCodec codec = new SnapshotCodec();

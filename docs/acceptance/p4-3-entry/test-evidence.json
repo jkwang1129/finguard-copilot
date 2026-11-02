@@ -1,0 +1,32 @@
+{
+  "java": {
+    "scope": "same-day prior full suite, not rerun for this closeout",
+    "reportCount": 70,
+    "tests": 333,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "record": "docs/acceptance/2026-11-02-p4-2-seven-fixes.md",
+    "localLog": "target/fix7-verified-java.log",
+    "localLogSha256": "2ec8f55939d1d3ca263ba915f1b93a501fd27a62ba739ffe9321892348a5c8bd"
+  },
+  "python": {
+    "scope": "this closeout full offline suite",
+    "passed": 172,
+    "failed": 0,
+    "skipped": 0,
+    "command": "uv run --project tools/agent-evaluation pytest tools/agent-evaluation/tests -q",
+    "localLog": "target/p4-entry-python-final.log",
+    "localLogSha256": "8fb68603b91d10e91ccb82154b85dbcca57a1f4995136a7a3914b2e501fdb002"
+  },
+  "packaging": {
+    "coreAndCopilot": "mvn -q -DskipTests package, exit 0",
+    "isTestRun": false
+  },
+  "review": {
+    "independent": "partial first review interrupted by model usage limit, then resumed; ACK evidence issue addressed by RED/GREEN test and local reruns",
+    "newAckTests": "empty queue with stale ACK rejected; later ACK accepted",
+    "harnessCorrection": "FAILED terminal initially publishes one DLQ message by design; compare duplicate DLQ depth to baseline, not zero",
+    "failedControlReport": "docs/acceptance/p4-3-entry/ack-harness-failure.json"
+  }
+}

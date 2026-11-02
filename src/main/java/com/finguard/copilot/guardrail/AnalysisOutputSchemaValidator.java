@@ -48,6 +48,7 @@ public final class AnalysisOutputSchemaValidator {
     public AnalysisOutputSchemaValidator(ObjectMapper mapper) {
         this.mapper = Objects.requireNonNull(mapper, "mapper must not be null")
                 .copy()
+                .enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS)
                 .enable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                 .enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS);
         if (PUBLISHED_SCHEMA.isMissingNode()) {

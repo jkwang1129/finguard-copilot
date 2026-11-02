@@ -37,6 +37,31 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 class CompatibleChatModelGatewayTest {
 
+    @Test void capturesOnlyHashedProviderCorrelationAndReportedUsage() {
+        var builder=RestClient.builder();var server=MockRestServiceServer.bindTo(builder).build();
+        var captured=new java.util.concurrent.atomic.AtomicReference<com.finguard.copilot.model.port.ProviderCallEvidence>();
+        var gateway=new CompatibleChatModelGateway(model("deepseek","deepseek-flash"),builder,captured::set);
+        server.expect(requestTo("https://model.example.internal/v1/chat/completions")).andRespond(withSuccess("""
+                {"id":"provider-id-1","model":"provider-model-v1","choices":[{"message":{"content":"{}"}}],"usage":{"prompt_tokens":10,"completion_tokens":5}}
+                """,MediaType.APPLICATION_JSON));
+        gateway.complete(request());server.verify();
+        assertThat(captured.get().providerRequestIdSha256()).isEqualTo(com.finguard.copilot.governance.CanonicalJson.sha256("provider-id-1"));
+        assertThat(captured.get().reportedInputTokens()).isEqualTo(10);
+        assertThat(captured.get().toString()).doesNotContain("provider-id-1","provider-model-v1","secret-for-test-only","system policy");
+    }
+
+    @Test void capturesErrorResponseCorrelationWithoutRetryOrRawBody() {
+        var builder=RestClient.builder();var server=MockRestServiceServer.bindTo(builder).build();
+        var captured=new java.util.concurrent.atomic.AtomicReference<com.finguard.copilot.model.port.ProviderCallEvidence>();
+        var gateway=new CompatibleChatModelGateway(model("deepseek","deepseek-flash"),builder,captured::set);
+        server.expect(requestTo("https://model.example.internal/v1/chat/completions")).andRespond(withStatus(TOO_MANY_REQUESTS)
+                .header("x-request-id","provider-error-1").body("private upstream error"));
+        assertThatThrownBy(()->gateway.complete(request())).isInstanceOf(CopilotException.class);server.verify();
+        assertThat(captured.get().httpStatus()).isEqualTo(429);
+        assertThat(captured.get().providerRequestIdSha256()).isEqualTo(com.finguard.copilot.governance.CanonicalJson.sha256("provider-error-1"));
+        assertThat(captured.get().toString()).doesNotContain("private upstream error","provider-error-1");
+    }
+
     @Test
     void configuredTimeoutStopsSlowLocalModelResponse() throws Exception {
         HttpServer server = HttpServer.create(new InetSocketAddress(InetAddress.getLoopbackAddress(), 0), 0);
@@ -145,6 +170,41 @@ class CompatibleChatModelGatewayTest {
 
         gateway.complete(request());
 
+        server.verify();
+    }
+
+    @Test
+    void doesNotOfferOrExecuteModelSuppliedArbitraryTools() {
+        RestClient.Builder builder = RestClient.builder();
+        MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
+        CompatibleChatModelGateway gateway = new CompatibleChatModelGateway(model(), builder);
+        server.expect(requestTo("https://model.example.internal/v1/chat/completions"))
+                .andExpect(method(org.springframework.http.HttpMethod.POST))
+                .andExpect(jsonPath("$.tools").doesNotExist())
+                .andRespond(withSuccess("""
+                        {"choices":[{"message":{"content":null,"tool_calls":[{"type":"function",
+                        "function":{"name":"http_get","arguments":"{\\"url\\":\\"http://127.0.0.1/admin\\"}"}}]}}],
+                        "usage":{"prompt_tokens":10,"completion_tokens":3}}
+                        """, MediaType.APPLICATION_JSON));
+
+        assertThatThrownBy(() -> gateway.complete(request()))
+                .isInstanceOfSatisfying(CopilotException.class,
+                        exception -> assertThat(exception.code()).isEqualTo(ErrorCode.MODEL_OUTPUT_INVALID));
+        server.verify();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"\"tool_calls\":[{\"type\":\"function\",\"function\":{\"name\":\"http_get\",\"arguments\":\"{}\"}}]",
+            "\"function_call\":{\"name\":\"http_get\",\"arguments\":\"{}\"}"})
+    void rejectsToolCallsEvenWhenMessageAlsoContainsText(String extra) {
+        RestClient.Builder builder = RestClient.builder();
+        MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
+        CompatibleChatModelGateway gateway = new CompatibleChatModelGateway(model(), builder);
+        server.expect(requestTo("https://model.example.internal/v1/chat/completions"))
+                .andRespond(withSuccess("{\"choices\":[{\"message\":{\"content\":\"{}\"," + extra
+                        + "}}],\"usage\":{\"prompt_tokens\":10,\"completion_tokens\":3}}", MediaType.APPLICATION_JSON));
+        assertThatThrownBy(() -> gateway.complete(request())).isInstanceOfSatisfying(CopilotException.class,
+                exception -> assertThat(exception.code()).isEqualTo(ErrorCode.MODEL_OUTPUT_INVALID));
         server.verify();
     }
 

@@ -108,6 +108,8 @@ $env:SPRING_PROFILES_ACTIVE = "stub"
 
 ## 核心原则
 
+P4-3 已接入的运行清单、预算和Redis许可配置见[调用与费用治理运行说明](docs/operations/phase4-3-governance.md)；[验收进度及边界](docs/acceptance/2026-11-02-p4-3-governance.md)单独记录。当前真实路由候选仅DeepSeek主模型，未通过评测的供应商不自动备用。
+
 1. Core 决定业务事实，模型只负责解释与辅助。
 2. 实时业务数据来自 Core API；RAG 只保存制度、手册和脱敏案例。
 3. MVP 没有业务写工具，最终决定仍由 `REVIEWER` 在 Core 中完成。

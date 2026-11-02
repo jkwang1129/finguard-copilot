@@ -51,6 +51,14 @@ public final class KnowledgeRetrievalService {
     }
 
     public List<KnowledgeEvidence> retrieve(String query, int topK) {
+        return retrieveBatch(query,topK).evidence();
+    }
+
+    public record RetrievalBatch(String indexVersion,List<KnowledgeEvidence> evidence) {
+        public RetrievalBatch { evidence=List.copyOf(evidence); }
+    }
+
+    public RetrievalBatch retrieveBatch(String query,int topK) {
         if (query == null || query.isBlank() || topK < 1 || topK > maximumTopK) {
             throw new IllegalArgumentException("retrieval query parameters are invalid");
         }
@@ -59,11 +67,12 @@ public final class KnowledgeRetrievalService {
                 .orElseThrow(() -> new KnowledgeRetrievalException(
                         KnowledgeRetrievalException.KNOWLEDGE_UNAVAILABLE + ": no published index"));
         try {
-            return vectorStore.search(new VectorSearchQuery(
+            var evidence=vectorStore.search(new VectorSearchQuery(
                             indexVersion, embeddingGateway.embed(query, embeddingVersion), topK)).stream()
                     .filter(result -> result.score() >= minimumScore)
                     .map(result -> toEvidence(indexVersion, result.document(), result.score()))
                     .toList();
+            return new RetrievalBatch(indexVersion,evidence);
         } catch (KnowledgeRetrievalException exception) {
             throw exception;
         } catch (RuntimeException exception) {

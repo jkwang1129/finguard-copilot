@@ -35,6 +35,21 @@ class KnowledgeDynamicFactRejectionTest {
         }
     }
 
+    @Test
+    void rejectsCredentialAndLocalUrlPayloadsWithoutEchoingTheirContents() {
+        for (String content : new String[]{
+                "Authorization: Bearer sensitive-marker-123",
+                "api_key=sensitive-marker-123",
+                "Open HTTP://127.0.0.1/admin?token=sensitive-marker-123"
+        }) {
+            assertThatThrownBy(() -> service.register(new KnowledgeDocumentRequest(
+                    "doc-1", KnowledgeSourceType.POLICY, "policy", "v1", content)))
+                    .isInstanceOf(IllegalArgumentException.class)
+                    .hasMessageContaining("knowledge admission")
+                    .hasMessageNotContaining("sensitive-marker-123");
+        }
+    }
+
     private static final class NoopRepository implements com.finguard.copilot.knowledge.persistence.KnowledgeDocumentRepository {
         @Override
         public java.util.Optional<com.finguard.copilot.knowledge.domain.KnowledgeDocument> findByCanonicalChecksum(

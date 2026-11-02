@@ -1,0 +1,16 @@
+{
+  "author_sha256": "524ac37cd669cc7d2cacbdf6191bc282881676cd7ae4208dcae021375f0f109e",
+  "category_counts": {
+    "all": 4,
+    "conflict": 4,
+    "injection": 4,
+    "single": 4
+  },
+  "count": 16,
+  "dataset_sha256": "a1aa55d0d29907a73d40ca3f1131464f418bbe0ca452cec7f6baa36fa555d420",
+  "evaluation_revision": "v2-r3-freeze-all-validator-dependencies",
+  "label_source": "isolated AI author, not human",
+  "parser_source_sha256": "f9c19d7d9f7eddc132e5180ae966dc55df4d35b9ac80791ee940a1637519147d",
+  "prior_data_visibility": "evaluator corrected after cases and initial results seen; not a new unseen run",
+  "reference_source_sha256": "25850f7856158b40949452bc4217eab41ccb5db3a6b516c02e98916761cb6c6a"
+}

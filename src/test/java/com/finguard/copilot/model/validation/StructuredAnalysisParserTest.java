@@ -23,6 +23,17 @@ class StructuredAnalysisParserTest {
     }
 
     @Test
+    void preservesFullDecimalThroughParserAndStoredResultValidation() {
+        String precise=validJson().replace("120000","99.999999999999999999");
+        assertThat(parser.parse(precise).businessEvidence().get(0).amount()).isEqualByComparingTo("99.999999999999999999");
+        var schema=new com.finguard.copilot.guardrail.AnalysisOutputSchemaValidator();
+        assertThat(schema.validate(precise).businessEvidence().get(0).amount()).isEqualByComparingTo("99.999999999999999999");
+        assertThat(schema.validate(precise.getBytes(java.nio.charset.StandardCharsets.UTF_8)).businessEvidence().get(0).amount())
+                .isEqualByComparingTo("99.999999999999999999");
+        assertInvalid(precise.replace("99.999999999999999999","\"99.999999999999999999\""));
+    }
+
+    @Test
     void acceptsJsonWrappedInMarkdownCodeFence() {
         AnalysisResult result = parser.parse("```json\n" + validJson() + "\n```");
 

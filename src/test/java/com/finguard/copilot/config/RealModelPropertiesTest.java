@@ -20,6 +20,7 @@ import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Configuration;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class RealModelPropertiesTest {
 
@@ -128,6 +129,86 @@ class RealModelPropertiesTest {
                     assertThat(context).hasNotFailed();
                     assertThat(context).hasSingleBean(com.finguard.copilot.knowledge.port.VectorStore.class);
                     assertThat(context).hasSingleBean(com.finguard.copilot.knowledge.retrieval.KnowledgeRetrievalService.class);
+                });
+    }
+
+    @Test
+    void bindsReviewedNumericRuleIntoTheRealModelConfiguration() throws Exception {
+        String text = "approved numeric policy";
+        String checksum = java.util.HexFormat.of().formatHex(java.security.MessageDigest.getInstance("SHA-256")
+                .digest(text.getBytes(java.nio.charset.StandardCharsets.UTF_8)));
+        contextRunner.withUserConfiguration(RealModelConfiguration.class)
+                .withPropertyValues(BASE_PROPERTIES)
+                .withPropertyValues("spring.profiles.active=real-qwen",
+                        "finguard.copilot.model.provider=qwen", "finguard.copilot.model.model-id=qwen-plus",
+                        "finguard.copilot.model.base-url=https://dashscope.aliyuncs.com/compatible-mode/v1",
+                        "finguard.copilot.model.api-key=secret-for-test-only",
+                        "finguard.copilot.model.price-table-version=free-v1",
+                        "finguard.copilot.numeric-guard.rules[0].version=threshold-v1",
+                        "finguard.copilot.numeric-guard.rules[0].rule-code=HO_RULE_03",
+                        "finguard.copilot.numeric-guard.rules[0].currency=USD",
+                        "finguard.copilot.numeric-guard.rules[0].operator=GT",
+                        "finguard.copilot.numeric-guard.rules[0].threshold=0.100000000000000001",
+                        "finguard.copilot.numeric-guard.rules[0].document-id=HO-P03",
+                        "finguard.copilot.numeric-guard.rules[0].document-version=1.0",
+                        "finguard.copilot.numeric-guard.rules[0].section-path=threshold",
+                        "finguard.copilot.numeric-guard.rules[0].content-sha256=" + checksum)
+                .run(context -> {
+                    assertThat(context).hasNotFailed();
+                    assertThat(context).hasSingleBean(com.finguard.copilot.guardrail.NumericThresholdGuard.class);
+                    assertThat(context.getBean(NumericGuardProperties.class).rules()).singleElement()
+                            .satisfies(rule -> assertThat(rule.threshold())
+                                    .isEqualByComparingTo("0.100000000000000001"));
+                    java.time.Instant now = java.time.Instant.parse("2026-10-27T00:00:00Z");
+                    var amount = new java.math.BigDecimal("0.100000000000000002");
+                    var facts = new com.finguard.copilot.coreclient.port.ReviewTaskContext(
+                            new com.finguard.copilot.coreclient.port.ReviewTaskContext.ReviewTask(
+                                    1, 0, "PENDING", "HO_RULE_03", "ALERT", now),
+                            new com.finguard.copilot.coreclient.port.ReviewTaskContext.Transaction(
+                                    2, 3, amount, "USD", now, "SYNTHETIC"),
+                            new com.finguard.copilot.coreclient.port.ReviewTaskContext.Reconciliation(
+                                    "MATCHED", "REFERENCE", "ALERT"), java.util.List.of(),
+                            new com.finguard.copilot.coreclient.port.ReviewTaskContext.AccountSummary("ACTIVE", "masked"), now);
+                    var result = new com.finguard.copilot.analysis.domain.AnalysisResult(1,
+                            java.util.UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), "summary", "explanation",
+                            java.util.List.of(new com.finguard.copilot.analysis.domain.AnalysisResult.BusinessEvidence(
+                                    2, 3, amount, "USD", "HO_RULE_03", "ALERT", java.util.List.of("transaction.amount"))),
+                            java.util.List.of(new com.finguard.copilot.analysis.domain.AnalysisResult.PolicyCitation(
+                                    "HO-P03", "1.0", "threshold", text)),
+                            com.finguard.copilot.analysis.domain.AnalysisRecommendation.IGNORED,
+                            "wrong", java.util.List.of(), java.util.List.of());
+                    var citation = new com.finguard.copilot.knowledge.domain.KnowledgeCitation(
+                            "HO-P03", "1.0", "chunk", "threshold", checksum, 0.9, "published-v1");
+                    assertThatThrownBy(() -> context.getBean(com.finguard.copilot.guardrail.NumericThresholdGuard.class)
+                            .validate(facts, result, java.util.List.of(
+                                    new com.finguard.copilot.knowledge.retrieval.KnowledgeEvidence(citation, text))))
+                            .isInstanceOf(com.finguard.copilot.common.error.CopilotException.class);
+                });
+    }
+
+    @Test
+    void bindsReviewedPolicyConditionsAndAuthorityIntoProductionOrchestrator() {
+        contextRunner.withUserConfiguration(RealModelConfiguration.class).withPropertyValues(BASE_PROPERTIES)
+                .withPropertyValues("spring.profiles.active=real-qwen","finguard.copilot.model.provider=qwen",
+                        "finguard.copilot.model.model-id=qwen-plus","finguard.copilot.model.base-url=https://dashscope.aliyuncs.com/compatible-mode/v1",
+                        "finguard.copilot.model.api-key=test-only","finguard.copilot.model.price-table-version=test",
+                        "finguard.copilot.reviewed-policy.sets[0].version=all-v1",
+                        "finguard.copilot.reviewed-policy.sets[0].rule-code=COMBINED",
+                        "finguard.copilot.reviewed-policy.sets[0].currency=USD",
+                        "finguard.copilot.reviewed-policy.sets[0].policies[0].binding.document-id=approved",
+                        "finguard.copilot.reviewed-policy.sets[0].policies[0].binding.document-version=v1",
+                        "finguard.copilot.reviewed-policy.sets[0].policies[0].binding.section-path=Document",
+                        "finguard.copilot.reviewed-policy.sets[0].policies[0].binding.content-sha256="+"a".repeat(64),
+                        "finguard.copilot.reviewed-policy.sets[0].policies[0].conditions[0].field=AMOUNT",
+                        "finguard.copilot.reviewed-policy.sets[0].policies[0].conditions[0].operator=GTE",
+                        "finguard.copilot.reviewed-policy.sets[0].policies[0].conditions[0].value=100.000000000000000001",
+                        "finguard.copilot.reviewed-policy.sets[0].policies[0].on-match=CONFIRMED",
+                        "finguard.copilot.reviewed-policy.sets[0].policies[0].on-miss=IGNORED")
+                .run(context->{
+                    assertThat(context).hasNotFailed();
+                    assertThat(context.getBean(com.finguard.copilot.guardrail.ReviewedPolicyGuard.class).ruleCodes()).containsExactly("COMBINED");
+                    assertThat(context.getBean(ReviewedPolicyProperties.class).sets().get(0).policies().get(0).conditions().get(0).value())
+                            .isEqualTo("100.000000000000000001");
                 });
     }
 

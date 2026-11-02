@@ -1,0 +1,128 @@
+{
+  "accuracy_total": {
+    "correct": 20,
+    "total": 20
+  },
+  "bad_cases": [],
+  "cases": [
+    {
+      "case_id": "P4H01",
+      "matches_label": true,
+      "status": "completed"
+    },
+    {
+      "case_id": "P4H02",
+      "matches_label": true,
+      "status": "completed"
+    },
+    {
+      "case_id": "P4H03",
+      "matches_label": true,
+      "status": "completed"
+    },
+    {
+      "case_id": "P4H04",
+      "matches_label": true,
+      "status": "completed"
+    },
+    {
+      "case_id": "P4H05",
+      "matches_label": true,
+      "status": "completed"
+    },
+    {
+      "case_id": "P4H06",
+      "matches_label": true,
+      "status": "completed"
+    },
+    {
+      "case_id": "P4H07",
+      "matches_label": true,
+      "status": "completed"
+    },
+    {
+      "case_id": "P4H08",
+      "matches_label": true,
+      "status": "completed"
+    },
+    {
+      "case_id": "P4H09",
+      "matches_label": true,
+      "status": "completed"
+    },
+    {
+      "case_id": "P4H10",
+      "matches_label": true,
+      "status": "completed"
+    },
+    {
+      "case_id": "P4H11",
+      "matches_label": true,
+      "status": "completed"
+    },
+    {
+      "case_id": "P4H12",
+      "matches_label": true,
+      "status": "completed"
+    },
+    {
+      "case_id": "P4H13",
+      "matches_label": true,
+      "status": "completed"
+    },
+    {
+      "case_id": "P4H14",
+      "matches_label": true,
+      "status": "completed"
+    },
+    {
+      "case_id": "P4H15",
+      "matches_label": true,
+      "status": "completed"
+    },
+    {
+      "case_id": "P4H16",
+      "matches_label": true,
+      "status": "completed"
+    },
+    {
+      "case_id": "P4H17",
+      "matches_label": true,
+      "status": "completed"
+    },
+    {
+      "case_id": "P4H18",
+      "matches_label": true,
+      "status": "completed"
+    },
+    {
+      "case_id": "P4H19",
+      "matches_label": true,
+      "status": "completed"
+    },
+    {
+      "case_id": "P4H20",
+      "matches_label": true,
+      "status": "completed"
+    }
+  ],
+  "counts": {
+    "completed": 20,
+    "failed": 0,
+    "not_run": 0
+  },
+  "dataset_sha256": "eb9146eb4c2325018b27963a2c62e0ce6a8847d00032a6fe3b91e325aaa5d3d2",
+  "dataset_version": "phase4-holdout-v1",
+  "manifest": {
+    "dataset_sha256": "eb9146eb4c2325018b27963a2c62e0ce6a8847d00032a6fe3b91e325aaa5d3d2",
+    "dataset_version": "phase4-holdout-v1",
+    "index_version": "synthetic-v1",
+    "model_version": "none",
+    "prompt_version": "none",
+    "rule_version": "synthetic-single-threshold-v1",
+    "source": "langgraph-offline"
+  },
+  "outcome_verification": "unverified",
+  "refused": 9,
+  "version_verification": "unverified"
+}

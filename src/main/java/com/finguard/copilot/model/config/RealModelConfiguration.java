@@ -1,6 +1,10 @@
 package com.finguard.copilot.model.config;
 
 import com.finguard.copilot.config.CopilotProperties;
+import com.finguard.copilot.config.NumericGuardProperties;
+import com.finguard.copilot.config.ReviewedPolicyProperties;
+import com.finguard.copilot.guardrail.ReviewedPolicyGuard;
+import com.finguard.copilot.guardrail.NumericThresholdGuard;
 import com.finguard.copilot.model.adapter.openai.CompatibleChatModelGateway;
 import com.finguard.copilot.model.port.ModelGateway;
 import com.finguard.copilot.analysis.application.AnalysisOrchestrator;
@@ -35,7 +39,8 @@ import java.time.Duration;
 
 @Configuration(proxyBeanMethods = false)
 @Profile({"real-model", "real-qwen", "real-deepseek", "real-zhipu"})
-@EnableConfigurationProperties(CopilotProperties.class)
+@EnableConfigurationProperties({CopilotProperties.class, NumericGuardProperties.class, ReviewedPolicyProperties.class,
+        com.finguard.copilot.governance.GovernanceProperties.class,com.finguard.copilot.governance.PermitProperties.class})
 public class RealModelConfiguration {
 
     @Bean
@@ -46,9 +51,9 @@ public class RealModelConfiguration {
     }
 
     @Bean
-    ModelGateway modelGateway(CopilotProperties.Model model) {
+    ModelGateway modelGateway(CopilotProperties.Model model,ObjectProvider<com.finguard.copilot.governance.BudgetReservations> budgets) {
         return new CompatibleChatModelGateway(model,
-                RestClient.builder().requestFactory(modelRequestFactory(model.timeout())));
+                RestClient.builder().requestFactory(modelRequestFactory(model.timeout())),value->budgets.getObject().recordProviderEvidence(value));
     }
 
     public static JdkClientHttpRequestFactory modelRequestFactory(Duration timeout) {
@@ -74,6 +79,16 @@ public class RealModelConfiguration {
     @Bean
     StructuredAnalysisParser structuredAnalysisParser() {
         return new StructuredAnalysisParser();
+    }
+
+    @Bean
+    NumericThresholdGuard numericThresholdGuard(NumericGuardProperties properties) {
+        return new NumericThresholdGuard(properties.rules());
+    }
+
+    @Bean
+    ReviewedPolicyGuard reviewedPolicyGuard(ReviewedPolicyProperties properties) {
+        return new ReviewedPolicyGuard(properties.sets());
     }
 
     @Bean
@@ -119,16 +134,59 @@ public class RealModelConfiguration {
     }
 
     @Bean
+    com.finguard.copilot.governance.RedisProviderPermits redisProviderPermits(
+            ObjectProvider<org.springframework.data.redis.core.StringRedisTemplate> redis,com.finguard.copilot.governance.PermitProperties permits) {
+        return new com.finguard.copilot.governance.RedisProviderPermits(redis::getObject,permits.providerConcurrency(),permits.reviewerPerMinute());
+    }
+
+    @Bean
+    com.finguard.copilot.governance.CallAdmission callAdmission(ObjectProvider<com.finguard.copilot.governance.BudgetReservations> budgets,
+            com.finguard.copilot.governance.RedisProviderPermits permits,CopilotProperties properties) {
+        return new com.finguard.copilot.governance.CallAdmission(budgets::getObject,permits,properties.model().timeout());
+    }
+
+    @Bean
+    com.finguard.copilot.governance.ModelCallPreflight modelCallPreflight(
+            ObjectProvider<org.springframework.jdbc.core.JdbcTemplate> jdbc,
+            ObjectProvider<org.springframework.transaction.support.TransactionTemplate> transactions,
+            ObjectProvider<KnowledgeIndexRepository> indexes,CopilotProperties properties,
+            ObjectProvider<com.finguard.copilot.governance.BudgetReservations> budgets,
+            com.finguard.copilot.governance.CallAdmission admission,
+            NumericGuardProperties numeric,ReviewedPolicyProperties reviewed,
+            com.finguard.copilot.governance.GovernanceProperties governance,Environment environment) {
+        return new com.finguard.copilot.governance.ModelCallPreflight() {
+          @Override public boolean managesReservation() {return true;}
+          @Override public void outcomeUnknown(java.util.UUID id) {budgets.getObject().markUnknown(id,"MODEL_CALL_OUTCOME_UNKNOWN");}
+          @Override public void outcomeUnknown(java.util.UUID id,com.finguard.copilot.model.port.ModelUsage usage) {
+              budgets.getObject().markUnknown(id,"MODEL_CALL_OUTCOME_UNKNOWN",usage);
+          }
+          @Override public void afterCall(java.util.UUID id) {admission.close(id);}
+          @Override public com.finguard.copilot.model.port.ModelRequest prepare(java.util.UUID id,com.finguard.copilot.context.FactSnapshot snapshot,
+                com.finguard.copilot.model.port.ModelRequest request,java.util.List<com.finguard.copilot.knowledge.retrieval.KnowledgeEvidence> evidence,String indexVersion) {
+            if(jdbc.getIfAvailable()==null || transactions.getIfAvailable()==null || indexes.getIfAvailable()==null || budgets.getIfAvailable()==null)
+                throw com.finguard.copilot.governance.RunManifestService.rejected("manifest persistence dependencies unavailable");
+            return new com.finguard.copilot.governance.RunManifestService(
+                    new com.finguard.copilot.governance.VersionedArtifactStore(jdbc.getObject(),transactions.getObject()),
+                    indexes.getObject(),properties,numeric,reviewed,environment.getProperty("COPILOT_EMBEDDING_VERSION","fixed-v1"),
+                    governance,java.time.Clock.systemUTC(),admission).prepare(id,snapshot,request,evidence,indexVersion);
+          }
+        };
+    }
+
+    @Bean
     AnalysisOrchestrator modelAnalysisOrchestrator(
             ModelGateway modelGateway,
             ContextAssembler contextAssembler,
             StructuredAnalysisParser parser,
             CopilotProperties properties,
+            NumericThresholdGuard numericThresholdGuard,
+            ReviewedPolicyGuard reviewedPolicyGuard,
+            com.finguard.copilot.governance.ModelCallPreflight preflight,
             ObjectProvider<KnowledgeRetrievalService> retrieval
     ) {
         return new ModelAnalysisOrchestrator(modelGateway, contextAssembler, parser,
                 properties.model(), properties.budget(), retrieval.getIfAvailable(),
-                properties.retrieval().topK());
+                properties.retrieval().topK(), numericThresholdGuard, reviewedPolicyGuard,preflight);
     }
 
     private String activeRealProfile(Environment environment) {

@@ -37,6 +37,7 @@ public final class StructuredAnalysisParser {
     public StructuredAnalysisParser(ObjectMapper mapper, AnalysisOutputSchemaValidator schemaValidator) {
         this.mapper = Objects.requireNonNull(mapper, "mapper must not be null")
                 .copy()
+                .enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS)
                 .enable(DeserializationFeature.FAIL_ON_TRAILING_TOKENS);
         this.schemaValidator = Objects.requireNonNull(schemaValidator, "schemaValidator must not be null");
     }

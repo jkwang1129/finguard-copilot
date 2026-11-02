@@ -1,5 +1,7 @@
 # FinGuard Copilot 系统架构
 
+本文同时描述目标架构；当前已实现范围以[TASKS](../TASKS.md)及验收记录为准。P4-3 的实际清单、预算、Redis许可及单主模型边界见[运行说明](operations/phase4-3-governance.md)和[验收记录](acceptance/2026-11-02-p4-3-governance.md)。Graph、模型工具执行、SSE及完整Trace仍按后续工作包推进。
+
 ## 1. 架构目标
 
 本架构将确定性业务系统与概率性模型隔离。任何可能改变 FinGuard 业务状态的操作仍由
@@ -248,10 +250,14 @@ Copilot MySQL 保存：
 - `prompt_version` 与 `model_configuration_version`：可复现实验配置；
 - `model_usage_ledger`：供应商、模型、Token、估算成本和价格表版本；
 - `evaluation_run` 与 `evaluation_result`：数据集、指标、Judge 和人工校准版本；
-- `reviewer_feedback`：评分、采纳情况和非敏感备注。
+- `review_feedback`：P4-2 当前只存一次提交的受控 `AGREE` / `DISAGREE` / `UNSURE` 枚举和服务端审核员身份；不收备注。
 
 事实快照默认保留 30 天，评测数据使用专门构造的脱敏案例长期保存。删除事实快照后仍可
 保留非敏感运行指标和校验和，但该运行必须标记为不可完整复现。
+
+V8 将快照/结果内容改为带 JSON_VALID 的 LONGTEXT，避免 MySQL 二进制 JSON 对任意精度金额的舍入；模型输出仍为版本一数字契约，Java 解析与响应读取使用 BigDecimal。方向性建议必须由 Core 项目政策、已配置单阈值规则或精确绑定的服务端审定政策包核验；恢复未终态存量结果时也执行该边界。配置与兼容性见[审定政策说明](REVIEWED_POLICIES.md)。
+
+V9增加不可变版本目录与单分析运行清单，V10增加预算账户、预留、分配及追加事件。调用前冻结上下文版本，取得Redis短期许可后，在独立事务中锁分析行并原子取得预算与V6调用占用；调用结果用冻结价格结算。预算未知则保留UNKNOWN_HELD，Redis TTL不释放金额；账单核对通过追加事件表达，旧估算不覆盖。
 
 ## 10. 安全控制
 
@@ -280,15 +286,14 @@ Copilot MySQL 保存：
 | Core 超时/不可用 | 返回 503，不创建不完整分析 |
 | MySQL 不可用 | 返回 503，不调用外部模型 |
 | RabbitMQ 不可用 | Outbox 保留待发布事件；API 可返回已持久化的 `202`，恢复后继续投递 |
-| Redis 不可用 | 新分析返回 503；既有运行可完成非模型阶段，但新的模型调用以 `QUOTA_UNAVAILABLE` 安全失败 |
-| Qdrant/知识索引不可用 | 运行失败为 `KNOWLEDGE_UNAVAILABLE`，不输出方向性建议 |
-| 模型超时/限流 | 运行失败为 `MODEL_UNAVAILABLE`，保留已捕获事实和引用 |
+| Redis 不可用 | API仍可持久化受理为202；新的模型调用不放行，有界本地恢复后以`MODEL_CAPACITY_UNAVAILABLE`失败，真实profile健康检查为DOWN |
+| Qdrant/知识索引不可用 | 检索路径为`KNOWLEDGE_UNAVAILABLE`；调用前索引/版本检查可为`MODEL_CONFIGURATION_INVALID`，不输出方向性建议 |
+| 模型超时/限流 | 分别保留`MODEL_TIMEOUT`/`MODEL_RATE_LIMITED`受控失败；费用不确定则UNKNOWN_HELD，不能按0元结算 |
 | 输出 Schema/事实/引用失败 | 运行失败为对应校验码，不暴露原始不可信输出 |
 | Langfuse/指标后端不可用 | 请求继续；最多内存缓冲 1,000 条或 60 秒，先到为准，随后丢弃并计数 |
 | SSE 连接断开 | 不影响后台运行；客户端可用最后事件 ID 重连或查询 GET API |
 
-MVP 不自动切换到更强、更贵的模型。模型重试最多一次，且必须在同一预算内；429 和明确
-不可重试错误不盲目重试。
+当前每分析最多一次付费供应商请求；无合格真实备用模型时受控拒绝。请求结果不确定后不重新发送或自动切换供应商；仅对不会新增付费请求的本地操作进行有界恢复。
 
 ## 12. 可观测性与成本
 
