@@ -199,6 +199,14 @@ try {
     $env:RABBITMQ_HOST='127.0.0.1'; $env:RABBITMQ_PORT='5672'
     $env:RABBITMQ_USERNAME=$rabbit.RABBITMQ_DEFAULT_USER; $env:RABBITMQ_PASSWORD=$rabbit.RABBITMQ_DEFAULT_PASS
     $env:RABBITMQ_VIRTUAL_HOST=$vhost
+    # Spring's direct environment properties override Core's legacy RABBITMQ_* placeholders.
+    # Bind both applications to this run before starting either JVM, including reused shells.
+    $env:SPRING_RABBITMQ_HOST='127.0.0.1'; $env:SPRING_RABBITMQ_PORT='5672'
+    $env:SPRING_RABBITMQ_USERNAME=$rabbit.RABBITMQ_DEFAULT_USER
+    $env:SPRING_RABBITMQ_PASSWORD=$rabbit.RABBITMQ_DEFAULT_PASS; $env:SPRING_RABBITMQ_VIRTUAL_HOST=$vhost
+    Check 'Run-owned RabbitMQ configuration is bound before Core startup' (
+        -not [string]::IsNullOrWhiteSpace($env:SPRING_RABBITMQ_USERNAME) -and
+        -not [string]::IsNullOrWhiteSpace($env:SPRING_RABBITMQ_PASSWORD) -and $env:SPRING_RABBITMQ_VIRTUAL_HOST -eq $vhost)
     $env:REDIS_HOST='127.0.0.1'; $env:REDIS_PORT=if ($LocalModelStub -or $IsolatedRedis) { '16380' } else { '6380' }; $env:REDIS_PASSWORD=$redis.REDIS_PASSWORD
     $random = New-Object byte[] 32
     [Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($random)
@@ -222,9 +230,6 @@ try {
     $env:SERVER_PORT='8081'; $env:COPILOT_MANAGEMENT_PORT='9091'; $env:COPILOT_MANAGEMENT_ADDRESS='127.0.0.1'; $env:SPRING_PROFILES_ACTIVE=$profile
     $env:COPILOT_DB_URL="jdbc:mysql://127.0.0.1:3306/$copilotDb"+'?sslMode=DISABLED&allowPublicKeyRetrieval=true'
     $env:COPILOT_DB_USERNAME=$dbUser; $env:COPILOT_DB_PASSWORD=$mysql.MYSQL_PASSWORD
-    $env:SPRING_RABBITMQ_HOST='127.0.0.1'; $env:SPRING_RABBITMQ_PORT='5672'
-    $env:SPRING_RABBITMQ_USERNAME=$rabbit.RABBITMQ_DEFAULT_USER
-    $env:SPRING_RABBITMQ_PASSWORD=$rabbit.RABBITMQ_DEFAULT_PASS; $env:SPRING_RABBITMQ_VIRTUAL_HOST=$vhost
     $env:COPILOT_MODEL_PROVIDER=$Provider; $env:COPILOT_MODEL_ID=$ModelId
     $env:COPILOT_REDIS_HOST=$env:REDIS_HOST; $env:COPILOT_REDIS_PORT=if ($ExpectRedisFailure) { '1' } else { $env:REDIS_PORT }; $env:COPILOT_REDIS_PASSWORD=$env:REDIS_PASSWORD
     $env:COPILOT_GOVERNANCE_FIXTURE_MODE=if ($LocalModelStub) { 'true' } else { 'false' }
@@ -392,9 +397,18 @@ INSERT INTO review_tasks(source_type,risk_hit_id) VALUES('RISK_HIT',LAST_INSERT_
     $report.recommendation=$result.result.recommendation
     $report.citationCount=if ($null -eq $result.result) { 0 } else { @($result.result.policyCitations).Count }
     $page = Invoke-RestMethod "$url/$analysisId/view" -Headers $headers
+    $inexactCostFields = @('estimatedCost','heldCny','inputTokens','outputTokens') | Where-Object {
+        $value=$page.cost.$_
+        $null -ne $value -and $value -isnot [string]
+    }
     Check 'Authorized UI projection returns exact IDs, amounts and accounting values as strings' ($page.schemaVersion -eq 1 -and
-        $page.reviewTaskId -is [string] -and $page.cost.heldCny -is [string] -and
+        $page.reviewTaskId -is [string] -and $null -ne $page.cost -and @($inexactCostFields).Count -eq 0 -and
         ($result.status -ne 'SUCCEEDED' -or ($page.result.businessEvidence[0].amount -is [string] -and $page.result.businessEvidence[0].transactionId -is [string])))
+    Check 'UI accounting distinguishes rejected admission from settled usage' (
+        ($expectedCalls -eq 0 -and $page.cost.accountingStatus -eq 'NOT_RECORDED' -and
+            $null -eq $page.cost.estimatedCost -and $null -eq $page.cost.heldCny -and -not $page.cost.callSlotClaimed) -or
+        ($expectedCalls -eq 1 -and $page.cost.accountingStatus -eq 'SETTLED' -and
+            $page.cost.estimatedCost -is [string] -and $page.cost.heldCny -eq '0' -and $page.cost.callSlotClaimed))
     foreach ($suffix in @('view','events')) {
         Check "Unauthenticated $suffix read rejected with 401" ((Http-Status 'GET' "$url/$analysisId/$suffix" @{} '') -eq 401)
         Check "ADMIN $suffix read rejected with 403" ((Http-Status 'GET' "$url/$analysisId/$suffix" $adminHeaders '') -eq 403)

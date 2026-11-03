@@ -21,6 +21,8 @@ C:\dev\finguard-copilot    AI 审核辅助系统（本仓库）
 
 ## 当前阶段
 
+2026-11-03：P4-4 可观测性与 P4-5 事务事件、SSE 和审核页面已完成本地工程验收；[P4-6总验收](docs/acceptance/2026-11-03-p4-6-final-acceptance.md)完成404项Java、183项Python、11项前端及六场景224项进程检查，最后OpenAPI文档修正后另有17项相关测试和新制品38项进程检查通过。最新操作入口见[审核页面手册](docs/operations/phase4-5-review-console.md)、[可观测性手册](docs/operations/phase4-4-observability.md)及[Phase4计划](docs/PHASE4_TASK_PLAN.md)。真实人工校准、合格备用模型和生产质量/部署仍单列待验收。以下保留各阶段的历史范围与证据。
+
 2026-10-22 提交前复核发现三条异常路径：模型 HTTP 超时未接线、数据库回滚后可能重复请求模型、失败用量记录异常可能导致消息丢弃。2026-10-24 已补修复和离线回归，见[异常路径修复验收](docs/acceptance/2026-10-24-phase3-failure-recovery.md)；既有真实模型质量结论不因此改变。
 
 Phase 2“RAG 与知识数据管道”已完成实现和仓库级验收：知识文档会经过脱敏准入、规范化、

@@ -1,0 +1,231 @@
+{
+  "runId": "20261103102101",
+  "startedAt": "2026-11-03T10:21:01.1543551+08:00",
+  "status": "PASSED",
+  "coreDatabase": "fg_core_e2e_20261103102101",
+  "copilotDatabase": "fg_copilot_e2e_20261103102101",
+  "rabbitVhost": "fg-e2e-20261103102101",
+  "qdrantContainer": "fg-e2e-qdrant-20261103102101",
+  "provider": "deepseek",
+  "model": "local-test-stub",
+  "prompt": "review-analysis-v2",
+  "maxModelCalls": 1,
+  "embedding": "fixed-v1",
+  "currency": "CNY",
+  "priceTableVersion": "smoke-fixture-priced-v1",
+  "fixture": true,
+  "expectedCalls": 0,
+  "harnessSha256": "94c4d717add6b65cbb2b37a72a4aff060d3f1db4a31de06fc41660a4612a0c31",
+  "smokeBudgetCny": 0.1,
+  "estimatedUpperBoundCny": 0.08,
+  "inputPricePerMillionCny": 2.0,
+  "outputPricePerMillionCny": 8.0,
+  "copilotJarSha256": "eaae5346f28595c64d549250a9152853cf2a4799702b5f39dfcd7a30567a927e",
+  "coreJarSha256": "c910fdb485e1ef55470c3bd30bbd42c15f07ec2f7e164be1b38a12e45cafee28",
+  "checks": [
+    {
+      "name": "Run-owned RabbitMQ configuration is bound before Core startup",
+      "passed": true
+    },
+    {
+      "name": "Core health UP with real MySQL/RabbitMQ/Redis",
+      "passed": true
+    },
+    {
+      "name": "Copilot real-deepseek profile health UP",
+      "passed": true
+    },
+    {
+      "name": "Current V12 event, trace linkage, governance and exact JSON text schema is active",
+      "passed": true
+    },
+    {
+      "name": "Published knowledge retrieved from Qdrant and checksum-verified MySQL source",
+      "passed": true
+    },
+    {
+      "name": "Reviewer JWT authenticated by Core",
+      "passed": true
+    },
+    {
+      "name": "Core supplies actual sanitized task context",
+      "passed": true
+    },
+    {
+      "name": "Unauthenticated Copilot request rejected with 401",
+      "passed": true
+    },
+    {
+      "name": "ADMIN without REVIEWER rejected with 403",
+      "passed": true
+    },
+    {
+      "name": "Analysis accepted through authenticated HTTP with 202",
+      "passed": true
+    },
+    {
+      "name": "Identical Idempotency-Key returns the same analysis",
+      "passed": true
+    },
+    {
+      "name": "Actual fixture HTTP calls match admission decision",
+      "passed": true
+    },
+    {
+      "name": "Immutable manifest binds this model price and published index",
+      "passed": true
+    },
+    {
+      "name": "Admission reaches the expected failed terminal state without charge",
+      "passed": true
+    },
+    {
+      "name": "Admission rejected without a usable result",
+      "passed": true
+    },
+    {
+      "name": "Core business decision remains PENDING and version unchanged",
+      "passed": true
+    },
+    {
+      "name": "Core business and audit table checksums unchanged",
+      "passed": true
+    },
+    {
+      "name": "Invocation ledger count matches actual admission",
+      "passed": true
+    },
+    {
+      "name": "Durable model call claim count matches actual admission",
+      "passed": true
+    },
+    {
+      "name": "Provider correlation evidence is persisted without raw response",
+      "passed": true
+    },
+    {
+      "name": "Outbox published and Worker receipt persisted",
+      "passed": true
+    },
+    {
+      "name": "Initial dead-letter depth matches the terminal outcome",
+      "passed": true
+    },
+    {
+      "name": "Duplicate terminal event routed through actual RabbitMQ exchange",
+      "passed": true
+    },
+    {
+      "name": "Duplicate ACK observed without new ledger write, receipt or call claim",
+      "passed": true
+    },
+    {
+      "name": "Duplicate event did not issue another fixture HTTP request",
+      "passed": true
+    },
+    {
+      "name": "Authorized UI projection returns exact IDs, amounts and accounting values as strings",
+      "passed": true
+    },
+    {
+      "name": "UI accounting distinguishes rejected admission from settled usage",
+      "passed": true
+    },
+    {
+      "name": "Unauthenticated view read rejected with 401",
+      "passed": true
+    },
+    {
+      "name": "ADMIN view read rejected with 403",
+      "passed": true
+    },
+    {
+      "name": "Unknown view read rejected with 404",
+      "passed": true
+    },
+    {
+      "name": "Unauthenticated events read rejected with 401",
+      "passed": true
+    },
+    {
+      "name": "ADMIN events read rejected with 403",
+      "passed": true
+    },
+    {
+      "name": "Unknown events read rejected with 404",
+      "passed": true
+    },
+    {
+      "name": "SSE frames equal the complete persisted monotonic event sequence",
+      "passed": true
+    },
+    {
+      "name": "Last-Event-ID reconnect replays only subsequent persisted events",
+      "passed": true
+    },
+    {
+      "name": "Future SSE cursor rejected with 409",
+      "passed": true
+    }
+  ],
+  "flywayVersion": "12",
+  "corePid": 42412,
+  "copilotPid": 33004,
+  "knowledge": {
+    "indexVersion": "published-20261103102101",
+    "embeddingVersion": "fixed-v1",
+    "scope": "synthetic smoke case, not semantic quality evaluation",
+    "retrievedChunk": "finguard-large-amount-review-policy:v1:0",
+    "chunkCount": 1,
+    "documentId": "finguard-large-amount-review-policy",
+    "citationPrecision": 1.0,
+    "status": "PUBLISHED",
+    "recallAtK": 1.0
+  },
+  "analysisId": "770f0d3d-7cd7-4761-8f99-9b349b980033",
+  "analysisStatus": "FAILED",
+  "failureCode": "MODEL_BUDGET_EXCEEDED",
+  "actualModelHttpCalls": 0,
+  "modelUsage": "",
+  "modelAccounting": null,
+  "manifest": {
+    "sha256": "8bb9cf2bf731f76773fb4da7abc306899d582b12292fe8acdba919cb69915afa",
+    "fixture": true,
+    "indexVersion": "published-20261103102101",
+    "modelVersion": "p4-model-a4e105408b945a82d440a3791533c2c7d0b9b3064dc02d6e60d35b7e65e372d3",
+    "priceVersion": "smoke-fixture-priced-v1",
+    "inputUpperBound": 9702,
+    "reservedEstimateCny": "0.03540400"
+  },
+  "budget": null,
+  "providerEvidence": {
+    "count": 0,
+    "httpStatus": null,
+    "requestIdAvailable": null,
+    "returnedModelAvailable": null
+  },
+  "rabbitRedelivery": {
+    "deadLetterMessages": 1,
+    "deadLetterBefore": 1,
+    "ackBefore": 1,
+    "ready": 0,
+    "unacknowledged": 0,
+    "ackAfter": 2
+  },
+  "actualModelHttpCallsAfterDuplicate": 0,
+  "recommendation": null,
+  "citationCount": 0,
+  "progress": {
+    "uiProjectionSchema": 1,
+    "sequences": [
+      1,
+      2,
+      3
+    ],
+    "resumedSequences": [
+      3
+    ]
+  },
+  "servicesLeftRunning": false,
+  "finishedAt": "2026-11-03T10:21:51.6348025+08:00"
+}

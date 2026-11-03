@@ -127,6 +127,7 @@ Java 265 项、Python 100 项及前端 lint/测试/构建通过；Phase 3 工程
 - [x] 实现只发送受控阶段和最终可用事件的 SSE API（有界连接、逐批授权、Last-Event-ID和DB补读）。
 - [x] 实现 React、TypeScript、Vite 轻量审核演示页面（创建、状态、精确证据/引用、费用/版本、反馈及Core入口）。
 - [x] 验证 SSE 重连和浏览器无法看到未经校验的模型内容（本地合成流程；[P4-5验收](docs/acceptance/2026-11-03-p4-5-review-console.md)，Java404/Python183/前端11，业务37项与恢复10项通过；不替代生产或真实模型质量门槛）。
+- [x] 交付 P4-6 本地工程总验收：本轮Java404/Python183/前端11、六场景224项、原16/固定24例Worker及离线校准复算、OpenAPI/文档与依赖审计；最后Schema修正后17项相关测试及新制品38项进程通过，[验收报告](docs/acceptance/2026-11-03-p4-6-final-acceptance.md)。真实人工校准、合格备用模型与生产质量/部署门槛保持未关闭，Phase5能力另列。
 
 ## 阶段 5：Agent Workflow 与 Tool Use
 

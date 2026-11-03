@@ -1,0 +1,48 @@
+{
+  "scope": "Affected tests after OpenAPI nullable metadata correction; NOT another full suite",
+  "command": "mvn test -DargLine=-Xmx512m -Dtest=ReviewPageOpenApiIntegrationTest,AnalysisPageServiceTest,GetAnalysisServiceTest,ReviewAnalysisControllerTest",
+  "exitCode": 0,
+  "tests": 17,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "suites": [
+    {
+      "name": "com.finguard.copilot.api.analysis.ReviewPageOpenApiIntegrationTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "37.75",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.analysis.application.AnalysisPageServiceTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "1.624",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.analysis.application.GetAnalysisServiceTest",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.19",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.api.analysis.ReviewAnalysisControllerTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "2.442",
+      "timestamp": null
+    }
+  ],
+  "logSha256": "35741ef6d0f843e6b7e7b025024f8811683e83398bd0a1eefb95ff9c69af2f3c"
+}

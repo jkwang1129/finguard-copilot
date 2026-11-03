@@ -1,0 +1,15 @@
+{
+  "source": "live Copilot HTTP",
+  "runId": "20261103100213",
+  "paths": {
+    "/api/copilot/review-analyses": "post",
+    "/api/copilot/review-analyses/{analysisId}": "get",
+    "/api/copilot/review-analyses/{analysisId}/view": "get",
+    "/api/copilot/review-analyses/{analysisId}/events": "get",
+    "/api/copilot/review-analyses/{analysisId}/feedback": "put"
+  },
+  "pageIdAndCostTypes": "string",
+  "sseMediaType": "text/event-stream",
+  "schemaSha256": "3f08f7b872e2a53f7216e61a18e2d4bf987baf8472813ed498963bd8d2499ebb",
+  "note": "SSE wire frames and freeform validated result object are further specified in the review console operation contract"
+}

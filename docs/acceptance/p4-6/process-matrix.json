@@ -1,0 +1,71 @@
+{
+  "entryCommit": "4ef7b4a66bed0e08bd910a55840cfd739c087559",
+  "runtimeJarBeforeMetadataCorrection": "eaae5346f28595c64d549250a9152853cf2a4799702b5f39dfcd7a30567a927e",
+  "scenarios": [
+    {
+      "scenario": "normal",
+      "runId": "20261103101723",
+      "status": "PASSED",
+      "checks": 38,
+      "failureCode": null,
+      "fixtureHttpCalls": 1,
+      "poisonedParentSpringOverrides": true,
+      "servicesLeftRunning": false
+    },
+    {
+      "scenario": "policy",
+      "runId": "20261103101816",
+      "status": "PASSED",
+      "checks": 38,
+      "failureCode": "FACT_VALIDATION_FAILED",
+      "fixtureHttpCalls": 1,
+      "poisonedParentSpringOverrides": true,
+      "servicesLeftRunning": false
+    },
+    {
+      "scenario": "fact",
+      "runId": "20261103101911",
+      "status": "PASSED",
+      "checks": 38,
+      "failureCode": "FACT_VALIDATION_FAILED",
+      "fixtureHttpCalls": 1,
+      "poisonedParentSpringOverrides": true,
+      "servicesLeftRunning": false
+    },
+    {
+      "scenario": "missing-policy",
+      "runId": "20261103102006",
+      "status": "PASSED",
+      "checks": 38,
+      "failureCode": "FACT_VALIDATION_FAILED",
+      "fixtureHttpCalls": 1,
+      "poisonedParentSpringOverrides": true,
+      "servicesLeftRunning": false
+    },
+    {
+      "scenario": "budget",
+      "runId": "20261103102101",
+      "status": "PASSED",
+      "checks": 36,
+      "failureCode": "MODEL_BUDGET_EXCEEDED",
+      "fixtureHttpCalls": 0,
+      "poisonedParentSpringOverrides": true,
+      "servicesLeftRunning": false
+    },
+    {
+      "scenario": "redis",
+      "runId": "20261103102151",
+      "status": "PASSED",
+      "checks": 36,
+      "failureCode": "MODEL_CAPACITY_UNAVAILABLE",
+      "fixtureHttpCalls": 0,
+      "poisonedParentSpringOverrides": true,
+      "servicesLeftRunning": false
+    }
+  ],
+  "checksPassed": 224,
+  "fixtureHttpCalls": 4,
+  "paidModelCalls": 0,
+  "postMetadataExtraRun": "20261103103623",
+  "postMetadataExtraChecks": 38
+}

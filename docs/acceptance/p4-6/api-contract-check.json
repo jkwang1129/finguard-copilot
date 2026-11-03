@@ -1,0 +1,24 @@
+{
+  "source": "live Copilot HTTP after metadata correction",
+  "runId": "20261103103623",
+  "paths": {
+    "/api/copilot/review-analyses": "post",
+    "/api/copilot/review-analyses/{analysisId}": "get",
+    "/api/copilot/review-analyses/{analysisId}/view": "get",
+    "/api/copilot/review-analyses/{analysisId}/events": "get",
+    "/api/copilot/review-analyses/{analysisId}/feedback": "put"
+  },
+  "pageIdType": "string",
+  "nullableCostTypes": "anyOf string/null",
+  "nullablePageFields": [
+    "failureCode",
+    "result",
+    "versions",
+    "traceId",
+    "feedbackVerdict"
+  ],
+  "legacyResponseSchemaUnchanged": true,
+  "sseMediaType": "text/event-stream",
+  "schemaSha256": "d29df4395068c123eb7c499912ad7ebf42350ce15bc9674209974fb38607179a",
+  "note": "SSE wire frames and validated freeform result object retain their additional operation contract"
+}

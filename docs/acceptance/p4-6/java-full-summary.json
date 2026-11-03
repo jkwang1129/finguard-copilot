@@ -1,0 +1,821 @@
+{
+  "command": "mvn test -DargLine=-Xmx512m -Dspring.test.context.cache.maxSize=1 -Dp4.evaluation.dataset=tools/agent-evaluation/data/phase4-worker-v3.jsonl -Dp4.evaluation.freeze=docs/evaluations/phase4-worker-v3-freeze.json -Dp4.evaluation.output=target/p4-6/worker-v3-java.json",
+  "exitCode": 0,
+  "suiteCount": 90,
+  "tests": 404,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "suites": [
+    {
+      "name": "com.finguard.copilot.analysis.application.AnalysisPageServiceTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "1.853",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.analysis.application.AnalysisStateMachineTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.028",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.analysis.application.CreateAnalysisServiceTest",
+      "tests": "10",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.476",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.analysis.application.DeterministicAnalysisOrchestratorTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.131",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.analysis.application.GetAnalysisServiceTest",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.059",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.analysis.application.ModelAnalysisOrchestratorTest",
+      "tests": "13",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.386",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.analysis.application.SubmitFeedbackServiceTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.033",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.analysis.persistence.AnalysisCreationStoreIntegrationTest",
+      "tests": "12",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "32.068",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.analysis.persistence.AnalysisIdempotencyIntegrationTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "28.872",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.analysis.persistence.IdempotencyCleanupJobIntegrationTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "21.853",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.analysis.persistence.ReviewFeedbackRepositoryIntegrationTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "25.718",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.analysis.Phase2CitationIntegrationTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.017",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.api.analysis.ReviewAnalysisControllerTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.396",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.api.analysis.ReviewFeedbackControllerTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.073",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.api.error.GlobalExceptionHandlerTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.047",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.config.CopilotPropertiesTest",
+      "tests": "15",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.483",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.config.RealModelPropertiesTest",
+      "tests": "18",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.799",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.context.ContextAssemblerTest",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.034",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.context.ExactJsonMigrationIntegrationTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "22.28",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.context.SnapshotCodecTest",
+      "tests": "10",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.034",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.context.SnapshotRetentionJobIntegrationTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "26.631",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.coreclient.http.HttpCoreClientTest",
+      "tests": "28",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.368",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.coreclient.http.HttpCoreClientTimeoutTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.409",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.dispatch.AnalysisWorkerIntegrationTest",
+      "tests": "10",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "38.095",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.dispatch.AnalysisWorkerModelUsageTest",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.471",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.dispatch.DispatchFailureDispositionTest",
+      "tests": "9",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.38",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.dispatch.OutboxCleanupJobIntegrationTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "23.209",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.dispatch.OutboxRelayIntegrationTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "38.251",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.dispatch.Phase1FailureRecoveryIntegrationTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "43.519",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.dispatch.Phase4WorkerComparisonIntegrationTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "31.238",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.events.AnalysisEventIntegrationTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "25.656",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.events.AnalysisEventMigrationTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "21.915",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.events.AnalysisEventsHttpTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.226",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.events.AnalysisEventStreamTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.25",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.events.RedisEventWakeupsTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "2.219",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.FinGuardCopilotApplicationTests",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "27.033",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.foundation.stub.FixedEmbeddingGatewayTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.013",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.foundation.stub.InMemoryVectorStoreTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.009",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.foundation.stub.StubFoundationConfigurationTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.055",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.foundation.stub.StubModelGatewayTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.01",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.governance.BudgetReservationsIntegrationTest",
+      "tests": "15",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "27.88",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.governance.CallAdmissionTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.2",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.governance.GovernedWorkerRaceIntegrationTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "26.607",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.governance.RedisProviderPermitsIntegrationTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "1.63",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.governance.RunManifestServiceTest",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.187",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.governance.VersionedArtifactStoreIntegrationTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "25.226",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.guardrail.AnalysisOutputSchemaValidatorTest",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.029",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.guardrail.CoreLargeAmountFactGuardTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.015",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.guardrail.CoreLargeAmountPolicyGuardTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.012",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.guardrail.FactConsistencyValidatorTest",
+      "tests": "12",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.016",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.guardrail.NumericThresholdGuardTest",
+      "tests": "16",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.039",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.guardrail.Phase4HoldoutNumericGuardTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.007",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.guardrail.ReviewedPolicyGuardTest",
+      "tests": "4",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.009",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.guardrail.UntrustedInstructionGuardTest",
+      "tests": "8",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.019",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.knowledge.domain.KnowledgeDomainTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.006",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.knowledge.index.KnowledgeIndexBuildServiceTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.005",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.knowledge.index.KnowledgeIndexChangeIntegrationTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "27.538",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.knowledge.index.KnowledgeIndexChangeServiceTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.015",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.knowledge.index.KnowledgeIndexEvaluationServiceTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.005",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.knowledge.index.KnowledgeIndexFailureIsolationTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.005",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.knowledge.index.KnowledgeIndexIntegrationTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "26.878",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.knowledge.index.KnowledgeIndexPublicationServiceTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.01",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.knowledge.index.KnowledgeIndexRollbackServiceTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.005",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.knowledge.index.LargeAmountPolicyFlowIntegrationTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "27.164",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.knowledge.ingest.DocumentChunkerTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.007",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.knowledge.ingest.DocumentCleanerTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.006",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.knowledge.ingest.KnowledgeDynamicFactRejectionTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.005",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.knowledge.ingest.KnowledgeIngestionServiceTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.008",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.knowledge.qdrant.QdrantHttpClientTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.051",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.knowledge.qdrant.QdrantVectorStoreIntegrationTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "1.849",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.knowledge.qdrant.QdrantVectorStoreTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.014",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.knowledge.retrieval.KnowledgeCitationValidatorTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.004",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.knowledge.retrieval.KnowledgeRetrievalServiceTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.016",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.MigrationTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "24.801",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.model.adapter.openai.CompatibleChatModelGatewayTest",
+      "tests": "15",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.51",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.model.validation.StructuredAnalysisParserTest",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.034",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.observability.AnalysisTelemetryTest",
+      "tests": "5",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.197",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.observability.BoundedSpanProcessorTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "2.023",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.observability.LedgerMetricsTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.024",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.observability.OtlpExportTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.533",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.observability.SafeSpanDataTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.006",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.observability.TelemetryMetricsTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.015",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.observability.TraceMessageTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.01",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.observability.WorkerTelemetryTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.208",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.Phase1MigrationTest",
+      "tests": "7",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "27.308",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.Phase2MigrationTest",
+      "tests": "3",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "25.655",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.port.PortContractTest",
+      "tests": "6",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.019",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.usage.ModelCostCalculatorTest",
+      "tests": "2",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.002",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.usage.ModelUsageRecorderIntegrationTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "25.663",
+      "timestamp": null
+    },
+    {
+      "name": "com.finguard.copilot.usage.ModelUsageRecorderTest",
+      "tests": "1",
+      "failures": "0",
+      "errors": "0",
+      "skipped": "0",
+      "time": "0.001",
+      "timestamp": null
+    }
+  ]
+}

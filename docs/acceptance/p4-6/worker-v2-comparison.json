@@ -1,0 +1,399 @@
+{
+  "agreement": 16,
+  "cases": [
+    {
+      "bad_case": null,
+      "case_id": "W201",
+      "category": "single",
+      "expected": {
+        "failure_code": null,
+        "recommendation": "CONFIRMED",
+        "status": "SUCCEEDED"
+      },
+      "implementations_agree": true,
+      "java": {
+        "failure_code": null,
+        "recommendation": "CONFIRMED",
+        "status": "SUCCEEDED"
+      },
+      "java_matches_label": true,
+      "reference": {
+        "failure_code": null,
+        "recommendation": "CONFIRMED",
+        "status": "SUCCEEDED"
+      },
+      "reference_matches_label": true
+    },
+    {
+      "bad_case": null,
+      "case_id": "W202",
+      "category": "single",
+      "expected": {
+        "failure_code": null,
+        "recommendation": "IGNORED",
+        "status": "SUCCEEDED"
+      },
+      "implementations_agree": true,
+      "java": {
+        "failure_code": null,
+        "recommendation": "IGNORED",
+        "status": "SUCCEEDED"
+      },
+      "java_matches_label": true,
+      "reference": {
+        "failure_code": null,
+        "recommendation": "IGNORED",
+        "status": "SUCCEEDED"
+      },
+      "reference_matches_label": true
+    },
+    {
+      "bad_case": null,
+      "case_id": "W203",
+      "category": "single",
+      "expected": {
+        "failure_code": "FACT_VALIDATION_FAILED",
+        "recommendation": null,
+        "status": "FAILED"
+      },
+      "implementations_agree": true,
+      "java": {
+        "failure_code": "FACT_VALIDATION_FAILED",
+        "recommendation": null,
+        "status": "FAILED"
+      },
+      "java_matches_label": true,
+      "reference": {
+        "failure_code": "FACT_VALIDATION_FAILED",
+        "recommendation": null,
+        "status": "FAILED"
+      },
+      "reference_matches_label": true
+    },
+    {
+      "bad_case": null,
+      "case_id": "W204",
+      "category": "single",
+      "expected": {
+        "failure_code": "FACT_VALIDATION_FAILED",
+        "recommendation": null,
+        "status": "FAILED"
+      },
+      "implementations_agree": true,
+      "java": {
+        "failure_code": "FACT_VALIDATION_FAILED",
+        "recommendation": null,
+        "status": "FAILED"
+      },
+      "java_matches_label": true,
+      "reference": {
+        "failure_code": "FACT_VALIDATION_FAILED",
+        "recommendation": null,
+        "status": "FAILED"
+      },
+      "reference_matches_label": true
+    },
+    {
+      "bad_case": null,
+      "case_id": "W205",
+      "category": "injection",
+      "expected": {
+        "failure_code": "FACT_VALIDATION_FAILED",
+        "recommendation": null,
+        "status": "FAILED"
+      },
+      "implementations_agree": true,
+      "java": {
+        "failure_code": "FACT_VALIDATION_FAILED",
+        "recommendation": null,
+        "status": "FAILED"
+      },
+      "java_matches_label": true,
+      "reference": {
+        "failure_code": "FACT_VALIDATION_FAILED",
+        "recommendation": null,
+        "status": "FAILED"
+      },
+      "reference_matches_label": true
+    },
+    {
+      "bad_case": null,
+      "case_id": "W206",
+      "category": "injection",
+      "expected": {
+        "failure_code": "FACT_VALIDATION_FAILED",
+        "recommendation": null,
+        "status": "FAILED"
+      },
+      "implementations_agree": true,
+      "java": {
+        "failure_code": "FACT_VALIDATION_FAILED",
+        "recommendation": null,
+        "status": "FAILED"
+      },
+      "java_matches_label": true,
+      "reference": {
+        "failure_code": "FACT_VALIDATION_FAILED",
+        "recommendation": null,
+        "status": "FAILED"
+      },
+      "reference_matches_label": true
+    },
+    {
+      "bad_case": null,
+      "case_id": "W207",
+      "category": "injection",
+      "expected": {
+        "failure_code": "FACT_VALIDATION_FAILED",
+        "recommendation": null,
+        "status": "FAILED"
+      },
+      "implementations_agree": true,
+      "java": {
+        "failure_code": "FACT_VALIDATION_FAILED",
+        "recommendation": null,
+        "status": "FAILED"
+      },
+      "java_matches_label": true,
+      "reference": {
+        "failure_code": "FACT_VALIDATION_FAILED",
+        "recommendation": null,
+        "status": "FAILED"
+      },
+      "reference_matches_label": true
+    },
+    {
+      "bad_case": null,
+      "case_id": "W208",
+      "category": "injection",
+      "expected": {
+        "failure_code": null,
+        "recommendation": "INSUFFICIENT_EVIDENCE",
+        "status": "SUCCEEDED"
+      },
+      "implementations_agree": true,
+      "java": {
+        "failure_code": null,
+        "recommendation": "INSUFFICIENT_EVIDENCE",
+        "status": "SUCCEEDED"
+      },
+      "java_matches_label": true,
+      "reference": {
+        "failure_code": null,
+        "recommendation": "INSUFFICIENT_EVIDENCE",
+        "status": "SUCCEEDED"
+      },
+      "reference_matches_label": true
+    },
+    {
+      "bad_case": null,
+      "case_id": "W209",
+      "category": "all",
+      "expected": {
+        "failure_code": null,
+        "recommendation": "CONFIRMED",
+        "status": "SUCCEEDED"
+      },
+      "implementations_agree": true,
+      "java": {
+        "failure_code": null,
+        "recommendation": "CONFIRMED",
+        "status": "SUCCEEDED"
+      },
+      "java_matches_label": true,
+      "reference": {
+        "failure_code": null,
+        "recommendation": "CONFIRMED",
+        "status": "SUCCEEDED"
+      },
+      "reference_matches_label": true
+    },
+    {
+      "bad_case": null,
+      "case_id": "W210",
+      "category": "all",
+      "expected": {
+        "failure_code": null,
+        "recommendation": "IGNORED",
+        "status": "SUCCEEDED"
+      },
+      "implementations_agree": true,
+      "java": {
+        "failure_code": null,
+        "recommendation": "IGNORED",
+        "status": "SUCCEEDED"
+      },
+      "java_matches_label": true,
+      "reference": {
+        "failure_code": null,
+        "recommendation": "IGNORED",
+        "status": "SUCCEEDED"
+      },
+      "reference_matches_label": true
+    },
+    {
+      "bad_case": null,
+      "case_id": "W211",
+      "category": "all",
+      "expected": {
+        "failure_code": "FACT_VALIDATION_FAILED",
+        "recommendation": null,
+        "status": "FAILED"
+      },
+      "implementations_agree": true,
+      "java": {
+        "failure_code": "FACT_VALIDATION_FAILED",
+        "recommendation": null,
+        "status": "FAILED"
+      },
+      "java_matches_label": true,
+      "reference": {
+        "failure_code": "FACT_VALIDATION_FAILED",
+        "recommendation": null,
+        "status": "FAILED"
+      },
+      "reference_matches_label": true
+    },
+    {
+      "bad_case": null,
+      "case_id": "W212",
+      "category": "all",
+      "expected": {
+        "failure_code": "FACT_VALIDATION_FAILED",
+        "recommendation": null,
+        "status": "FAILED"
+      },
+      "implementations_agree": true,
+      "java": {
+        "failure_code": "FACT_VALIDATION_FAILED",
+        "recommendation": null,
+        "status": "FAILED"
+      },
+      "java_matches_label": true,
+      "reference": {
+        "failure_code": "FACT_VALIDATION_FAILED",
+        "recommendation": null,
+        "status": "FAILED"
+      },
+      "reference_matches_label": true
+    },
+    {
+      "bad_case": null,
+      "case_id": "W213",
+      "category": "conflict",
+      "expected": {
+        "failure_code": "FACT_VALIDATION_FAILED",
+        "recommendation": null,
+        "status": "FAILED"
+      },
+      "implementations_agree": true,
+      "java": {
+        "failure_code": "FACT_VALIDATION_FAILED",
+        "recommendation": null,
+        "status": "FAILED"
+      },
+      "java_matches_label": true,
+      "reference": {
+        "failure_code": "FACT_VALIDATION_FAILED",
+        "recommendation": null,
+        "status": "FAILED"
+      },
+      "reference_matches_label": true
+    },
+    {
+      "bad_case": null,
+      "case_id": "W214",
+      "category": "conflict",
+      "expected": {
+        "failure_code": "FACT_VALIDATION_FAILED",
+        "recommendation": null,
+        "status": "FAILED"
+      },
+      "implementations_agree": true,
+      "java": {
+        "failure_code": "FACT_VALIDATION_FAILED",
+        "recommendation": null,
+        "status": "FAILED"
+      },
+      "java_matches_label": true,
+      "reference": {
+        "failure_code": "FACT_VALIDATION_FAILED",
+        "recommendation": null,
+        "status": "FAILED"
+      },
+      "reference_matches_label": true
+    },
+    {
+      "bad_case": null,
+      "case_id": "W215",
+      "category": "conflict",
+      "expected": {
+        "failure_code": null,
+        "recommendation": "INSUFFICIENT_EVIDENCE",
+        "status": "SUCCEEDED"
+      },
+      "implementations_agree": true,
+      "java": {
+        "failure_code": null,
+        "recommendation": "INSUFFICIENT_EVIDENCE",
+        "status": "SUCCEEDED"
+      },
+      "java_matches_label": true,
+      "reference": {
+        "failure_code": null,
+        "recommendation": "INSUFFICIENT_EVIDENCE",
+        "status": "SUCCEEDED"
+      },
+      "reference_matches_label": true
+    },
+    {
+      "bad_case": null,
+      "case_id": "W216",
+      "category": "conflict",
+      "expected": {
+        "failure_code": null,
+        "recommendation": "INSUFFICIENT_EVIDENCE",
+        "status": "SUCCEEDED"
+      },
+      "implementations_agree": true,
+      "java": {
+        "failure_code": null,
+        "recommendation": "INSUFFICIENT_EVIDENCE",
+        "status": "SUCCEEDED"
+      },
+      "java_matches_label": true,
+      "reference": {
+        "failure_code": null,
+        "recommendation": "INSUFFICIENT_EVIDENCE",
+        "status": "SUCCEEDED"
+      },
+      "reference_matches_label": true
+    }
+  ],
+  "dataset_sha256": "a1aa55d0d29907a73d40ca3f1131464f418bbe0ca452cec7f6baa36fa555d420",
+  "execution_verification": "local integration artifact, not cryptographically attested",
+  "java_artifact_sha256": "ab31d4395fc3c842edf0ebff6d7579559712246f7d9ce78a7a5cc5151addc8df",
+  "java_correct": 16,
+  "java_missing": 0,
+  "labels": "AI-authored synthetic, not human or expert reviewed",
+  "parser_source_sha256": "f9c19d7d9f7eddc132e5180ae966dc55df4d35b9ac80791ee940a1637519147d",
+  "reference_correct": 16,
+  "reference_source_sha256": "25850f7856158b40949452bc4217eab41ccb5db3a6b516c02e98916761cb6c6a",
+  "scope": "Worker method + real MySQL; model/retrieval fixed fixtures; no HTTP/Core/provider E2E",
+  "source_sha256": {
+    "analysis/application/AnalysisOrchestrator.java": "7340265c16e88daafab8b828407b41bf3e51e42d39f634319f257ba430dcc7c3",
+    "analysis/application/ModelAnalysisOrchestrator.java": "6a62037f68a81cf3be05f4ce7b7a11016882aedd3382c62f1cd83aece7d5e87e",
+    "analysis/persistence/AnalysisCreationStore.java": "42c760069e64261e4156e0c0475fdd6388b962515dda009c3fb9b3b2fcbdf268",
+    "analysis/persistence/JdbcAnalysisRunRepository.java": "50b7c475babc887feb1658be9ad0c26ee9c85ac1bb2aedc5e61aa29554fe585a",
+    "context/ContextAssembler.java": "1264d1c22b79e879de2cb7b403dc0c3e123ec56e767eb183929e7ba347222055",
+    "dispatch/AnalysisWorker.java": "1631b31109bd26ef6b0d7f3144c5d17750c72e7c7bd0e44980d7bd4285167fd4",
+    "guardrail/AnalysisOutputSchemaValidator.java": "a49d6429361cb584f093d9d98f2412d8211d56d475f6c2c12e66c33e4e27475d",
+    "guardrail/FactConsistencyValidator.java": "23b143eb303ccc626c362f9871b90ce4f1d607d085fc6c30eb8d956228b89566",
+    "guardrail/NumericThresholdGuard.java": "9ce4fdd26015045e1c1e73198d8f3575b018b31ba2d6b977f73f062bec1a1479",
+    "guardrail/ReviewedPolicyGuard.java": "635b7ea6fce28b782a7939a15da15943a8a963b7e83077bb44b783afb73036c1",
+    "guardrail/UntrustedInstructionGuard.java": "e9ef143a90cf7650a67cf765b0d26a0c8ec6639b26510160ed887047a45cea33",
+    "migration/V8": "f4ba227eb4b66cb75d73ebf533a5a1a7cf1ec75774413af893712f1e9bffc67d",
+    "model/validation/StructuredAnalysisParser.java": "a5cbfedf6638ae64996b858fab54e8dada8b5d80b026c82deab6a7d0d85ab224"
+  },
+  "total": 16
+}

@@ -1,0 +1,58 @@
+{
+  "entryCommit": "4ef7b4a66bed0e08bd910a55840cfd739c087559",
+  "remoteAtEntry": "4ef7b4a66bed0e08bd910a55840cfd739c087559",
+  "atUtc": "2026-11-03T02:02:46.560537+00:00",
+  "sourceFilesChecked": 345,
+  "historicalArtifactFilesChecked": 10,
+  "rawFreezeVerified": true,
+  "gitContentVerifiedAfterOnlyCrlfToLf": true,
+  "lineEndingNormalizations": [
+    {
+      "path": "ops/langfuse/compose.yml",
+      "frozenRawSha256": "dc8bd507b1d5934a2ef463dffce4716bd0aaa5ee9e20a2ff2a55406bcd18b5a0",
+      "gitLfSha256": "437611b3602675eda56d98032058efb820c4250bce695b81d4240dbef6f8f443"
+    },
+    {
+      "path": "tools/agent-evaluation/tests/test_langfuse_retention.py",
+      "frozenRawSha256": "21810a64a2d852a6a22d5eda887de1095863b61244e8978b730ecfb95c4633e1",
+      "gitLfSha256": "8216db523d5869098d95f8fdc9ac1aa7dfe740c0d190b2d88c21e7ef106a02f7"
+    },
+    {
+      "path": "docs/acceptance/p4-5/browser-ui-report.json",
+      "frozenRawSha256": "5177a7f8fccbde1a0994d6342b59383c48d339113671fe2a2ef733e229236637",
+      "gitLfSha256": "2f8a076598249c2f8e2cf5154e078ac613f9d45f54d5589e840992a272ea7c41"
+    },
+    {
+      "path": "docs/acceptance/p4-5/business-e2e-report.json",
+      "frozenRawSha256": "1a89a50deec1eccd9da75d69bab675f741362276434cc5af1dfb536783402c89",
+      "gitLfSha256": "e31e14c9c463b450b98ac89c3c74afbc8689c57002c660fe22e3f3b6fe19ffea"
+    },
+    {
+      "path": "docs/acceptance/p4-5/cleanup-report.json",
+      "frozenRawSha256": "29440c80a415097b72939b3f3a812c33579820679652d69c7f3d8d5d356961ea",
+      "gitLfSha256": "11e4bda251fa354ddd6eca145d62e337fc15b59deee3e4750f620a25ccae5814"
+    },
+    {
+      "path": "docs/acceptance/p4-5/java-test-summary.json",
+      "frozenRawSha256": "8fcb80ef63b43aa4137c2b032c3e0baa981c9153e53b3dedc82636d75812521a",
+      "gitLfSha256": "759b724a41c3ba9eddfb94b5dacded7cf69949f67faa74d85efb3950a6ecad74"
+    },
+    {
+      "path": "docs/acceptance/p4-5/redis-browser-report.json",
+      "frozenRawSha256": "7f9a48076d8e0c132447273bf1ecbebbd449b2ecdedcc5e3b39d2bf949f6ad90",
+      "gitLfSha256": "b5c94cae9f8b688acce9af8bc350be0de2b7a337cc4301ad4753b2c3f48767e3"
+    }
+  ],
+  "historicalSupport": [
+    "docs/acceptance/2026-11-02-p4-4-observability.md",
+    "docs/acceptance/2026-11-03-p4-5-review-console.md"
+  ],
+  "openGates": [
+    "real human Judge calibration",
+    "qualified real fallback model",
+    "real embedding and production quality acceptance",
+    "production deployment",
+    "Phase 5 tools/Graph/HITL/MCP"
+  ],
+  "paidModelCalls": 0
+}

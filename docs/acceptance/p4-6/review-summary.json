@@ -1,0 +1,9 @@
+{
+  "reviewerModel": "gpt-6.1-sol",
+  "scope": "Read-only P4-6 diff and acceptance evidence consistency",
+  "critical": 0,
+  "important": 0,
+  "note": "Refresh pre-fix live API evidence before freeze",
+  "noteResolved": "Fresh run20261103103623 and OpenAPI snapshot verified; prior snapshots retained",
+  "testsRunByReviewer": false
+}
