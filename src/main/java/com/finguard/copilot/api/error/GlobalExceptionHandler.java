@@ -27,6 +27,11 @@ public class GlobalExceptionHandler {
     private static final Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
     private static final String INTERNAL_DETAIL = "The server could not process the request";
 
+    @ExceptionHandler(org.springframework.web.servlet.resource.NoResourceFoundException.class)
+    ResponseEntity<ProblemDetail> handleMissingResource(HttpServletRequest request) {
+        return problem(ErrorCode.RESOURCE_NOT_FOUND,HttpStatus.NOT_FOUND,"The requested resource was not found",request);
+    }
+
     @ExceptionHandler(CopilotException.class)
     ResponseEntity<ProblemDetail> handleCopilotException(
             CopilotException exception,

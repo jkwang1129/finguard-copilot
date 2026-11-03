@@ -154,6 +154,11 @@ public class AnalysisCreationStore {
         try {
             transactions.executeWithoutResult(ignored -> {
                 expectOne(runRepository.insert(run));
+                if(event.traceparent()!=null) {
+                    expectOne(jdbc.update("UPDATE analysis_run SET trace_id=:traceId WHERE id=:id",
+                            new MapSqlParameterSource("traceId",event.traceparent().substring(3,35))
+                                    .addValue("id",JdbcAnalysisRunRepository.uuidBytes(analysis.analysisId()))));
+                }
                 try {
                     expectOne(insertIdempotency(analysis, normalizedIdempotencyExpiry));
                 } catch (DuplicateKeyException exception) {
@@ -247,12 +252,13 @@ public class AnalysisCreationStore {
 
     private static String analysisRequestedPayload(OutboxRecord event) {
         return """
-                {"schemaVersion":%d,"eventId":"%s","analysisId":"%s","occurredAt":"%s"}
+                {"schemaVersion":%d,"eventId":"%s","analysisId":"%s","occurredAt":"%s"%s}
                 """.formatted(
                 event.schemaVersion(),
                 event.eventId(),
                 event.analysisId(),
-                event.occurredAt()
+                event.occurredAt(),
+                event.traceparent()==null?"":",\"traceparent\":\""+event.traceparent()+"\""
         ).strip();
     }
 
@@ -354,10 +360,15 @@ public class AnalysisCreationStore {
             UUID analysisId,
             int schemaVersion,
             Instant occurredAt,
-            Instant nextAttemptAt
+            Instant nextAttemptAt,
+            String traceparent
     ) {
 
+        public OutboxRecord(UUID eventId,UUID analysisId,int schemaVersion,Instant occurredAt,Instant nextAttemptAt) {
+            this(eventId,analysisId,schemaVersion,occurredAt,nextAttemptAt,null);
+        }
         public OutboxRecord {
+            traceparent=com.finguard.copilot.observability.AnalysisTelemetry.validTraceparent(traceparent);
             if (eventId == null || analysisId == null) {
                 throw new IllegalArgumentException("outbox identifiers must not be null");
             }

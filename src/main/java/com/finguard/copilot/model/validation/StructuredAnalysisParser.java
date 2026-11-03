@@ -53,7 +53,7 @@ public final class StructuredAnalysisParser {
             rejectInjection(node);
             return schemaValidator.validate(node);
         } catch (CopilotException exception) {
-            LOG.warn("Structured model output rejected: code={}, reason={}", exception.code(), exception.getMessage());
+            LOG.warn("Structured model output rejected: code={}", exception.code());
             throw invalid("model output failed validation");
         } catch (JsonProcessingException | IllegalArgumentException exception) {
             LOG.warn("Structured model JSON parse rejected: type={}", exception.getClass().getSimpleName());

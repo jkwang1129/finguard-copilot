@@ -154,9 +154,11 @@ public final class ModelUsageRecorder {
         if (meterRegistry == null) {
             return;
         }
-        Counter.builder("copilot.model.calls")
+        try {
+        provider=com.finguard.copilot.observability.TelemetryVocabulary.provider(provider);
+        outcome=com.finguard.copilot.observability.TelemetryVocabulary.outcome(outcome);
+        Counter.builder("copilot.model.usage.records")
                 .tag("provider", provider)
-                .tag("model_configuration_version", modelConfigurationVersion)
                 .tag("outcome", outcome)
                 .register(meterRegistry).increment();
         Counter.builder("copilot.model.input.tokens")
@@ -180,6 +182,9 @@ public final class ModelUsageRecorder {
                     .tag("provider", provider)
                     .tag("failure_category", outcome.toLowerCase())
                     .register(meterRegistry).increment();
+        }
+        } catch(RuntimeException ignored) {
+            // The ledger has already committed; a meter failure must not change the business outcome.
         }
     }
 

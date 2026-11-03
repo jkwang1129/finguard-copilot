@@ -1,0 +1,18 @@
+{
+  "runId": "20261103094454",
+  "stoppedProcessIds": [
+    43344,
+    13268,
+    3216,
+    42748
+  ],
+  "stoppedContainers": [
+    "fg-e2e-qdrant-20261103094454",
+    "fg-e2e-redis-20261103094454"
+  ],
+  "temporaryCredentialsRemoved": true,
+  "sharedServicesRetained": true,
+  "databasesAndVhostRetained": true,
+  "observabilityStackRetained": true,
+  "at": "2026-11-03T09:48:51.6716870+08:00"
+}

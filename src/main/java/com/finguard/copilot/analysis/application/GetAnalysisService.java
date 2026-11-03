@@ -35,6 +35,12 @@ public class GetAnalysisService {
     }
 
     public AnalysisResponse get(UUID analysisId, String bearerToken) {
+        AnalysisView view=authorize(analysisId,bearerToken).view();
+        return response(view);
+    }
+
+    public record AuthorizedAnalysis(String reviewer,AnalysisView view) {}
+    public AuthorizedAnalysis authorize(UUID analysisId,String bearerToken) {
         CurrentUser currentUser = currentUser(bearerToken);
         if (!currentUser.roles().contains("REVIEWER")) {
             throw new CopilotException(ErrorCode.FORBIDDEN, "Reviewer access is required");
@@ -42,6 +48,9 @@ public class GetAnalysisService {
         AnalysisView view = runRepository.findByIdAndReviewer(analysisId, currentUser.username())
                 .orElseThrow(() -> new CopilotException(
                         ErrorCode.RESOURCE_NOT_FOUND, "Analysis run was not found"));
+        return new AuthorizedAnalysis(currentUser.username(),view);
+    }
+    private AnalysisResponse response(AnalysisView view) {
         JsonNode result = null;
         if (view.status() == AnalysisStatus.SUCCEEDED) {
             try {

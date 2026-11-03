@@ -57,7 +57,8 @@ if ($PlanOnly) {
     return
 }
 
-$healthUrl = "$($env:FINGUARD_COPILOT_BASE_URL.TrimEnd('/'))/actuator/health"
+$managementBase = if ($env:COPILOT_MANAGEMENT_BASE_URL) { $env:COPILOT_MANAGEMENT_BASE_URL.TrimEnd('/') } else { 'http://127.0.0.1:9091' }
+$healthUrl = "$managementBase/actuator/health"
 try {
     $health = Invoke-RestMethod -UseBasicParsing -Uri $healthUrl -Method Get
     if ($health.status -ne 'UP') {

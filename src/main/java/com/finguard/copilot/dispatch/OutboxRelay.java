@@ -35,6 +35,8 @@ public class OutboxRelay {
     private final ObjectMapper objectMapper;
     private final CopilotProperties properties;
     private final Clock clock;
+    private com.finguard.copilot.observability.AnalysisTelemetry telemetry=com.finguard.copilot.observability.AnalysisTelemetry.noop();
+    @Autowired public void setTelemetry(com.finguard.copilot.observability.AnalysisTelemetry value) {telemetry=Objects.requireNonNull(value);}
 
     @Autowired
     public OutboxRelay(
@@ -82,6 +84,14 @@ public class OutboxRelay {
     }
 
     private boolean publish(OutboxRepository.OutboxEvent event) {
+        String parent=null;
+        try {parent=objectMapper.readValue(event.payloadJson(),AnalysisRequestedMessage.class).traceparent();}
+        catch(Exception ignored) {/* existing validation below determines business disposition */}
+        try(var trace=telemetry.start(com.finguard.copilot.observability.AnalysisTelemetry.Stage.OUTBOX_PUBLISH,event.analysisId(),parent)) {
+            boolean published=publishObserved(event);if(!published) trace.failure("SERVICE_UNAVAILABLE");return published;
+        }
+    }
+    private boolean publishObserved(OutboxRepository.OutboxEvent event) {
         AnalysisRequestedMessage message;
         try {
             message = objectMapper.readValue(
@@ -101,7 +111,7 @@ public class OutboxRelay {
             rabbitTemplate.convertAndSend(
                     RabbitTopologyConfiguration.ANALYSIS_EXCHANGE,
                     RabbitTopologyConfiguration.ANALYSIS_ROUTING_KEY,
-                    message,
+                    message.withTraceparent(telemetry.traceparent()),
                     correlation);
             CorrelationData.Confirm confirm = correlation.getFuture().get(
                     properties.dispatch().publisherConfirmTimeout().toMillis(), TimeUnit.MILLISECONDS);

@@ -43,6 +43,8 @@ public class CreateAnalysisService {
     private final AnalysisCreationStore creationStore;
     private final Clock clock;
     private final Duration snapshotRetention;
+    private com.finguard.copilot.observability.AnalysisTelemetry telemetry=com.finguard.copilot.observability.AnalysisTelemetry.noop();
+    @Autowired public void setTelemetry(com.finguard.copilot.observability.AnalysisTelemetry value) {telemetry=Objects.requireNonNull(value);}
 
     public CreateAnalysisService(
             CoreClient coreClient,
@@ -100,10 +102,15 @@ public class CreateAnalysisService {
     }
 
     public AnalysisAcceptedResponse create(CreateAnalysisCommand command, String bearerToken) {
+        return telemetry.call(com.finguard.copilot.observability.AnalysisTelemetry.Stage.API_CREATE,()->{
+            var result=createObserved(command,bearerToken);telemetry.analysisId(result.analysisId());return result;
+        });
+    }
+    private AnalysisAcceptedResponse createObserved(CreateAnalysisCommand command,String bearerToken) {
         if (command == null) {
             throw new CopilotException(ErrorCode.INVALID_REQUEST, "The analysis request is required");
         }
-        CurrentUser currentUser = currentUser(bearerToken);
+        CurrentUser currentUser = telemetry.call(com.finguard.copilot.observability.AnalysisTelemetry.Stage.CORE_CONTEXT,()->currentUser(bearerToken));
         requireReviewer(currentUser);
         String idempotencyKey = normalizeIdempotencyKey(command.idempotencyKey());
         byte[] requestHash = requestHash(command.reviewTaskId());
@@ -115,9 +122,10 @@ public class CreateAnalysisService {
             return replayOrConflict(reservation.get(), requestHash);
         }
 
-        ReviewTaskContext context = reviewTaskContext(command.reviewTaskId(), bearerToken);
-        FactSnapshot snapshot = snapshotCodec.capture(context, snapshotRetention);
+        ReviewTaskContext context = telemetry.call(com.finguard.copilot.observability.AnalysisTelemetry.Stage.CORE_CONTEXT,()->reviewTaskContext(command.reviewTaskId(),bearerToken));
+        FactSnapshot snapshot = telemetry.call(com.finguard.copilot.observability.AnalysisTelemetry.Stage.SNAPSHOT,()->snapshotCodec.capture(context,snapshotRetention));
         UUID analysisId = UUID.randomUUID();
+        telemetry.analysisId(analysisId);
         Instant expiresAt = now.plus(IDEMPOTENCY_HOURS, ChronoUnit.HOURS);
         NewAnalysis analysis = new NewAnalysis(
                 analysisId,
@@ -133,12 +141,13 @@ public class CreateAnalysisService {
                 analysisId,
                 1,
                 now,
-                now
+                now,
+                telemetry.traceparent()
         );
 
         for (int attempt = 0; attempt < 2; attempt++) {
             try {
-                CreatedAnalysis created = creationStore.create(analysis, snapshot, event, expiresAt);
+                CreatedAnalysis created = telemetry.call(com.finguard.copilot.observability.AnalysisTelemetry.Stage.PERSISTENCE,()->creationStore.create(analysis,snapshot,event,expiresAt));
                 return new AnalysisAcceptedResponse(created.analysisId(), created.status(), false);
             } catch (AnalysisCreationException exception) {
                 if (exception.kind() != AnalysisCreationException.Kind.CONFLICT) {

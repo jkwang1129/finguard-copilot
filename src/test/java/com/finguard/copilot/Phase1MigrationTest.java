@@ -60,7 +60,8 @@ class Phase1MigrationTest {
                 "created_at", "datetime(6)|NO",
                 "updated_at", "datetime(6)|NO",
                 "failure_code", "varchar(64)|YES",
-                "fully_reproducible", "tinyint(1)|NO"
+                "fully_reproducible", "tinyint(1)|NO",
+                "trace_id", "char(32)|YES"
         ));
 
         assertThat(indexes("analysis_run")).containsEntry(

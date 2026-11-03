@@ -58,6 +58,8 @@ public final class ModelAnalysisOrchestrator implements AnalysisOrchestrator {
     private final ReviewedPolicyGuard reviewedPolicyGuard;
     private final String outputSchemaJson;
     private final com.finguard.copilot.governance.ModelCallPreflight preflight;
+    private com.finguard.copilot.observability.AnalysisTelemetry telemetry=com.finguard.copilot.observability.AnalysisTelemetry.noop();
+    public ModelAnalysisOrchestrator withTelemetry(com.finguard.copilot.observability.AnalysisTelemetry value) {telemetry=Objects.requireNonNull(value);return this;}
 
     public ModelAnalysisOrchestrator(
             ModelGateway modelGateway,
@@ -138,13 +140,13 @@ public final class ModelAnalysisOrchestrator implements AnalysisOrchestrator {
         if(preflight!=null) {
             if(retrievalService==null) throw com.finguard.copilot.governance.RunManifestService.rejected("published index retrieval unavailable");
             try {
-                batch=retrievalService.retrieveBatch(snapshot.facts().reviewTask().ruleCode()+" "+snapshot.facts().reviewTask().reasonCode(),retrievalTopK);
+                batch=telemetry.call(com.finguard.copilot.observability.AnalysisTelemetry.Stage.RETRIEVAL,()->retrievalService.retrieveBatch(snapshot.facts().reviewTask().ruleCode()+" "+snapshot.facts().reviewTask().reasonCode(),retrievalTopK));
             } catch(KnowledgeRetrievalException e) {throw com.finguard.copilot.governance.RunManifestService.rejected("published index retrieval failed");}
         }
-        List<KnowledgeEvidence> evidence = batch==null?retrievePolicyEvidence(snapshot):batch.evidence();
-        ContextAssembler.AssembledContext assembled = retrievalService == null
+        List<KnowledgeEvidence> evidence = batch==null?telemetry.call(com.finguard.copilot.observability.AnalysisTelemetry.Stage.RETRIEVAL,()->retrievePolicyEvidence(snapshot)):batch.evidence();
+        ContextAssembler.AssembledContext assembled = telemetry.call(com.finguard.copilot.observability.AnalysisTelemetry.Stage.CONTEXT,()->retrievalService == null
                 ? contextAssembler.assemble(snapshot.facts(), List.of(), defaultReviewerInput(snapshot))
-                : contextAssembler.assembleRetrieved(snapshot.facts(), evidence, defaultReviewerInput(snapshot));
+                : contextAssembler.assembleRetrieved(snapshot.facts(), evidence, defaultReviewerInput(snapshot)));
         String modelConfigurationVersion = modelConfigurationVersion();
         String promptVersion = assembled.promptVersion();
         ModelRequest request = new ModelRequest(
@@ -157,13 +159,18 @@ public final class ModelAnalysisOrchestrator implements AnalysisOrchestrator {
                 promptVersion,
                 modelConfigurationVersion);
         if(preflight!=null) {
-            request=preflight.prepare(analysisId,snapshot,request,assembled.retainedEvidence(),batch.indexVersion());
+            ModelRequest unprepared=request;String indexVersion=batch.indexVersion();
+            request=telemetry.call(com.finguard.copilot.observability.AnalysisTelemetry.Stage.PREFLIGHT,()->preflight.prepare(analysisId,snapshot,unprepared,assembled.retainedEvidence(),indexVersion));
             modelConfigurationVersion=request.modelConfigurationVersion();
         }
         ModelResponse response;
         Instant started = Instant.now();
         try {
-            response = modelGateway.complete(request);
+            ModelRequest prepared=request;
+            response = telemetry.call(com.finguard.copilot.observability.AnalysisTelemetry.Stage.MODEL,()->{
+                telemetry.modelMetadata(model.provider(),model.modelId(),prepared.promptVersion(),prepared.modelConfigurationVersion());
+                return modelGateway.complete(prepared);
+            });
         } catch (CopilotException exception) {
             throw failure(exception.code(), modelConfigurationVersion, promptVersion,
                     new ModelUsage(0, 0, elapsedSince(started)), outcome(exception.code()));
@@ -179,16 +186,19 @@ public final class ModelAnalysisOrchestrator implements AnalysisOrchestrator {
         }
 
         try {
-            AnalysisResult result = parser.parse(response.structuredContent());
+            AnalysisResult result = telemetry.call(com.finguard.copilot.observability.AnalysisTelemetry.Stage.VALIDATION,()->{
+                AnalysisResult parsed=parser.parse(response.structuredContent());
+                if(!analysisId.equals(parsed.analysisId())) throw new CopilotException(ErrorCode.MODEL_OUTPUT_INVALID,"model output analysis id does not match request");
+                validatePolicy(snapshot,parsed,assembled);return parsed;
+            });
             if (!analysisId.equals(result.analysisId())) {
                 throw new CopilotException(ErrorCode.MODEL_OUTPUT_INVALID,
                         "model output analysis id does not match request");
             }
-            validatePolicy(snapshot,result,assembled);
             return new AnalysisExecution(result, response.provider(), modelConfigurationVersion,
                     assembled.promptVersion(), response.usage());
         } catch (CopilotException exception) {
-            LOG.warn("Model result rejected: code={}, reason={}", exception.code(), exception.getMessage());
+            LOG.warn("Model result rejected: code={}", exception.code());
             throw failure(exception.code(), modelConfigurationVersion, promptVersion,
                     response.usage(), "FAILURE");
         }

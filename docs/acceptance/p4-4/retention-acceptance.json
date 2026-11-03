@@ -1,0 +1,22 @@
+{
+  "preview": {
+    "status": "OK",
+    "retentionDays": 7,
+    "dryRun": true,
+    "candidateCount": 1,
+    "requestedDeletionCount": 0,
+    "deletionVerification": "NOT_REQUESTED"
+  },
+  "apply": {
+    "status": "OK",
+    "retentionDays": 7,
+    "dryRun": false,
+    "candidateCount": 1,
+    "requestedDeletionCount": 1,
+    "deletionVerification": "ASYNC_NOT_VERIFIED"
+  },
+  "expiredFixtureAbsent": true,
+  "recentFixturePreserved": true,
+  "verifiedThrough": "Langfuse v4 observations API",
+  "onlyOwnedSyntheticProject": true
+}

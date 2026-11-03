@@ -21,6 +21,9 @@ server:
   shutdown: graceful
 
 management:
+  server:
+    port: ${COPILOT_MANAGEMENT_PORT:9091}
+    address: ${COPILOT_MANAGEMENT_ADDRESS:127.0.0.1}
   health:
     redis:
       enabled: false
@@ -31,6 +34,11 @@ management:
 
 finguard:
   copilot:
+    events:
+      redis-enabled: ${COPILOT_EVENTS_REDIS_ENABLED:false}
+    telemetry:
+      otlp-endpoint: ${COPILOT_OTLP_TRACES_ENDPOINT:}
+      langfuse-endpoint: ${COPILOT_LANGFUSE_TRACES_ENDPOINT:}
     core:
       base-url: ${FINGUARD_CORE_BASE_URL:http://localhost:8080}
     model:
@@ -73,6 +81,12 @@ finguard:
       snapshot-retention: ${COPILOT_SNAPSHOT_RETENTION:30d}
       published-outbox-retention: ${COPILOT_PUBLISHED_OUTBOX_RETENTION:7d}
       fixed-delay: ${COPILOT_JOBS_FIXED_DELAY:1h}
+
+logging:
+  level:
+    io.opentelemetry.exporter: OFF
+  pattern:
+    level: "%5p [trace=%X{traceId:-} span=%X{spanId:-} analysis=%X{analysisId:-}]"
 
 ---
 spring:

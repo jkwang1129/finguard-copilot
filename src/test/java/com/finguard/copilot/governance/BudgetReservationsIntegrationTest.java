@@ -56,6 +56,21 @@ class BudgetReservationsIntegrationTest {
         assertThat(jdbc.queryForObject("SELECT held_cny FROM model_budget_account WHERE scope_key='global:2026-11-02'",BigDecimal.class)).isZero();
         assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM model_budget_event WHERE event_type='SETTLED'",Integer.class)).isEqualTo(1);
     }
+    @Test void ledgerMetricsReflectUnknownHeldReleasedAndVerifiedSettlementFromMysql() {
+        var released=seed("released");budgets.acquire(released);budgets.releaseNotSent(released);
+        var settled=seed("settled");budgets.acquire(settled);budgets.settle(settled,new ModelUsage(100,10,Duration.ofMillis(1)));
+        var unknown=seed("unknown");budgets.acquire(unknown);budgets.markUnknown(unknown,"MODEL_CALL_OUTCOME_UNKNOWN");
+        var meters=new io.micrometer.core.instrument.simple.SimpleMeterRegistry();
+        var metrics=new com.finguard.copilot.observability.LedgerMetrics(jdbc,meters);
+        try {
+            metrics.refresh();
+            assertThat(meters.get("copilot.ledger.reservations").tag("state","UNKNOWN_HELD").gauge().value()).isEqualTo(1);
+            assertThat(meters.get("copilot.ledger.reservations").tag("state","RELEASED_NOT_SENT").gauge().value()).isEqualTo(1);
+            assertThat(meters.get("copilot.ledger.reservations").tag("state","SETTLED").gauge().value()).isEqualTo(1);
+            assertThat(meters.get("copilot.ledger.call.slots").gauge().value()).isEqualTo(3);
+            assertThat(meters.get("copilot.ledger.refresh.success").gauge().value()).isEqualTo(1);
+        } finally {metrics.close();}
+    }
     @Test void concurrentAnalysesCannotOverdrawSharedBudgetAndLoserHasNoCallSlot() throws Exception {
         UUID first=seed("one"),second=seed("two");var gate=new CountDownLatch(1);var pool=Executors.newFixedThreadPool(2);
         try {
@@ -132,7 +147,7 @@ class BudgetReservationsIntegrationTest {
         assertThat(jdbc.queryForObject("SELECT estimated_cost FROM model_usage_ledger",BigDecimal.class)).isEqualByComparingTo("0.00970800");
         assertThat(jdbc.queryForObject("SELECT price_table_version FROM model_usage_ledger",String.class)).isEqualTo("price-v1");
         assertThat(jdbc.queryForObject("SELECT currency FROM model_usage_ledger",String.class)).isEqualTo("CNY");
-        assertThat(metrics.get("copilot.model.calls").counter().count()).isEqualTo(1);
+        assertThat(metrics.get("copilot.model.usage.records").counter().count()).isEqualTo(1);
     }
     @Test void providerCorrelationIsPersistedWithoutChangingTheReservedBalance() {
         UUID id=seed("one");budgets.acquire(id);

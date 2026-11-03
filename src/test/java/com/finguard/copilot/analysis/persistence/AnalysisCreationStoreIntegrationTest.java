@@ -208,6 +208,15 @@ class AnalysisCreationStoreIntegrationTest {
                         .put("occurredAt", fixture.event().occurredAt().toString()));
     }
 
+    @Test void traceLinkAndOutboxContextCommitWithTheAnalysis() {
+        var f=fixture("trace-reviewer","trace-key");
+        String parent="00-"+"a".repeat(32)+"-"+"b".repeat(16)+"-01";
+        var e=f.event();
+        store.create(f.analysis(),f.snapshot(),new AnalysisCreationStore.OutboxRecord(e.eventId(),e.analysisId(),e.schemaVersion(),e.occurredAt(),e.nextAttemptAt(),parent),f.idempotencyExpiresAt());
+        assertThat(jdbc.getJdbcTemplate().queryForObject("SELECT trace_id FROM analysis_run",String.class)).isEqualTo("a".repeat(32));
+        assertThat(jdbc.getJdbcTemplate().queryForObject("SELECT JSON_UNQUOTE(JSON_EXTRACT(payload_json,'$.traceparent')) FROM outbox_event",String.class)).isEqualTo(parent);
+    }
+
     @ParameterizedTest
     @ValueSource(strings = {
             "analysis_run",
@@ -373,9 +382,11 @@ class AnalysisCreationStoreIntegrationTest {
                         "analysisId",
                         "schemaVersion",
                         "occurredAt",
-                        "nextAttemptAt"
+                        "nextAttemptAt",
+                        "traceparent"
                 );
         assertThat(Arrays.stream(OutboxRecord.class.getRecordComponents())
+                .filter(component -> !component.getName().equals("traceparent"))
                 .map(component -> component.getType().getName()))
                 .doesNotContain(byte[].class.getName(), String.class.getName());
 

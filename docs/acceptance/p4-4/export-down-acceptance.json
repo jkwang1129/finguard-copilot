@@ -1,0 +1,8 @@
+{
+  "businessUnaffected": true,
+  "checksPassed": 26,
+  "langfuseExportFailures": 20.0,
+  "businessStatus": "PASSED",
+  "actualModelHttpCallsAfterDuplicate": 1,
+  "runId": "20261102221052"
+}

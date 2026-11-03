@@ -53,7 +53,7 @@ public class ReviewAnalysisController {
         return getService.get(analysisId, bearerToken(authorization));
     }
 
-    private static String bearerToken(String authorization) {
+    static String bearerToken(String authorization) {
         if (authorization == null || authorization.length() <= 7
                 || !authorization.regionMatches(true, 0, "Bearer ", 0, 7)) {
             throw new CopilotException(ErrorCode.UNAUTHENTICATED,

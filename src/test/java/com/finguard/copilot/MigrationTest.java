@@ -38,7 +38,8 @@ class MigrationTest {
             "created_at",
             "updated_at",
             "failure_code",
-            "fully_reproducible"
+            "fully_reproducible",
+            "trace_id"
     );
 
     @Container

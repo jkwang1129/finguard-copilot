@@ -15,6 +15,7 @@ P4-1 已实现护栏与 P4-2 工程能力可以作为 P4-3 的开发基线；P4-
 | P4-1 | 已知安全集、精确数值与审定政策拒绝路径 | 未知注入不保证拦截；自由审核文本未开放，工具参数治理属 Phase 5 |
 | P4-2 | 评测报告、同批 Worker 比较、反馈 API、真实 Judge 调用、AI 模拟校准交付 10/10 | 真实人工标签仍缺；参考基线 N319/N321 两项漏报保留；反馈保留期限未配置 |
 | P4-3 | 单主模型契约下P4-3.1至.5完成工程验收：Java371/Python175、6替身+1最终真实场景通过 | [P4-3记录](docs/acceptance/2026-11-02-p4-3-governance.md)；无合格真实备用，供应商内部实现及生产质量不由本地测试证明 |
+| P4-4 | 本地工程验收：12阶段Trace、V11关联、脱敏有界导出、固定指标、实际Langfuse/Prometheus/Grafana、过期合成样本清理 | [验收记录](docs/acceptance/2026-11-02-p4-4-observability.md)；Core/供应商内部Span、生产容量及高可用另验；Java391含修正后的定向复测，Python183 |
 
 ## 阶段 0：架构与工程基线
 
@@ -119,13 +120,13 @@ Java 265 项、Python 100 项及前端 lint/测试/构建通过；Phase 3 工程
 - [x] 完成现有权限、知识准入 URL/秘密及模型工具调用响应拒绝测试（非全面渗透测试）。
 - [ ] Phase 5 开放工具执行时补工具参数、URL、权限和副作用治理验收。
 - [x] 处理 2026-10-22 提交前 npm audit 发现的 5 项前端开发工具链告警（3 high、2 moderate）并复测；[2026-10-27 验收记录](docs/acceptance/2026-10-27-phase4-first-batch.md)。
-- [ ] 接入 OpenTelemetry、Langfuse、Prometheus 和 Grafana。
-- [ ] 在P4-4统一已验证用量、未知费用、未发送占用和供应商调用尝试的Trace/指标口径（现以预算/占用/追加事件为真相）。
-- [ ] 验证指标标签低基数且不包含敏感信息。
-- [ ] 实现 MySQL `analysis_event` 单调序列和 Redis Pub/Sub 唤醒。
-- [ ] 实现只发送受控阶段和最终可用事件的 SSE API。
-- [ ] 实现 React、TypeScript、Vite 轻量审核演示页面。
-- [ ] 验证 SSE 重连和浏览器无法看到未经校验的模型内容。
+- [x] 接入 OpenTelemetry、Langfuse、Prometheus 和 Grafana（本地实例与业务替身链路已运行，见P4-4记录）。
+- [x] 在P4-4统一已验证用量、未知费用、未发送占用和供应商调用尝试的Trace/指标口径（账本为真相，采样快照注明新鲜度）。
+- [x] 验证业务指标固定枚举标签及导出元数据白名单；实际主端口隔离、遥测不可达和重复投递验收通过。
+- [x] 实现 MySQL `analysis_event` 单调序列和 Redis Pub/Sub 唤醒（V12；事务/CAS/回滚/并发与旧运行快照）。
+- [x] 实现只发送受控阶段和最终可用事件的 SSE API（有界连接、逐批授权、Last-Event-ID和DB补读）。
+- [x] 实现 React、TypeScript、Vite 轻量审核演示页面（创建、状态、精确证据/引用、费用/版本、反馈及Core入口）。
+- [x] 验证 SSE 重连和浏览器无法看到未经校验的模型内容（本地合成流程；[P4-5验收](docs/acceptance/2026-11-03-p4-5-review-console.md)，Java404/Python183/前端11，业务37项与恢复10项通过；不替代生产或真实模型质量门槛）。
 
 ## 阶段 5：Agent Workflow 与 Tool Use
 

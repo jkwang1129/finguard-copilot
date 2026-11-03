@@ -51,9 +51,11 @@ public class RealModelConfiguration {
     }
 
     @Bean
-    ModelGateway modelGateway(CopilotProperties.Model model,ObjectProvider<com.finguard.copilot.governance.BudgetReservations> budgets) {
+    ModelGateway modelGateway(CopilotProperties.Model model,ObjectProvider<com.finguard.copilot.governance.BudgetReservations> budgets,
+            ObjectProvider<com.finguard.copilot.observability.AnalysisTelemetry> telemetry) {
         return new CompatibleChatModelGateway(model,
-                RestClient.builder().requestFactory(modelRequestFactory(model.timeout())),value->budgets.getObject().recordProviderEvidence(value));
+                RestClient.builder().requestFactory(modelRequestFactory(model.timeout())),value->budgets.getObject().recordProviderEvidence(value))
+                .withTelemetry(telemetry.getIfAvailable(com.finguard.copilot.observability.AnalysisTelemetry::noop));
     }
 
     public static JdkClientHttpRequestFactory modelRequestFactory(Duration timeout) {
@@ -182,11 +184,13 @@ public class RealModelConfiguration {
             NumericThresholdGuard numericThresholdGuard,
             ReviewedPolicyGuard reviewedPolicyGuard,
             com.finguard.copilot.governance.ModelCallPreflight preflight,
-            ObjectProvider<KnowledgeRetrievalService> retrieval
+            ObjectProvider<KnowledgeRetrievalService> retrieval,
+            ObjectProvider<com.finguard.copilot.observability.AnalysisTelemetry> telemetry
     ) {
         return new ModelAnalysisOrchestrator(modelGateway, contextAssembler, parser,
                 properties.model(), properties.budget(), retrieval.getIfAvailable(),
-                properties.retrieval().topK(), numericThresholdGuard, reviewedPolicyGuard,preflight);
+                properties.retrieval().topK(), numericThresholdGuard, reviewedPolicyGuard,preflight)
+                .withTelemetry(telemetry.getIfAvailable(com.finguard.copilot.observability.AnalysisTelemetry::noop));
     }
 
     private String activeRealProfile(Environment environment) {

@@ -19,3 +19,7 @@ The Spring AI Alibaba BOM is imported during Phase 0 so later Agent dependencies
 Runtime credentials are environment-only. Local `.env` files, model keys, JWTs, and database passwords must never be committed.
 
 P4-3 adds `spring-boot-starter-data-redis` for executable quota/lease control. With the existing Spring Boot 3.5.8 dependency management, the packaged runtime resolves Spring Data Redis 3.5.6 and Lettuce 6.6.0.RELEASE. Isolated tests use Redis 8.2.8-alpine; no new model/Agent framework dependency was added.
+
+P4-4 adds the Boot-managed OpenTelemetry SDK and OTLP exporter 1.49.0, with SDK testing in test scope. Instrumentation is explicit; no Java Agent or prompt/body capture is enabled. Langfuse and its dependencies are isolated local Compose services with pinned image digests; the optional demo retention worker uses Python standard-library HTTP clients and the free public deletion API, not Enterprise retention.
+
+P4-5 reuses Spring MVC SseEmitter, JDBC/Flyway and the P4-3 Redis dependency; no new runtime library is added. The browser uses native fetch/ReadableStream/TextDecoder with the existing React/TypeScript/Vite stack. Vite proxies are development routing, not a production hosting setup.

@@ -1,0 +1,18 @@
+{
+  "runId": "20261102203851",
+  "analysisId": "3cce32b8-5133-4f72-940d-faf76cd44b93",
+  "checksPassed": 26,
+  "httpCalls": 1,
+  "failedStages": [
+    {
+      "stage": "VALIDATION",
+      "traceId": "06dfcbc22a4fadaf9a755905db4adeaa",
+      "errorCode": "FACT_VALIDATION_FAILED"
+    },
+    {
+      "stage": "WORKER",
+      "traceId": "06dfcbc22a4fadaf9a755905db4adeaa",
+      "errorCode": null
+    }
+  ]
+}

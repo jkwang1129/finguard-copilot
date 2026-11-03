@@ -48,6 +48,8 @@ public class VersionedArtifactStore {
             jdbc.update("INSERT IGNORE INTO model_run_manifest(analysis_id,manifest_sha256,manifest_json) VALUES(?,?,?)",id,hash,CanonicalJson.encode(stable));
             String existing=jdbc.queryForObject("SELECT manifest_sha256 FROM model_run_manifest WHERE analysis_id=? FOR UPDATE",String.class,id);
             if(!hash.equals(existing)) throw RunManifestService.rejected("analysis manifest is already frozen");
+            try {io.opentelemetry.api.trace.Span.current().setAttribute("finguard.manifest_sha256",hash);}
+            catch(RuntimeException ignored) {/* telemetry cannot roll back the verified manifest */}
         });
     }
 }

@@ -90,9 +90,16 @@ public class JdbcAnalysisRunRepository implements AnalysisRunRepository {
             """;
 
     private final NamedParameterJdbcTemplate jdbc;
+    private final org.springframework.transaction.support.TransactionTemplate eventTransactions;
+    private com.finguard.copilot.events.AnalysisEventRepository events;
+    @org.springframework.beans.factory.annotation.Autowired
+    public void setEvents(com.finguard.copilot.events.AnalysisEventRepository value){events=value;}
 
     public JdbcAnalysisRunRepository(NamedParameterJdbcTemplate jdbc) {
         this.jdbc = jdbc;
+        eventTransactions=new org.springframework.transaction.support.TransactionTemplate(
+                new org.springframework.jdbc.datasource.DataSourceTransactionManager(jdbc.getJdbcTemplate().getDataSource()));
+        events=new com.finguard.copilot.events.AnalysisEventRepository(jdbc.getJdbcTemplate());
     }
 
     @Override
@@ -109,7 +116,11 @@ public class JdbcAnalysisRunRepository implements AnalysisRunRepository {
                 .addValue("updatedAt", Timestamp.from(run.updatedAt()))
                 .addValue("failureCode", run.failureCode())
                 .addValue("fullyReproducible", run.fullyReproducible());
-        return jdbc.update(INSERT_RUN, parameters);
+        return eventTransactions.execute(tx->{
+            int inserted=jdbc.update(INSERT_RUN,parameters);
+            if(inserted==1) events.append(run.id(),run.status(),run.failureCode(),run.createdAt(),"STATE_CHANGED");
+            return inserted;
+        });
     }
 
     @Override
@@ -173,7 +184,11 @@ public class JdbcAnalysisRunRepository implements AnalysisRunRepository {
                 .addValue("updatedAt", Timestamp.from(updatedAt))
                 .addValue("id", uuidBytes(analysisId))
                 .addValue("expected", expected.name());
-        return jdbc.update(UPDATE_STATUS, parameters);
+        return eventTransactions.execute(tx->{
+            int changed=jdbc.update(UPDATE_STATUS,parameters);
+            if(changed==1) events.append(analysisId,next,failureCode,updatedAt,"STATE_CHANGED");
+            return changed;
+        });
     }
 
     @Override

@@ -19,12 +19,17 @@ param(
     [switch]$ExpectBudgetRejection,
     [switch]$ExpectRedisFailure,
     [switch]$PlanOnly,
+    [switch]$BrowserAcceptance,
     [switch]$KeepRunning
 )
 $ErrorActionPreference = 'Stop'
 $initialEnvironment = @{}
 Get-ChildItem Env: | ForEach-Object { $initialEnvironment[$_.Name] = $_.Value }
 $root = Split-Path -Parent $PSScriptRoot
+if ($BrowserAcceptance -and (-not $LocalModelStub -or -not $KeepRunning)) { throw 'BrowserAcceptance requires LocalModelStub and KeepRunning; synthetic local credentials only' }
+if ($BrowserAcceptance -and -not (Test-Path -LiteralPath (Join-Path $CoreRoot 'src/main/resources/static/demo/index.html'))) {
+    throw 'BrowserAcceptance requires a Core checkout with the review console; specify -CoreRoot C:\dev\finguard-core'
+}
 if (-not $LocalModelStub) { . (Join-Path $PSScriptRoot 'import-model-environment.ps1') -Path $EnvironmentFile }
 if ($LocalModelStub) {
     $env:COPILOT_MODEL_PROVIDER='deepseek'; $env:COPILOT_MODEL_API_KEY='local-test-only'
@@ -159,7 +164,7 @@ function Http-Status([string]$Method,[string]$Url,[hashtable]$Headers,[string]$B
 }
 try {
     if (-not $env:COPILOT_MODEL_API_KEY) { throw 'Set COPILOT_MODEL_API_KEY in the current process before running' }
-    $ports = @(8080,8081,6333); if ($LocalModelStub) { $ports += 18765 }; if ($LocalModelStub -or $IsolatedRedis) { $ports += 16380 }
+    $ports = @(8080,8081,9091,6333); if ($LocalModelStub) { $ports += 18765 }; if ($LocalModelStub -or $IsolatedRedis) { $ports += 16380 }
     foreach ($port in $ports) {
         if (Get-NetTCPConnection -State Listen -LocalPort $port -ErrorAction SilentlyContinue) { throw "Port $port is already occupied" }
     }
@@ -208,7 +213,13 @@ try {
     $core = Start-Java 'core' $CoreRoot (Join-Path $CoreRoot 'target\finguard-core-0.0.1-SNAPSHOT.jar')
     $processes += $core; Health 'http://127.0.0.1:8080' $core
     Check 'Core health UP with real MySQL/RabbitMQ/Redis' $true
-    $env:SERVER_PORT='8081'; $env:SPRING_PROFILES_ACTIVE=$profile
+    if ($BrowserAcceptance) {
+        $entry=Invoke-WebRequest 'http://127.0.0.1:8080/demo/index.html' -TimeoutSec 10 -SkipHttpErrorCheck
+        Check 'Configured Core review entry serves an actual HTML console' ($entry.StatusCode -eq 200 -and $entry.Headers['Content-Type'] -like '*text/html*')
+        $report.coreCommit=(& git -C $CoreRoot rev-parse HEAD).Trim()
+        $report.coreJarSha256=(Get-FileHash (Join-Path $CoreRoot 'target/finguard-core-0.0.1-SNAPSHOT.jar') -Algorithm SHA256).Hash.ToLowerInvariant()
+    }
+    $env:SERVER_PORT='8081'; $env:COPILOT_MANAGEMENT_PORT='9091'; $env:COPILOT_MANAGEMENT_ADDRESS='127.0.0.1'; $env:SPRING_PROFILES_ACTIVE=$profile
     $env:COPILOT_DB_URL="jdbc:mysql://127.0.0.1:3306/$copilotDb"+'?sslMode=DISABLED&allowPublicKeyRetrieval=true'
     $env:COPILOT_DB_USERNAME=$dbUser; $env:COPILOT_DB_PASSWORD=$mysql.MYSQL_PASSWORD
     $env:SPRING_RABBITMQ_HOST='127.0.0.1'; $env:SPRING_RABBITMQ_PORT='5672'
@@ -233,10 +244,10 @@ try {
     $env:COPILOT_EMBEDDING_VERSION='fixed-v1'; $env:E2E_INDEX_VERSION="published-$runId"
     $copilot = Start-Java 'copilot' $root (Join-Path $root 'target\finguard-copilot-0.0.1-SNAPSHOT.jar')
     $expectedHealth=if ($ExpectRedisFailure) { 'DOWN' } else { 'UP' }
-    $processes += $copilot; Health 'http://127.0.0.1:8081' $copilot $expectedHealth
+    $processes += $copilot; Health 'http://127.0.0.1:9091' $copilot $expectedHealth
     Check "Copilot $profile profile health $expectedHealth" $true
     $report.flywayVersion=Sql "SELECT version FROM $copilotDb.flyway_schema_history WHERE success=1 ORDER BY installed_rank DESC LIMIT 1;"
-    Check 'Current V10 governance and exact JSON text schema is active' ($report.flywayVersion -eq '10' -and
+    Check 'Current V12 event, trace linkage, governance and exact JSON text schema is active' ($report.flywayVersion -eq '12' -and
         (Sql "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema='$copilotDb' AND table_name IN ('analysis_input_snapshot','analysis_result') AND column_name IN ('facts_json','result_json') AND data_type='longtext';") -eq '2')
     $report.corePid=$core.Id; $report.copilotPid=$copilot.Id
     $java = Join-Path $env:JAVA_HOME 'bin\java.exe'
@@ -380,6 +391,31 @@ INSERT INTO review_tasks(source_type,risk_hit_id) VALUES('RISK_HIT',LAST_INSERT_
     }
     $report.recommendation=$result.result.recommendation
     $report.citationCount=if ($null -eq $result.result) { 0 } else { @($result.result.policyCitations).Count }
+    $page = Invoke-RestMethod "$url/$analysisId/view" -Headers $headers
+    Check 'Authorized UI projection returns exact IDs, amounts and accounting values as strings' ($page.schemaVersion -eq 1 -and
+        $page.reviewTaskId -is [string] -and $page.cost.heldCny -is [string] -and
+        ($result.status -ne 'SUCCEEDED' -or ($page.result.businessEvidence[0].amount -is [string] -and $page.result.businessEvidence[0].transactionId -is [string])))
+    foreach ($suffix in @('view','events')) {
+        Check "Unauthenticated $suffix read rejected with 401" ((Http-Status 'GET' "$url/$analysisId/$suffix" @{} '') -eq 401)
+        Check "ADMIN $suffix read rejected with 403" ((Http-Status 'GET' "$url/$analysisId/$suffix" $adminHeaders '') -eq 403)
+        Check "Unknown $suffix read rejected with 404" ((Http-Status 'GET' "$url/00000000-0000-0000-0000-000000000001/$suffix" $headers '') -eq 404)
+    }
+    $stream=(Invoke-WebRequest "$url/$analysisId/events" -Headers $headers -TimeoutSec 15).Content
+    $sequences=@([regex]::Matches($stream,'(?m)^id:(\d+)') | ForEach-Object { [long]$_.Groups[1].Value })
+    $persisted=Sql "SELECT GROUP_CONCAT(sequence_number ORDER BY sequence_number) FROM $copilotDb.analysis_event WHERE analysis_id=UNHEX(REPLACE('$analysisId','-',''));"
+    Check 'SSE frames equal the complete persisted monotonic event sequence' ($sequences.Count -ge 2 -and ($sequences -join ',') -eq $persisted)
+    $resume=@{Authorization=$headers.Authorization;'Last-Event-ID'=[string]$sequences[1]}
+    $resumed=(Invoke-WebRequest "$url/$analysisId/events" -Headers $resume -TimeoutSec 15).Content
+    $later=@([regex]::Matches($resumed,'(?m)^id:(\d+)') | ForEach-Object { [long]$_.Groups[1].Value })
+    Check 'Last-Event-ID reconnect replays only subsequent persisted events' (($later -join ',') -eq (($sequences | Select-Object -Skip 2) -join ','))
+    $future=@{Authorization=$headers.Authorization;'Last-Event-ID'='9223372036854775807'}
+    Check 'Future SSE cursor rejected with 409' ((Http-Status 'GET' "$url/$analysisId/events" $future '') -eq 409)
+    $report.progress=@{sequences=$sequences; resumedSequences=$later; uiProjectionSchema=$page.schemaVersion}
+    if ($BrowserAcceptance) {
+        # Ephemeral SYNTHETIC credentials for local browser verification only. Never copy into acceptance artifacts.
+        @{username='e2e-reviewer';password=$env:FINGUARD_AUTH_BOOTSTRAP_REVIEWER_PASSWORD;reviewTaskId=[string]$taskId;analysisId=$analysisId;runId=$runId} |
+            ConvertTo-Json | Set-Content -LiteralPath (Join-Path $output 'browser-session.json') -Encoding UTF8
+    }
     $report.status='PASSED'
 } catch {
     $report.status='FAILED'

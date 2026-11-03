@@ -63,6 +63,9 @@ public class OutboxRepository {
 
     private final JdbcTemplate jdbc;
     private final TransactionTemplate transactions;
+    private com.finguard.copilot.events.AnalysisEventRepository events;
+    @org.springframework.beans.factory.annotation.Autowired
+    public void setEvents(com.finguard.copilot.events.AnalysisEventRepository value){events=value;}
 
     @Autowired
     public OutboxRepository(JdbcTemplate jdbc) {
@@ -72,6 +75,7 @@ public class OutboxRepository {
     public OutboxRepository(JdbcTemplate jdbc, TransactionTemplate transactions) {
         this.jdbc = jdbc;
         this.transactions = transactions;
+        events=new com.finguard.copilot.events.AnalysisEventRepository(jdbc);
     }
 
     public List<OutboxEvent> claimDueEvents(Instant now, int batchSize, Duration leaseDuration) {
@@ -87,8 +91,9 @@ public class OutboxRepository {
             for (OutboxEvent event : events) {
                 jdbc.update(LEASE_EVENT, Timestamp.from(leaseUntil),
                         JdbcAnalysisRunRepository.uuidBytes(event.eventId()));
-                jdbc.update(QUEUE_RUN, Timestamp.from(normalizedNow),
+                int queued=jdbc.update(QUEUE_RUN, Timestamp.from(normalizedNow),
                         JdbcAnalysisRunRepository.uuidBytes(event.analysisId()));
+                if(queued==1) this.events.append(event.analysisId(),com.finguard.copilot.analysis.domain.AnalysisStatus.QUEUED,null,normalizedNow,"STATE_CHANGED");
             }
             return events;
         });

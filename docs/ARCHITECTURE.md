@@ -1,6 +1,6 @@
 # FinGuard Copilot 系统架构
 
-本文同时描述目标架构；当前已实现范围以[TASKS](../TASKS.md)及验收记录为准。P4-3 的实际清单、预算、Redis许可及单主模型边界见[运行说明](operations/phase4-3-governance.md)和[验收记录](acceptance/2026-11-02-p4-3-governance.md)。Graph、模型工具执行、SSE及完整Trace仍按后续工作包推进。
+本文同时描述目标架构；当前已实现范围以[TASKS](../TASKS.md)及验收记录为准。P4-3 的实际清单、预算、Redis许可及单主模型边界见[运行说明](operations/phase4-3-governance.md)和[验收记录](acceptance/2026-11-02-p4-3-governance.md)。P4-4 已接入显式、脱敏的 Copilot 阶段 Trace、Langfuse、Prometheus/Grafana 与预算状态指标，范围见[运行说明](operations/phase4-4-observability.md)。P4-5 的事务状态事件、授权 SSE 和 React 审核台见[运行说明](operations/phase4-5-review-console.md)。Core/供应商内部 Span、Graph 和模型工具执行仍属于独立范围。
 
 ## 1. 架构目标
 
@@ -57,7 +57,7 @@ flowchart LR
 | `model` | 模型路由、请求、结构化响应、用量和成本 | 模型客户端端口 |
 | `dispatch` | Outbox、RabbitMQ、幂等消费和重试 | 消息与存储端口 |
 | `quota` | 用户配额、供应商并发和限流 | Redis 端口 |
-| `realtime` | 受控 SSE 阶段事件 | `analysis` 只读端口 |
+| `events` | 持久状态事件、有界授权 SSE 和可选 Redis 唤醒 | `analysis` 授权及持久端口 |
 | `guardrail` | Schema、事实、引用和安全校验 | 纯领域对象 |
 | `runstore` | 运行、快照、证据、引用、版本 | MySQL 端口 |
 | `evaluation` | 评测导出、Golden Dataset 和 Judge 接口 | 上述公开端口 |
@@ -301,10 +301,10 @@ V9增加不可变版本目录与单分析运行清单，V10增加预算账户、
 成功率、事实校验失败率、引用覆盖率、输入/输出 Token、模型调用次数和估算成本。不得
 使用用户、任务、交易、文档 ID 或 Prompt 文本作为指标标签。
 
-每个运行具有 Trace ID，跨 Copilot、Core、消息处理和模型调用传播标准追踪上下文。
-OpenTelemetry 提供厂商无关 Trace；Langfuse 保存脱敏的 Agent/Prompt/Tool 轨迹、评测结果
-和 Bad Case 标签；Prometheus/Grafana 负责系统指标。成本根据版本化价格表估算，超过单次
-预算时在调用前拒绝，不能事后只做统计。
+当前P4-4对新建分析保存Trace ID，将标准追踪上下文经Outbox/Relay传播到Worker；旧记录允许为空。
+Core读取记录为Copilot侧阶段并传递traceparent，Core和供应商内部Span尚未验收。
+OpenTelemetry只导出白名单阶段及版本指纹，Langfuse不采集原始Prompt、事实、模型正文或虚构工具轨迹；
+Prometheus/Grafana负责固定标签指标和注明新鲜度的账本快照。成本根据版本化价格表估算，超过预算时在调用前拒绝。
 
 Agent 评测组合三类证据：确定性规则检查、版本化 LLM-as-Judge 和人工抽样。Judge 必须
 在固定人工样本上记录一致率，不能把 Judge 分数当作绝对真值。Python 评测工具使用
@@ -314,6 +314,10 @@ Golden Dataset，用于验证能力是否依赖某个 Java 框架，而不是作
 SSE 以 MySQL `analysis_event` 的单调序号作为可恢复事件源。Worker 在状态事务内写入受控
 事件；Redis Pub/Sub 只作为唤醒提示，不是事件真相源。客户端携带 Last-Event-ID 重连时
 从数据库补发缺失事件，因此 Redis 或浏览器短暂断线不会丢失阶段进度。
+
+P4-5 已实现上述进度链路：V12 在创建、成功状态 CAS 和 Outbox 转 QUEUED 的同一事务内追加事件；旧运行只回填一条当前状态快照。每进程16/每审核员4连接、60秒、批64、1秒轮询和15秒心跳，批次及心跳前重新检查 Core 角色与归属。可选 Redis 通知不进入业务成功条件，模型准入的 Redis 故障策略仍保持保守拒绝。
+
+页面使用单独的授权 `/view` 投影，保留原有结果 API 契约，将金额、ID、费用及 Token 转为精确字符串；只展示已验证结果及受控错误、账本状态和冻结版本指纹。React 通过 fetch 头传 JWT 和 Last-Event-ID，内存会话、有限恢复、幂等创建重试、退出隔离旧异步响应，全部模型/政策文本按纯文本呈现。反馈仍写 Copilot V7 表，Core 最终决策通过固定入口由人完成。见[P4-5验收](acceptance/2026-11-03-p4-5-review-console.md)。
 
 ## 13. 部署拓扑
 

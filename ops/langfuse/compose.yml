@@ -1,0 +1,136 @@
+# Local demonstration only. Based on upstream compose at 517ea17b90e73a0267f627220e3fcc3e5ae85851.
+name: finguard-copilot-langfuse
+x-shared: &shared
+  DATABASE_URL: postgresql://langfuse:${LF_POSTGRES_PASSWORD:?set local credentials}@postgres:5432/langfuse
+  NEXTAUTH_URL: http://127.0.0.1:13001
+  SALT: ${LF_SALT:?set local credentials}
+  ENCRYPTION_KEY: ${LF_ENCRYPTION_KEY:?set local credentials}
+  TELEMETRY_ENABLED: "false"
+  CLICKHOUSE_MIGRATION_URL: clickhouse://clickhouse:9000
+  CLICKHOUSE_URL: http://clickhouse:8123
+  CLICKHOUSE_USER: langfuse
+  CLICKHOUSE_PASSWORD: ${LF_CLICKHOUSE_PASSWORD:?set local credentials}
+  CLICKHOUSE_CLUSTER_ENABLED: "false"
+  REDIS_HOST: redis
+  REDIS_PORT: "6379"
+  REDIS_AUTH: ${LF_REDIS_PASSWORD:?set local credentials}
+  LANGFUSE_S3_EVENT_UPLOAD_BUCKET: langfuse
+  LANGFUSE_S3_EVENT_UPLOAD_REGION: auto
+  LANGFUSE_S3_EVENT_UPLOAD_ACCESS_KEY_ID: langfuse
+  LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY: ${LF_MINIO_PASSWORD:?set local credentials}
+  LANGFUSE_S3_EVENT_UPLOAD_ENDPOINT: http://minio:9000
+  LANGFUSE_S3_EVENT_UPLOAD_FORCE_PATH_STYLE: "true"
+  LANGFUSE_S3_MEDIA_UPLOAD_BUCKET: langfuse
+  LANGFUSE_S3_MEDIA_UPLOAD_REGION: auto
+  LANGFUSE_S3_MEDIA_UPLOAD_ACCESS_KEY_ID: langfuse
+  LANGFUSE_S3_MEDIA_UPLOAD_SECRET_ACCESS_KEY: ${LF_MINIO_PASSWORD:?set local credentials}
+  LANGFUSE_S3_MEDIA_UPLOAD_ENDPOINT: http://minio:9000
+  LANGFUSE_S3_MEDIA_UPLOAD_FORCE_PATH_STYLE: "true"
+x-dependencies: &dependencies
+  postgres: {condition: service_healthy}
+  clickhouse: {condition: service_healthy}
+  redis: {condition: service_healthy}
+  minio: {condition: service_healthy}
+services:
+  web:
+    image: docker.langfuse.com/langfuse/langfuse:4@sha256:c311fd9db4b69f6514fdcb1b86a2a105d5a4ed51fbf0ded033ff2722459c804a
+    depends_on: *dependencies
+    ports: ["127.0.0.1:13001:3000"]
+    environment:
+      <<: *shared
+      HOSTNAME: 0.0.0.0
+      NODE_OPTIONS: --max-old-space-size=1024
+      NEXTAUTH_SECRET: ${LF_AUTH_SECRET:?set local credentials}
+      AUTH_DISABLE_SIGNUP: "true"
+      LANGFUSE_S3_MEDIA_UPLOAD_ENDPOINT: http://127.0.0.1:13002
+      LANGFUSE_S3_MEDIA_UPLOAD_INTERNAL_ENDPOINT: http://minio:9000
+      LANGFUSE_INIT_ORG_ID: ${LF_ORG_ID:?set local credentials}
+      LANGFUSE_INIT_ORG_NAME: FinGuard Local Demo
+      LANGFUSE_INIT_PROJECT_ID: ${LF_PROJECT_ID:?set local credentials}
+      LANGFUSE_INIT_PROJECT_NAME: FinGuard P4-4 Synthetic
+      LANGFUSE_INIT_PROJECT_PUBLIC_KEY: ${COPILOT_LANGFUSE_PUBLIC_KEY:?set local credentials}
+      LANGFUSE_INIT_PROJECT_SECRET_KEY: ${COPILOT_LANGFUSE_SECRET_KEY:?set local credentials}
+      LANGFUSE_INIT_USER_EMAIL: reviewer@finguard.invalid
+      LANGFUSE_INIT_USER_NAME: Local Demo Reviewer
+      LANGFUSE_INIT_USER_PASSWORD: ${LF_USER_PASSWORD:?set local credentials}
+    mem_limit: 1536m
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/public/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 60s
+  worker:
+    image: docker.langfuse.com/langfuse/langfuse-worker:4@sha256:aa1724b989a00f1e4ca9930709202489c73deaaf2f1116bbd3d71c77edb8fedb
+    depends_on: *dependencies
+    environment: *shared
+    mem_limit: 768m
+  postgres:
+    image: postgres:17@sha256:3b0cda93be7c8dba2ed484d19393d93845dc3dafb88973e248ba8e6d99d784e1
+    environment:
+      POSTGRES_USER: langfuse
+      POSTGRES_DB: langfuse
+      POSTGRES_PASSWORD: ${LF_POSTGRES_PASSWORD:?set local credentials}
+    volumes: ["postgres-data:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "langfuse", "-d", "langfuse"]
+      interval: 5s
+      retries: 20
+    mem_limit: 256m
+  clickhouse:
+    image: clickhouse/clickhouse-server:26.3.62.3@sha256:de3e47c64078aa196dae2349e048fc98ba81947f651f5c20e06e46baea8ae40a
+    environment:
+      CLICKHOUSE_DB: default
+      CLICKHOUSE_USER: langfuse
+      CLICKHOUSE_PASSWORD: ${LF_CLICKHOUSE_PASSWORD:?set local credentials}
+    volumes:
+      - clickhouse-data:/var/lib/clickhouse
+      - ./clickhouse-limits.xml:/etc/clickhouse-server/config.d/local-limits.xml:ro
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "--quiet", "http://localhost:8123/ping"]
+      interval: 5s
+      retries: 30
+    mem_limit: 2g
+    ulimits: {nofile: {soft: 65536, hard: 65536}}
+  redis:
+    image: redis:8.2.8-alpine@sha256:a7859ed111db3c1f5404a973a4747505d559fb5ca32d37e447afc0ef845a2103
+    command: ["redis-server", "--requirepass", "${LF_REDIS_PASSWORD:?set local credentials}", "--maxmemory", "128mb", "--maxmemory-policy", "noeviction"]
+    environment: {REDISCLI_AUTH: "${LF_REDIS_PASSWORD:?set local credentials}"}
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      retries: 20
+    mem_limit: 192m
+  minio:
+    image: cgr.dev/chainguard/minio@sha256:0a01100085e30fb08d2f39e39c9f5c9d83a95707f220b007d813b690cd41622d
+    entrypoint: sh
+    command: -c 'mkdir -p /data/langfuse && minio server --address ":9000" /data'
+    ports: ["127.0.0.1:13002:9000"]
+    environment:
+      MINIO_ROOT_USER: langfuse
+      MINIO_ROOT_PASSWORD: ${LF_MINIO_PASSWORD:?set local credentials}
+    volumes: ["minio-data:/data"]
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      retries: 20
+    mem_limit: 256m
+  retention:
+    profiles: [retention]
+    image: python:3.12-alpine@sha256:e6dae589c1c05976188fd3bd019afd091445fc533ed2ea29001beddc7368a9c8
+    command: [python, /app/langfuse_retention.py, --loop, --apply]
+    depends_on:
+      web: {condition: service_healthy}
+    environment:
+      LF_RETENTION_BASE_URL: http://web:3000
+      LF_PROJECT_ID: ${LF_PROJECT_ID:?set local credentials}
+      COPILOT_LANGFUSE_PUBLIC_KEY: ${COPILOT_LANGFUSE_PUBLIC_KEY:?set local credentials}
+      COPILOT_LANGFUSE_SECRET_KEY: ${COPILOT_LANGFUSE_SECRET_KEY:?set local credentials}
+    volumes:
+      - ../../scripts/e2e/langfuse_retention.py:/app/langfuse_retention.py:ro
+    read_only: true
+    mem_limit: 64m
+volumes:
+  postgres-data:
+  clickhouse-data:
+  minio-data:

@@ -66,6 +66,8 @@ public class AnalysisWorker {
     private final ModelUsageRecorder usageRecorder;
     private final ModelCallReservations reservations;
     private final AnalysisStateMachine stateMachine = new AnalysisStateMachine();
+    private com.finguard.copilot.observability.AnalysisTelemetry telemetry=com.finguard.copilot.observability.AnalysisTelemetry.noop();
+    @Autowired public void setTelemetry(com.finguard.copilot.observability.AnalysisTelemetry value) {telemetry=Objects.requireNonNull(value);}
 
     @Autowired
     public AnalysisWorker(
@@ -191,6 +193,21 @@ public class AnalysisWorker {
     }
 
     public WorkerOutcome process(AnalysisRequestedMessage message, int attempt) {
+        if(message==null || attempt<1) throw new IllegalArgumentException("worker message and attempt are invalid");
+        try(var trace=telemetry.start(com.finguard.copilot.observability.AnalysisTelemetry.Stage.WORKER,message.analysisId(),message.traceparent())) {
+            try {
+                var outcome=processObserved(message,attempt);
+                trace.outcome(switch(outcome) {
+                    case COMPLETED,COMPLETED_FROM_STORED_RESULT -> "SUCCESS";
+                    case NOOP -> "NOOP";
+                    case RETRIED -> "RETRY";
+                    default -> "FAILURE";
+                });
+                return outcome;
+            } catch(RuntimeException e) {trace.failure(e instanceof CopilotException c?c.code().name():"INTERNAL_ERROR");throw e;}
+        }
+    }
+    private WorkerOutcome processObserved(AnalysisRequestedMessage message,int attempt) {
         if (message == null || attempt < 1) {
             throw new IllegalArgumentException("worker message and attempt are invalid");
         }
@@ -279,8 +296,10 @@ public class AnalysisWorker {
         }
         AnalysisResult validated;
         try {
-            validated = schemaValidator.validate(execution.result());
-            factValidator.validate(message.analysisId(), preflight.snapshot(), validated);
+            validated = telemetry.call(com.finguard.copilot.observability.AnalysisTelemetry.Stage.VALIDATION,()->{
+                var checked=schemaValidator.validate(execution.result());
+                factValidator.validate(message.analysisId(),preflight.snapshot(),checked);return checked;
+            });
         } catch (RuntimeException exception) {
             try {
                 recordRejectedExecution(message.analysisId(), execution);
@@ -300,8 +319,8 @@ public class AnalysisWorker {
             }
         }
         try {
-            recordSuccess(message.analysisId(), execution);
-            WorkerOutcome outcome = transactions.execute(status -> finishModelCall(message, validated));
+            telemetry.run(com.finguard.copilot.observability.AnalysisTelemetry.Stage.ACCOUNTING,()->recordSuccess(message.analysisId(), execution));
+            WorkerOutcome outcome = telemetry.call(com.finguard.copilot.observability.AnalysisTelemetry.Stage.PERSISTENCE,()->transactions.execute(status -> finishModelCall(message, validated)));
             return outcome == null ? WorkerOutcome.NOOP : outcome;
         } catch (RuntimeException exception) {
             return terminalModelDisposition(message, "MODEL_CALL_OUTCOME_UNKNOWN",execution.usage());
@@ -490,7 +509,7 @@ public class AnalysisWorker {
                     || exception.code() == ErrorCode.OUTPUT_SCHEMA_INVALID
                     || exception.code() == ErrorCode.FACT_VALIDATION_FAILED
                     || exception.code() == ErrorCode.KNOWLEDGE_UNAVAILABLE) {
-                LOG.warn("Analysis validation rejected: code={}, reason={}", exception.code(), exception.getMessage());
+                LOG.warn("Analysis validation rejected: code={}", exception.code());
                 if (execution != null && execution.usage() != null) {
                     recordRejectedExecution(message.analysisId(), execution);
                 }

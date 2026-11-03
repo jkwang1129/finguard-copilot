@@ -56,6 +56,7 @@ public final class CompatibleChatModelGateway implements ModelGateway {
         Instant started = Instant.now();
         try {
             JsonNode payload = requestPayload(request);
+            telemetry.providerAttempt(model.provider());
             var entity = restClient.post()
                     .uri(model.chatCompletionsPath())
                     .contentType(MediaType.APPLICATION_JSON)
@@ -74,6 +75,11 @@ public final class CompatibleChatModelGateway implements ModelGateway {
         } catch (RestClientException | JsonProcessingException | IllegalArgumentException exception) {
             throw invalidOrUnavailable(exception);
         }
+    }
+
+    private com.finguard.copilot.observability.AnalysisTelemetry telemetry=com.finguard.copilot.observability.AnalysisTelemetry.noop();
+    public CompatibleChatModelGateway withTelemetry(com.finguard.copilot.observability.AnalysisTelemetry value) {
+        telemetry=Objects.requireNonNull(value);return this;
     }
 
     private void observe(ModelRequest request,String body,HttpHeaders headers,int status,Instant started) {

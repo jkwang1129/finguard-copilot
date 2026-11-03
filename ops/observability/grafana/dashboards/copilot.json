@@ -1,0 +1,18 @@
+{
+  "uid": "finguard-copilot-p4-4",
+  "title": "FinGuard Copilot — runtime and ledger",
+  "schemaVersion": 41,
+  "version": 1,
+  "editable": false,
+  "refresh": "15s",
+  "tags": ["finguard", "p4-4"],
+  "time": {"from": "now-1h", "to": "now"},
+  "panels": [
+    {"id": 1, "type": "timeseries", "title": "Stage mean duration (seconds)", "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0}, "datasource": {"type": "prometheus", "uid": "finguard-prometheus"}, "targets": [{"refId": "A", "expr": "sum by(stage,outcome)(rate(copilot_stage_duration_seconds_sum[5m])) / clamp_min(sum by(stage,outcome)(rate(copilot_stage_duration_seconds_count[5m])),0.000001)", "legendFormat": "{{stage}} {{outcome}}"}]},
+    {"id": 2, "type": "timeseries", "title": "Provider HTTP attempts / second (not accepted calls)", "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}, "datasource": {"type": "prometheus", "uid": "finguard-prometheus"}, "targets": [{"refId": "A", "expr": "sum by(provider)(rate(copilot_provider_request_attempts_total[5m]))", "legendFormat": "{{provider}}"}]},
+    {"id": 3, "type": "timeseries", "title": "Budget reservations — one shared DB (max across replicas)", "gridPos": {"h": 8, "w": 12, "x": 0, "y": 8}, "datasource": {"type": "prometheus", "uid": "finguard-prometheus"}, "targets": [{"refId": "A", "expr": "max by(state)(copilot_ledger_reservations)", "legendFormat": "{{state}}"}]},
+    {"id": 4, "type": "timeseries", "title": "Held money and settled estimate (CNY, not provider invoice)", "gridPos": {"h": 8, "w": 12, "x": 12, "y": 8}, "datasource": {"type": "prometheus", "uid": "finguard-prometheus"}, "targets": [{"refId": "A", "expr": "max by(state)(copilot_ledger_held_cny)", "legendFormat": "held {{state}}"}, {"refId": "B", "expr": "max(copilot_ledger_settled_estimate_cny)", "legendFormat": "settled estimate"}]},
+    {"id": 5, "type": "timeseries", "title": "Telemetry queue and dropped spans", "gridPos": {"h": 8, "w": 12, "x": 0, "y": 16}, "datasource": {"type": "prometheus", "uid": "finguard-prometheus"}, "targets": [{"refId": "A", "expr": "max by(destination)(copilot_telemetry_queue_size)", "legendFormat": "queued {{destination}}"}, {"refId": "B", "expr": "sum by(destination,reason)(rate(copilot_telemetry_dropped_total[5m]))", "legendFormat": "dropped {{destination}} {{reason}}"}]},
+    {"id": 6, "type": "timeseries", "title": "Ledger freshness — inspect success and age together", "gridPos": {"h": 8, "w": 12, "x": 12, "y": 16}, "datasource": {"type": "prometheus", "uid": "finguard-prometheus"}, "targets": [{"refId": "A", "expr": "min(copilot_ledger_refresh_success)", "legendFormat": "refresh success"}, {"refId": "B", "expr": "max(copilot_ledger_snapshot_age_seconds)", "legendFormat": "snapshot age seconds"}]}
+  ]
+}

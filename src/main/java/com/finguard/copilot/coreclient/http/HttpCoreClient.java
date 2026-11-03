@@ -69,7 +69,11 @@ public final class HttpCoreClient implements CoreClient {
         try {
             String responseBody = restClient.get()
                     .uri(path, uriVariables)
-                    .headers(headers -> headers.setBearerAuth(bearerToken))
+                    .headers(headers -> {
+                        headers.setBearerAuth(bearerToken);
+                        var span=io.opentelemetry.api.trace.Span.current().getSpanContext();
+                        if(span.isValid()) headers.set("traceparent","00-"+span.getTraceId()+"-"+span.getSpanId()+"-"+(span.isSampled()?"01":"00"));
+                    })
                     .retrieve()
                     .onStatus(statusCode -> !statusCode.is2xxSuccessful(), (request, response) -> {
                         throw upstreamStatus(endpoint, response.getStatusCode());
