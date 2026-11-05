@@ -1,0 +1,59 @@
+{
+  "agreement": {
+    "matched": 10,
+    "total": 10
+  },
+  "cases": [
+    {
+      "case_id": "P4H01",
+      "status": "MATCHED"
+    },
+    {
+      "case_id": "P4H02",
+      "status": "MATCHED"
+    },
+    {
+      "case_id": "P4H04",
+      "status": "MATCHED"
+    },
+    {
+      "case_id": "P4H05",
+      "status": "MATCHED"
+    },
+    {
+      "case_id": "P4H08",
+      "status": "MATCHED"
+    },
+    {
+      "case_id": "P4H11",
+      "status": "MATCHED"
+    },
+    {
+      "case_id": "P4H12",
+      "status": "MATCHED"
+    },
+    {
+      "case_id": "P4H13",
+      "status": "MATCHED"
+    },
+    {
+      "case_id": "P4H14",
+      "status": "MATCHED"
+    },
+    {
+      "case_id": "P4H16",
+      "status": "MATCHED"
+    }
+  ],
+  "counts": {
+    "abstained": 0,
+    "disagreed": 0,
+    "matched": 10,
+    "missing": 0
+  },
+  "dataset_sha256": "a2d1e749ffef619767153799cb0c8a90796e11b0555608754ad813c0348c5742",
+  "judge_output_verification": "unverified",
+  "judge_version": "deepseek-flash-synthetic-judge-v1",
+  "label_verification": "unverified",
+  "label_version": "project-user-human-20261104-v1"
+}

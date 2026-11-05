@@ -6,6 +6,9 @@ export const states = [
   "VALIDATING",
   "SUCCEEDED",
   "FAILED",
+  "PLANNING",
+  "TOOL_RUNNING",
+  "WAITING_FOR_HUMAN",
 ] as const;
 export type Status = (typeof states)[number];
 export type Verdict = "AGREE" | "DISAGREE" | "UNSURE";
@@ -14,6 +17,9 @@ export interface Session {
   username: string;
 }
 export interface Progress {
+  agentRevision?: string | null;
+  agentNode?: string | null;
+  toolNames?: (ToolName | "OTHER")[] | null;
   analysisId: string;
   sequence: string;
   type: "SNAPSHOT" | "STATE_CHANGED";
@@ -73,6 +79,34 @@ export interface Page {
   } | null;
   traceId: string | null;
   feedbackVerdict: Verdict | null;
+  agent?: AgentSummary | null;
+}
+export type ToolName = "get_review_facts" | "get_task_state" | "search_review_policy";
+export interface AgentSummary {
+  workflowVersion: string;
+  revision: string;
+  node: string;
+  waitingReason: string | null;
+  waitExpiresAt: string | null;
+  capturedAt: string;
+  snapshotExpiresAt: string;
+  modelCalls: number;
+  toolCalls: number;
+  plannedTools: ToolName[];
+  replayable: boolean;
+  canResume: boolean;
+}
+export interface AgentTrace {
+  analysisId: string;
+  revision: string;
+  replayable: boolean;
+  tools: { slot: number; toolName: ToolName | "OTHER"; status: string; checksum: string | null }[];
+  calls: { ordinal: number; status: string; estimatedCost: string | null; inputTokens: string | null; outputTokens: string | null }[];
+}
+export function validateRevision(value: string): string {
+  if (!/^(0|[1-9][0-9]{0,18})$/.test(value) || BigInt(value) > 9223372036854775807n)
+    throw new ApiError("INVALID_REQUEST");
+  return value;
 }
 const messages: Record<string, string> = {
   UNAUTHENTICATED: "登录已失效，请重新登录。",
@@ -107,6 +141,8 @@ export function validateAnalysisId(value: string): string {
   return value;
 }
 export interface Api {
+  resume?(token: string, id: string, revision: string, action: "CONTINUE" | "CANCEL", key: string, signal?: AbortSignal): Promise<void>;
+  trace?(token: string, id: string, signal?: AbortSignal): Promise<AgentTrace>;
   login(
     username: string,
     password: string,
@@ -134,6 +170,38 @@ export interface Api {
 }
 export class ReviewApi implements Api {
   private readonly fetcher: typeof fetch;
+  async resume(token: string, id: string, revision: string, action: "CONTINUE" | "CANCEL", key: string, signal?: AbortSignal): Promise<void> {
+    const response = await this.request("/api/copilot/review-analyses/" + validateAnalysisId(id) + "/resume", token, {
+      method: "POST", headers: { "Content-Type": "application/json", "Idempotency-Key": key },
+      body: JSON.stringify({ expectedRevision: validateRevision(revision), action }), signal,
+    });
+    const receipt = await response.json();
+    if (receipt.analysisId !== id || typeof receipt.revision !== "string" || !states.includes(receipt.status))
+      throw new ApiError("INVALID_RESPONSE");
+    validateRevision(receipt.revision);
+  }
+  async trace(token: string, id: string, signal?: AbortSignal): Promise<AgentTrace> {
+    const trace: AgentTrace = await (await this.request(
+      "/api/copilot/review-analyses/" + validateAnalysisId(id) + "/trace", token, { signal })).json();
+    if (trace.analysisId !== id || typeof trace.revision !== "string" || !Array.isArray(trace.tools) || !Array.isArray(trace.calls)
+      || typeof trace.replayable !== "boolean") throw new ApiError("INVALID_RESPONSE");
+    validateRevision(trace.revision);
+    for (const tool of trace.tools) {
+      if (!Number.isInteger(tool.slot) || tool.slot < 1 || tool.slot > 4 ||
+        !["get_review_facts", "get_task_state", "search_review_policy", "OTHER"].includes(tool.toolName) ||
+        !["CLAIMED", "SUCCEEDED", "REJECTED", "UNKNOWN"].includes(tool.status) ||
+        tool.checksum !== null && !/^[a-f0-9]{64}$/.test(tool.checksum)) throw new ApiError("INVALID_RESPONSE");
+    }
+    for (const call of trace.calls) {
+      if (!Number.isInteger(call.ordinal) || call.ordinal < 1 || call.ordinal > 2 ||
+        !["RESERVED", "SETTLED", "UNKNOWN_HELD", "RELEASED_NOT_SENT"].includes(call.status)) throw new ApiError("INVALID_RESPONSE");
+      for (const field of ["estimatedCost", "inputTokens", "outputTokens"] as const) {
+        const value = call[field];
+        if (value !== null && (typeof value !== "string" || !/^[0-9]+(?:\.[0-9]+)?$/.test(value))) throw new ApiError("INVALID_RESPONSE");
+      }
+    }
+    return trace;
+  }
   constructor(fetcher: typeof fetch = fetch) {
     this.fetcher = fetcher.bind(globalThis);
   }
@@ -236,6 +304,15 @@ export class ReviewApi implements Api {
     )
       throw new ApiError("INVALID_RESPONSE");
     validateTaskId(page.reviewTaskId);
+    if (page.agent) {
+      validateRevision(page.agent.revision);
+      if (page.agent.workflowVersion !== "agent-v1" || !Number.isInteger(page.agent.modelCalls) ||
+        page.agent.modelCalls < 0 || page.agent.modelCalls > 2 || !Number.isInteger(page.agent.toolCalls) ||
+        page.agent.toolCalls < 0 || page.agent.toolCalls > 4 || !Array.isArray(page.agent.plannedTools) ||
+        !page.agent.plannedTools.every((tool) => ["get_review_facts", "get_task_state", "search_review_policy"].includes(tool)) ||
+        !Number.isFinite(Date.parse(page.agent.capturedAt)) || !Number.isFinite(Date.parse(page.agent.snapshotExpiresAt)) ||
+        typeof page.agent.canResume !== "boolean") throw new ApiError("INVALID_RESPONSE");
+    }
     for (const key of [
       "estimatedCost",
       "heldCny",

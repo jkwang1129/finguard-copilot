@@ -61,6 +61,22 @@ public final class StructuredAnalysisParser {
         }
     }
 
+    /** Preserve a security rejection category so an Agent cannot spend its repair turn on known injection. */
+    public AnalysisResult parseForAgent(String content) {
+        if(content==null || content.isBlank()) throw invalid("model output must not be blank");
+        try {
+            JsonNode node=mapper.reader().with(DeserializationFeature.FAIL_ON_TRAILING_TOKENS)
+                    .readTree(unwrapCodeFence(content));
+            try {rejectInjection(node);}
+            catch(CopilotException rejected) {
+                throw new CopilotException(ErrorCode.FACT_VALIDATION_FAILED,"Agent output instruction marker rejected");
+            }
+            return schemaValidator.validate(node);
+        } catch(JsonProcessingException|IllegalArgumentException exception) {
+            throw invalid("model output is not valid structured JSON");
+        }
+    }
+
     private String unwrapCodeFence(String content) {
         String trimmed = content.trim();
         if (!trimmed.startsWith("```") || !trimmed.endsWith("```")) {

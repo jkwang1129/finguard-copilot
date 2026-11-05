@@ -1,0 +1,880 @@
+{
+  "runId": "20261103214530",
+  "startedAt": "2026-11-03T21:45:30.6645089+08:00",
+  "status": "PASSED",
+  "coreDatabase": "fg_core_e2e_20261103214530",
+  "copilotDatabase": "fg_copilot_e2e_20261103214530",
+  "rabbitVhost": "fg-e2e-20261103214530",
+  "qdrantContainer": "fg-e2e-qdrant-20261103214530",
+  "provider": "deepseek",
+  "model": "local-test-stub",
+  "prompt": "review-analysis-v2",
+  "maxModelCalls": 2,
+  "embedding": "fixed-v1",
+  "currency": "CNY",
+  "priceTableVersion": "smoke-fixture-zero-v1",
+  "fixture": true,
+  "expectedCalls": 2,
+  "harnessSha256": "42de3bea14767e6183d352bcbab822813b10bdef2f37953a21c2d7b8fa30fd52",
+  "smokeBudgetCny": 0.1,
+  "estimatedUpperBoundCny": 0.0,
+  "inputPricePerMillionCny": 0.0,
+  "outputPricePerMillionCny": 0.0,
+  "copilotJarSha256": "f9429d45bf5e2a261c69da6760f551e9d74da34b349f756b41a305a1beef1b5b",
+  "coreJarSha256": "c910fdb485e1ef55470c3bd30bbd42c15f07ec2f7e164be1b38a12e45cafee28",
+  "checks": [
+    {
+      "name": "Run-owned RabbitMQ configuration is bound before Core startup",
+      "passed": true
+    },
+    {
+      "name": "Core health UP with real MySQL/RabbitMQ/Redis",
+      "passed": true
+    },
+    {
+      "name": "Copilot real-deepseek profile health UP",
+      "passed": true
+    },
+    {
+      "name": "All current migrations, events, trace linkage, governance and exact JSON text schema are active",
+      "passed": true
+    },
+    {
+      "name": "Published knowledge retrieved from Qdrant and checksum-verified MySQL source",
+      "passed": true
+    },
+    {
+      "name": "Reviewer JWT authenticated by Core",
+      "passed": true
+    },
+    {
+      "name": "Core supplies actual sanitized task context",
+      "passed": true
+    },
+    {
+      "name": "Agent unauthenticated creation rejected",
+      "passed": true
+    },
+    {
+      "name": "Agent accepted with HTTP 202",
+      "passed": true
+    },
+    {
+      "name": "Native tool selection pauses durably before execution",
+      "passed": true
+    },
+    {
+      "name": "Revision is an exact string",
+      "passed": true
+    },
+    {
+      "name": "Agent trace requires fresh reviewer identity",
+      "passed": true
+    },
+    {
+      "name": "Agent view requires fresh reviewer identity",
+      "passed": true
+    },
+    {
+      "name": "Resume rejects missing identity",
+      "passed": true
+    },
+    {
+      "name": "Resume rejects stale revision",
+      "passed": true
+    },
+    {
+      "name": "Owned JVM restart preserves waiting revision and counters",
+      "passed": true
+    },
+    {
+      "name": "Reauthorized continuation accepted with HTTP 202",
+      "passed": true
+    },
+    {
+      "name": "Duplicate continuation replays the same receipt",
+      "passed": true
+    },
+    {
+      "name": "Resumed native graph reaches validated success",
+      "passed": true
+    },
+    {
+      "name": "Two native HTTP calls and two settled immutable claims",
+      "passed": true
+    },
+    {
+      "name": "Both persisted tool executions are audited exactly once",
+      "passed": true
+    },
+    {
+      "name": "Graph never falls back to the legacy paid-call ledger",
+      "passed": true
+    },
+    {
+      "name": "All Core business table checksums unchanged",
+      "passed": true
+    },
+    {
+      "name": "Graph SSE replays every committed controlled state",
+      "passed": true
+    },
+    {
+      "name": "MCP issuance still requires Core reviewer identity",
+      "passed": true
+    },
+    {
+      "name": "Local capability is short lived, scoped and never a Core JWT",
+      "passed": true
+    },
+    {
+      "name": "Real STDIO initialize/list/call and bounded error paths pass",
+      "passed": true
+    },
+    {
+      "name": "Agent and MCP together never exceed four shared slots",
+      "passed": true
+    },
+    {
+      "name": "Explicit revocation denies existing bridge capability",
+      "passed": true
+    },
+    {
+      "name": "Real STDIO client cannot list tools after capability expiry",
+      "passed": true
+    },
+    {
+      "name": "MCP never calls a model or writes Core business state",
+      "passed": true
+    },
+    {
+      "name": "Graph branch direct_final matches status/calls/slots and preserves Core",
+      "passed": true
+    },
+    {
+      "name": "Graph branch direct_final SSE reconnect exactly replays committed events",
+      "passed": true
+    },
+    {
+      "name": "Graph branch format_repair matches status/calls/slots and preserves Core",
+      "passed": true
+    },
+    {
+      "name": "Graph branch format_repair SSE reconnect exactly replays committed events",
+      "passed": true
+    },
+    {
+      "name": "Graph branch fact_mismatch matches status/calls/slots and preserves Core",
+      "passed": true
+    },
+    {
+      "name": "Graph branch fact_mismatch SSE reconnect exactly replays committed events",
+      "passed": true
+    },
+    {
+      "name": "Graph branch policy_conflict matches status/calls/slots and preserves Core",
+      "passed": true
+    },
+    {
+      "name": "Graph branch policy_conflict SSE reconnect exactly replays committed events",
+      "passed": true
+    },
+    {
+      "name": "Graph branch output_injection matches status/calls/slots and preserves Core",
+      "passed": true
+    },
+    {
+      "name": "Graph branch output_injection SSE reconnect exactly replays committed events",
+      "passed": true
+    },
+    {
+      "name": "Graph branch unknown_tool matches status/calls/slots and preserves Core",
+      "passed": true
+    },
+    {
+      "name": "Graph branch unknown_tool SSE reconnect exactly replays committed events",
+      "passed": true
+    },
+    {
+      "name": "Graph branch extra_arguments matches status/calls/slots and preserves Core",
+      "passed": true
+    },
+    {
+      "name": "Graph branch extra_arguments SSE reconnect exactly replays committed events",
+      "passed": true
+    },
+    {
+      "name": "Graph branch url_argument matches status/calls/slots and preserves Core",
+      "passed": true
+    },
+    {
+      "name": "Graph branch url_argument SSE reconnect exactly replays committed events",
+      "passed": true
+    },
+    {
+      "name": "Graph branch query_injection matches status/calls/slots and preserves Core",
+      "passed": true
+    },
+    {
+      "name": "Graph branch query_injection SSE reconnect exactly replays committed events",
+      "passed": true
+    },
+    {
+      "name": "Graph branch too_many_tools matches status/calls/slots and preserves Core",
+      "passed": true
+    },
+    {
+      "name": "Graph branch too_many_tools SSE reconnect exactly replays committed events",
+      "passed": true
+    },
+    {
+      "name": "Graph branch second_tools matches status/calls/slots and preserves Core",
+      "passed": true
+    },
+    {
+      "name": "Graph branch second_tools SSE reconnect exactly replays committed events",
+      "passed": true
+    },
+    {
+      "name": "Graph branch provider_unknown matches status/calls/slots and preserves Core",
+      "passed": true
+    },
+    {
+      "name": "Unknown provider response keeps its immutable hold",
+      "passed": true
+    },
+    {
+      "name": "Graph branch provider_unknown SSE reconnect exactly replays committed events",
+      "passed": true
+    },
+    {
+      "name": "Graph branch retrieval_retry matches status/calls/slots and preserves Core",
+      "passed": true
+    },
+    {
+      "name": "Graph branch retrieval_retry SSE reconnect exactly replays committed events",
+      "passed": true
+    },
+    {
+      "name": "Actual isolated Redis outage fails closed before model HTTP/claim",
+      "passed": true
+    },
+    {
+      "name": "AMQP connection outage retains accepted analysis in durable Outbox",
+      "passed": true
+    },
+    {
+      "name": "Disabled Agent runtime defers the frozen run without legacy fallback",
+      "passed": true
+    },
+    {
+      "name": "Rabbit recovery and runtime reenable finish the original analysis exactly within two calls",
+      "passed": true
+    },
+    {
+      "name": "Priced fixture budget rejection performs no provider HTTP or claim",
+      "passed": true
+    },
+    {
+      "name": "Infrastructure faults never write Core business tables",
+      "passed": true
+    },
+    {
+      "name": "Fault TOOL_BEFORE_CLAIM killed only its owned JVM at the intended window",
+      "passed": true
+    },
+    {
+      "name": "Fault TOOL_BEFORE_CLAIM recovers without extra model/tool executions or business writes",
+      "passed": true
+    },
+    {
+      "name": "Fault TOOL_AFTER_CLAIM killed only its owned JVM at the intended window",
+      "passed": true
+    },
+    {
+      "name": "Fault TOOL_AFTER_CLAIM recovers without extra model/tool executions or business writes",
+      "passed": true
+    },
+    {
+      "name": "Fault TOOL_AFTER_READ killed only its owned JVM at the intended window",
+      "passed": true
+    },
+    {
+      "name": "Fault TOOL_AFTER_READ recovers without extra model/tool executions or business writes",
+      "passed": true
+    },
+    {
+      "name": "Fault TOOL_AFTER_PERSIST killed only its owned JVM at the intended window",
+      "passed": true
+    },
+    {
+      "name": "Fault TOOL_AFTER_PERSIST recovers without extra model/tool executions or business writes",
+      "passed": true
+    },
+    {
+      "name": "Fault MODEL_BEFORE_CLAIM killed only its owned JVM at the intended window",
+      "passed": true
+    },
+    {
+      "name": "Fault MODEL_BEFORE_CLAIM recovers without extra model/tool executions or business writes",
+      "passed": true
+    },
+    {
+      "name": "Fault MODEL_AFTER_CLAIM killed only its owned JVM at the intended window",
+      "passed": true
+    },
+    {
+      "name": "Fault MODEL_AFTER_CLAIM recovers without extra model/tool executions or business writes",
+      "passed": true
+    },
+    {
+      "name": "Fault MODEL_AFTER_CLAIM keeps the uncertain call held permanently",
+      "passed": true
+    },
+    {
+      "name": "Fault MODEL_AFTER_RESPONSE killed only its owned JVM at the intended window",
+      "passed": true
+    },
+    {
+      "name": "Fault MODEL_AFTER_RESPONSE recovers without extra model/tool executions or business writes",
+      "passed": true
+    },
+    {
+      "name": "Fault MODEL_AFTER_RESPONSE keeps the uncertain call held permanently",
+      "passed": true
+    },
+    {
+      "name": "Fault MODEL_AFTER_PERSIST killed only its owned JVM at the intended window",
+      "passed": true
+    },
+    {
+      "name": "Fault MODEL_AFTER_PERSIST recovers without extra model/tool executions or business writes",
+      "passed": true
+    },
+    {
+      "name": "Fault CHECKPOINT_AFTER_COMMIT killed only its owned JVM at the intended window",
+      "passed": true
+    },
+    {
+      "name": "Fault CHECKPOINT_AFTER_COMMIT recovers without extra model/tool executions or business writes",
+      "passed": true
+    },
+    {
+      "name": "Fault BEFORE_ACK killed only its owned JVM at the intended window",
+      "passed": true
+    },
+    {
+      "name": "Fault BEFORE_ACK recovers without extra model/tool executions or business writes",
+      "passed": true
+    }
+  ],
+  "flywayVersion": "16",
+  "flywayVersions": [
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "11",
+    "12",
+    "13",
+    "14",
+    "15",
+    "16"
+  ],
+  "corePid": 37680,
+  "copilotPid": 22184,
+  "knowledge": {
+    "status": "PUBLISHED",
+    "recallAtK": 1.0,
+    "indexVersion": "published-20261103214530",
+    "embeddingVersion": "fixed-v1",
+    "scope": "synthetic smoke case, not semantic quality evaluation",
+    "retrievedChunk": "finguard-large-amount-review-policy:v1:0",
+    "chunkCount": 1,
+    "documentId": "finguard-large-amount-review-policy",
+    "citationPrecision": 1.0
+  },
+  "workflow": "agent-v1",
+  "analysisId": "7c425e1c-4760-4b04-af70-668d12c22772",
+  "analysisStatus": "SUCCEEDED",
+  "failureCode": null,
+  "actualModelHttpCalls": 2,
+  "agentCalls": "1\tSETTLED\t10\t5\t0.00000000\n2\tSETTLED\t10\t5\t0.00000000",
+  "toolExecutions": "1\tsearch_review_policy\tSUCCEEDED\n2\tget_task_state\tSUCCEEDED",
+  "coreChecksumBefore": "fg_core_e2e_20261103214530.accounts\t3656340744\nfg_core_e2e_20261103214530.transactions\t981145641\nfg_core_e2e_20261103214530.import_jobs\t3384373467\nfg_core_e2e_20261103214530.reconciliation_jobs\t3206311154\nfg_core_e2e_20261103214530.reconciliation_results\t3178495594\nfg_core_e2e_20261103214530.risk_hits\t862599926\nfg_core_e2e_20261103214530.review_tasks\t1313571924\nfg_core_e2e_20261103214530.audit_logs\t0",
+  "coreChecksumAfter": "fg_core_e2e_20261103214530.accounts\t3656340744\nfg_core_e2e_20261103214530.transactions\t981145641\nfg_core_e2e_20261103214530.import_jobs\t3384373467\nfg_core_e2e_20261103214530.reconciliation_jobs\t3206311154\nfg_core_e2e_20261103214530.reconciliation_results\t3178495594\nfg_core_e2e_20261103214530.risk_hits\t862599926\nfg_core_e2e_20261103214530.review_tasks\t1313571924\nfg_core_e2e_20261103214530.audit_logs\t0",
+  "eventSequences": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10
+  ],
+  "mcp": {
+    "initialized": true,
+    "protocolVersion": "2025-11-25",
+    "tools": [
+      "get_review_facts",
+      "get_task_state",
+      "search_review_policy"
+    ],
+    "successfulReads": 2,
+    "budgetRejected": true,
+    "unknownToolRejected": true
+  },
+  "mcpExpiry": {
+    "initialized": true,
+    "capabilityDenied": true,
+    "protocolVersion": "2025-11-25"
+  },
+  "mcpStoredCapabilities": "73234d1eb97263b8bd9a764b4e270d830f412f9ff2eab5d208992f7e0e6dce0c\t6\t2026-11-03 21:51:38.245053\t2026-11-03 21:46:42.556670\n9096ca0d8f0c974e8cec9bcb4672db7c9063ca3ec75c38ba223969594b48336f\t6\t2026-11-03 21:46:41.841955\tNULL",
+  "branchMatrix": [
+    {
+      "modelClaims": "1",
+      "actualHttpCalls": 1,
+      "status": "SUCCEEDED",
+      "scenario": "direct_final",
+      "receipts": "3",
+      "analysisId": "a5aaac19-4391-4994-8b01-e983c7fe3dff",
+      "toolReceipts": "1",
+      "outbox": "3",
+      "coreChecksum": "fg_core_e2e_20261103214530.accounts\t3656340744\nfg_core_e2e_20261103214530.transactions\t981145641\nfg_core_e2e_20261103214530.import_jobs\t3384373467\nfg_core_e2e_20261103214530.reconciliation_jobs\t3206311154\nfg_core_e2e_20261103214530.reconciliation_results\t3178495594\nfg_core_e2e_20261103214530.risk_hits\t862599926\nfg_core_e2e_20261103214530.review_tasks\t1313571924\nfg_core_e2e_20261103214530.audit_logs\t0",
+      "tools": "1\tsearch_review_policy\tSUCCEEDED",
+      "failureCode": null,
+      "calls": "1\tSETTLED\tSUCCESS\t0.00000000\t0.00000000",
+      "events": "1,2,3,4,5,6"
+    },
+    {
+      "modelClaims": "2",
+      "actualHttpCalls": 2,
+      "status": "SUCCEEDED",
+      "scenario": "format_repair",
+      "receipts": "4",
+      "analysisId": "024e915f-b062-4325-8af8-84995c39511f",
+      "toolReceipts": "1",
+      "outbox": "4",
+      "coreChecksum": "fg_core_e2e_20261103214530.accounts\t3656340744\nfg_core_e2e_20261103214530.transactions\t981145641\nfg_core_e2e_20261103214530.import_jobs\t3384373467\nfg_core_e2e_20261103214530.reconciliation_jobs\t3206311154\nfg_core_e2e_20261103214530.reconciliation_results\t3178495594\nfg_core_e2e_20261103214530.risk_hits\t862599926\nfg_core_e2e_20261103214530.review_tasks\t1313571924\nfg_core_e2e_20261103214530.audit_logs\t0",
+      "tools": "1\tsearch_review_policy\tSUCCEEDED",
+      "failureCode": null,
+      "calls": "1\tSETTLED\tSUCCESS\t0.00000000\t0.00000000\n2\tSETTLED\tSUCCESS\t0.00000000\t0.00000000",
+      "events": "1,2,3,4,5,6,7"
+    },
+    {
+      "modelClaims": "1",
+      "actualHttpCalls": 1,
+      "status": "FAILED",
+      "scenario": "fact_mismatch",
+      "receipts": "2",
+      "analysisId": "e7ba1496-54cb-46fa-8feb-99dd74dab2c5",
+      "toolReceipts": "1",
+      "outbox": "2",
+      "coreChecksum": "fg_core_e2e_20261103214530.accounts\t3656340744\nfg_core_e2e_20261103214530.transactions\t981145641\nfg_core_e2e_20261103214530.import_jobs\t3384373467\nfg_core_e2e_20261103214530.reconciliation_jobs\t3206311154\nfg_core_e2e_20261103214530.reconciliation_results\t3178495594\nfg_core_e2e_20261103214530.risk_hits\t862599926\nfg_core_e2e_20261103214530.review_tasks\t1313571924\nfg_core_e2e_20261103214530.audit_logs\t0",
+      "tools": "1\tsearch_review_policy\tSUCCEEDED",
+      "failureCode": "FACT_VALIDATION_FAILED",
+      "calls": "1\tSETTLED\tSUCCESS\t0.00000000\t0.00000000",
+      "events": "1,2,3,4,5"
+    },
+    {
+      "modelClaims": "1",
+      "actualHttpCalls": 1,
+      "status": "FAILED",
+      "scenario": "policy_conflict",
+      "receipts": "2",
+      "analysisId": "234ff424-9d13-4b93-868a-f930ff4f874f",
+      "toolReceipts": "1",
+      "outbox": "2",
+      "coreChecksum": "fg_core_e2e_20261103214530.accounts\t3656340744\nfg_core_e2e_20261103214530.transactions\t981145641\nfg_core_e2e_20261103214530.import_jobs\t3384373467\nfg_core_e2e_20261103214530.reconciliation_jobs\t3206311154\nfg_core_e2e_20261103214530.reconciliation_results\t3178495594\nfg_core_e2e_20261103214530.risk_hits\t862599926\nfg_core_e2e_20261103214530.review_tasks\t1313571924\nfg_core_e2e_20261103214530.audit_logs\t0",
+      "tools": "1\tsearch_review_policy\tSUCCEEDED",
+      "failureCode": "FACT_VALIDATION_FAILED",
+      "calls": "1\tSETTLED\tSUCCESS\t0.00000000\t0.00000000",
+      "events": "1,2,3,4,5"
+    },
+    {
+      "modelClaims": "1",
+      "actualHttpCalls": 1,
+      "status": "FAILED",
+      "scenario": "output_injection",
+      "receipts": "2",
+      "analysisId": "d636398a-9a8e-48b9-8e5f-8c7e8580101d",
+      "toolReceipts": "1",
+      "outbox": "2",
+      "coreChecksum": "fg_core_e2e_20261103214530.accounts\t3656340744\nfg_core_e2e_20261103214530.transactions\t981145641\nfg_core_e2e_20261103214530.import_jobs\t3384373467\nfg_core_e2e_20261103214530.reconciliation_jobs\t3206311154\nfg_core_e2e_20261103214530.reconciliation_results\t3178495594\nfg_core_e2e_20261103214530.risk_hits\t862599926\nfg_core_e2e_20261103214530.review_tasks\t1313571924\nfg_core_e2e_20261103214530.audit_logs\t0",
+      "tools": "1\tsearch_review_policy\tSUCCEEDED",
+      "failureCode": "FACT_VALIDATION_FAILED",
+      "calls": "1\tSETTLED\tSUCCESS\t0.00000000\t0.00000000",
+      "events": "1,2,3,4,5"
+    },
+    {
+      "modelClaims": "1",
+      "actualHttpCalls": 1,
+      "status": "FAILED",
+      "scenario": "unknown_tool",
+      "receipts": "2",
+      "analysisId": "e4b2ebfa-0251-4b1e-bd02-cf7cd5b1e5d2",
+      "toolReceipts": "1",
+      "outbox": "2",
+      "coreChecksum": "fg_core_e2e_20261103214530.accounts\t3656340744\nfg_core_e2e_20261103214530.transactions\t981145641\nfg_core_e2e_20261103214530.import_jobs\t3384373467\nfg_core_e2e_20261103214530.reconciliation_jobs\t3206311154\nfg_core_e2e_20261103214530.reconciliation_results\t3178495594\nfg_core_e2e_20261103214530.risk_hits\t862599926\nfg_core_e2e_20261103214530.review_tasks\t1313571924\nfg_core_e2e_20261103214530.audit_logs\t0",
+      "tools": "1\tsearch_review_policy\tSUCCEEDED",
+      "failureCode": "MODEL_OUTPUT_INVALID",
+      "calls": "1\tSETTLED\tFAILURE\t0.00000000\t0.00000000",
+      "events": "1,2,3,4,5"
+    },
+    {
+      "modelClaims": "1",
+      "actualHttpCalls": 1,
+      "status": "FAILED",
+      "scenario": "extra_arguments",
+      "receipts": "2",
+      "analysisId": "bb1b988d-2f29-4187-8092-e5d411c603f4",
+      "toolReceipts": "1",
+      "outbox": "2",
+      "coreChecksum": "fg_core_e2e_20261103214530.accounts\t3656340744\nfg_core_e2e_20261103214530.transactions\t981145641\nfg_core_e2e_20261103214530.import_jobs\t3384373467\nfg_core_e2e_20261103214530.reconciliation_jobs\t3206311154\nfg_core_e2e_20261103214530.reconciliation_results\t3178495594\nfg_core_e2e_20261103214530.risk_hits\t862599926\nfg_core_e2e_20261103214530.review_tasks\t1313571924\nfg_core_e2e_20261103214530.audit_logs\t0",
+      "tools": "1\tsearch_review_policy\tSUCCEEDED",
+      "failureCode": "MODEL_OUTPUT_INVALID",
+      "calls": "1\tSETTLED\tFAILURE\t0.00000000\t0.00000000",
+      "events": "1,2,3,4,5"
+    },
+    {
+      "modelClaims": "1",
+      "actualHttpCalls": 1,
+      "status": "FAILED",
+      "scenario": "url_argument",
+      "receipts": "2",
+      "analysisId": "cea4afc4-6933-403f-8bef-7840b0c513a5",
+      "toolReceipts": "1",
+      "outbox": "2",
+      "coreChecksum": "fg_core_e2e_20261103214530.accounts\t3656340744\nfg_core_e2e_20261103214530.transactions\t981145641\nfg_core_e2e_20261103214530.import_jobs\t3384373467\nfg_core_e2e_20261103214530.reconciliation_jobs\t3206311154\nfg_core_e2e_20261103214530.reconciliation_results\t3178495594\nfg_core_e2e_20261103214530.risk_hits\t862599926\nfg_core_e2e_20261103214530.review_tasks\t1313571924\nfg_core_e2e_20261103214530.audit_logs\t0",
+      "tools": "1\tsearch_review_policy\tSUCCEEDED",
+      "failureCode": "MODEL_OUTPUT_INVALID",
+      "calls": "1\tSETTLED\tFAILURE\t0.00000000\t0.00000000",
+      "events": "1,2,3,4,5"
+    },
+    {
+      "modelClaims": "1",
+      "actualHttpCalls": 1,
+      "status": "FAILED",
+      "scenario": "query_injection",
+      "receipts": "2",
+      "analysisId": "8a88394b-5150-4a61-8620-c7ecf6c9cdbc",
+      "toolReceipts": "1",
+      "outbox": "2",
+      "coreChecksum": "fg_core_e2e_20261103214530.accounts\t3656340744\nfg_core_e2e_20261103214530.transactions\t981145641\nfg_core_e2e_20261103214530.import_jobs\t3384373467\nfg_core_e2e_20261103214530.reconciliation_jobs\t3206311154\nfg_core_e2e_20261103214530.reconciliation_results\t3178495594\nfg_core_e2e_20261103214530.risk_hits\t862599926\nfg_core_e2e_20261103214530.review_tasks\t1313571924\nfg_core_e2e_20261103214530.audit_logs\t0",
+      "tools": "1\tsearch_review_policy\tSUCCEEDED",
+      "failureCode": "MODEL_OUTPUT_INVALID",
+      "calls": "1\tSETTLED\tFAILURE\t0.00000000\t0.00000000",
+      "events": "1,2,3,4,5"
+    },
+    {
+      "modelClaims": "1",
+      "actualHttpCalls": 1,
+      "status": "FAILED",
+      "scenario": "too_many_tools",
+      "receipts": "2",
+      "analysisId": "f47acad0-5117-468f-a017-1560a507e939",
+      "toolReceipts": "1",
+      "outbox": "2",
+      "coreChecksum": "fg_core_e2e_20261103214530.accounts\t3656340744\nfg_core_e2e_20261103214530.transactions\t981145641\nfg_core_e2e_20261103214530.import_jobs\t3384373467\nfg_core_e2e_20261103214530.reconciliation_jobs\t3206311154\nfg_core_e2e_20261103214530.reconciliation_results\t3178495594\nfg_core_e2e_20261103214530.risk_hits\t862599926\nfg_core_e2e_20261103214530.review_tasks\t1313571924\nfg_core_e2e_20261103214530.audit_logs\t0",
+      "tools": "1\tsearch_review_policy\tSUCCEEDED",
+      "failureCode": "MODEL_BUDGET_EXCEEDED",
+      "calls": "1\tSETTLED\tSUCCESS\t0.00000000\t0.00000000",
+      "events": "1,2,3,4,5"
+    },
+    {
+      "modelClaims": "2",
+      "actualHttpCalls": 2,
+      "status": "FAILED",
+      "scenario": "second_tools",
+      "receipts": "4",
+      "analysisId": "392de920-0780-43d5-9b58-5984a359cbcf",
+      "toolReceipts": "2",
+      "outbox": "4",
+      "coreChecksum": "fg_core_e2e_20261103214530.accounts\t3656340744\nfg_core_e2e_20261103214530.transactions\t981145641\nfg_core_e2e_20261103214530.import_jobs\t3384373467\nfg_core_e2e_20261103214530.reconciliation_jobs\t3206311154\nfg_core_e2e_20261103214530.reconciliation_results\t3178495594\nfg_core_e2e_20261103214530.risk_hits\t862599926\nfg_core_e2e_20261103214530.review_tasks\t1313571924\nfg_core_e2e_20261103214530.audit_logs\t0",
+      "tools": "1\tsearch_review_policy\tSUCCEEDED\n2\tget_task_state\tSUCCEEDED",
+      "failureCode": "MODEL_OUTPUT_INVALID",
+      "calls": "1\tSETTLED\tSUCCESS\t0.00000000\t0.00000000\n2\tSETTLED\tFAILURE\t0.00000000\t0.00000000",
+      "events": "1,2,3,4,5,6,7,8,9"
+    },
+    {
+      "modelClaims": "1",
+      "actualHttpCalls": 1,
+      "status": "FAILED",
+      "scenario": "provider_unknown",
+      "receipts": "2",
+      "analysisId": "14394fd0-4b3e-4a26-a760-22d756bf2641",
+      "toolReceipts": "1",
+      "outbox": "2",
+      "coreChecksum": "fg_core_e2e_20261103214530.accounts\t3656340744\nfg_core_e2e_20261103214530.transactions\t981145641\nfg_core_e2e_20261103214530.import_jobs\t3384373467\nfg_core_e2e_20261103214530.reconciliation_jobs\t3206311154\nfg_core_e2e_20261103214530.reconciliation_results\t3178495594\nfg_core_e2e_20261103214530.risk_hits\t862599926\nfg_core_e2e_20261103214530.review_tasks\t1313571924\nfg_core_e2e_20261103214530.audit_logs\t0",
+      "tools": "1\tsearch_review_policy\tSUCCEEDED",
+      "failureCode": "MODEL_UNAVAILABLE",
+      "calls": "1\tUNKNOWN_HELD\tUNKNOWN\t0.00000000\tNULL",
+      "events": "1,2,3,4,5"
+    },
+    {
+      "modelClaims": "1",
+      "actualHttpCalls": 1,
+      "status": "SUCCEEDED",
+      "scenario": "retrieval_retry",
+      "receipts": "4",
+      "analysisId": "a0ed8852-883c-491d-8920-014835c845f6",
+      "toolReceipts": "2",
+      "outbox": "4",
+      "coreChecksum": "fg_core_e2e_20261103214530.accounts\t3656340744\nfg_core_e2e_20261103214530.transactions\t981145641\nfg_core_e2e_20261103214530.import_jobs\t3384373467\nfg_core_e2e_20261103214530.reconciliation_jobs\t3206311154\nfg_core_e2e_20261103214530.reconciliation_results\t3178495594\nfg_core_e2e_20261103214530.risk_hits\t862599926\nfg_core_e2e_20261103214530.review_tasks\t1313571924\nfg_core_e2e_20261103214530.audit_logs\t0",
+      "tools": "1\tsearch_review_policy\tSUCCEEDED\n2\tsearch_review_policy\tSUCCEEDED",
+      "failureCode": null,
+      "calls": "1\tSETTLED\tSUCCESS\t0.00000000\t0.00000000",
+      "events": "1,2,3,4,5,6,7"
+    }
+  ],
+  "infrastructure": [
+    {
+      "modelClaims": "0",
+      "actualHttpCalls": 0,
+      "status": "FAILED",
+      "scenario": "redis_outage",
+      "receipts": "2",
+      "analysisId": "d921e1d2-a7d3-4b55-84ab-a9d00bd048ea",
+      "toolReceipts": "1",
+      "outbox": "2",
+      "coreChecksum": "fg_core_e2e_20261103214530.accounts\t3656340744\nfg_core_e2e_20261103214530.transactions\t981145641\nfg_core_e2e_20261103214530.import_jobs\t3384373467\nfg_core_e2e_20261103214530.reconciliation_jobs\t3206311154\nfg_core_e2e_20261103214530.reconciliation_results\t3178495594\nfg_core_e2e_20261103214530.risk_hits\t862599926\nfg_core_e2e_20261103214530.review_tasks\t1313571924\nfg_core_e2e_20261103214530.audit_logs\t0",
+      "tools": "1\tsearch_review_policy\tSUCCEEDED",
+      "failureCode": "MODEL_CAPACITY_UNAVAILABLE",
+      "calls": "",
+      "events": "1,2,3,4,5"
+    },
+    {
+      "modelClaims": "2",
+      "actualHttpCalls": 2,
+      "status": "SUCCEEDED",
+      "scenario": "rabbit_outage_and_runtime_toggle",
+      "receipts": "6",
+      "analysisId": "59f10403-7ec0-4134-ae2c-1abb799ba814",
+      "toolReceipts": "2",
+      "outbox": "6",
+      "coreChecksum": "fg_core_e2e_20261103214530.accounts\t3656340744\nfg_core_e2e_20261103214530.transactions\t981145641\nfg_core_e2e_20261103214530.import_jobs\t3384373467\nfg_core_e2e_20261103214530.reconciliation_jobs\t3206311154\nfg_core_e2e_20261103214530.reconciliation_results\t3178495594\nfg_core_e2e_20261103214530.risk_hits\t862599926\nfg_core_e2e_20261103214530.review_tasks\t1313571924\nfg_core_e2e_20261103214530.audit_logs\t0",
+      "tools": "1\tsearch_review_policy\tSUCCEEDED\n2\tget_task_state\tSUCCEEDED",
+      "failureCode": null,
+      "calls": "1\tSETTLED\tSUCCESS\t0.00000000\t0.00000000\n2\tSETTLED\tSUCCESS\t0.00000000\t0.00000000",
+      "events": "1,2,3,4,5,6,7,8,9,10"
+    },
+    {
+      "modelClaims": "0",
+      "actualHttpCalls": 0,
+      "status": "FAILED",
+      "scenario": "insufficient_call_budget",
+      "receipts": "2",
+      "analysisId": "24310b6b-9dd1-4e10-8572-7aba1c571a19",
+      "toolReceipts": "1",
+      "outbox": "2",
+      "coreChecksum": "fg_core_e2e_20261103214530.accounts\t3656340744\nfg_core_e2e_20261103214530.transactions\t981145641\nfg_core_e2e_20261103214530.import_jobs\t3384373467\nfg_core_e2e_20261103214530.reconciliation_jobs\t3206311154\nfg_core_e2e_20261103214530.reconciliation_results\t3178495594\nfg_core_e2e_20261103214530.risk_hits\t862599926\nfg_core_e2e_20261103214530.review_tasks\t1313571924\nfg_core_e2e_20261103214530.audit_logs\t0",
+      "tools": "1\tsearch_review_policy\tSUCCEEDED",
+      "failureCode": "MODEL_BUDGET_EXCEEDED",
+      "calls": "",
+      "events": "1,2,3,4,5"
+    }
+  ],
+  "faultMatrix": [
+    {
+      "expectedToolReads": 2,
+      "failureCode": null,
+      "analysisId": "6c2ae687-0d4f-4d87-8b52-0adcfacd4ae2",
+      "point": "TOOL_BEFORE_CLAIM",
+      "eventSequences": "1,2,3,4,5,6,7,8,9",
+      "receiptCount": "5",
+      "actualHttpCalls": 2,
+      "beforeRecovery": "0\tRETRIEVE\t0\t0",
+      "outboxCount": "5",
+      "actualToolReads": 2,
+      "status": "SUCCEEDED",
+      "coreChecksum": "fg_core_e2e_20261103214530.accounts\t3656340744\nfg_core_e2e_20261103214530.transactions\t981145641\nfg_core_e2e_20261103214530.import_jobs\t3384373467\nfg_core_e2e_20261103214530.reconciliation_jobs\t3206311154\nfg_core_e2e_20261103214530.reconciliation_results\t3178495594\nfg_core_e2e_20261103214530.risk_hits\t862599926\nfg_core_e2e_20261103214530.review_tasks\t1313571924\nfg_core_e2e_20261103214530.audit_logs\t0",
+      "expectedHttpCalls": 2,
+      "tools": "1\tSUCCEEDED\n2\tSUCCEEDED",
+      "expectedStatus": "SUCCEEDED",
+      "leaseRecovery": "expired ownership timestamp after actual JVM halt; claims and memory untouched",
+      "calls": "1\tSETTLED\tSUCCESS\t0.00000000\t0.00000000\n2\tSETTLED\tSUCCESS\t0.00000000\t0.00000000"
+    },
+    {
+      "expectedToolReads": 0,
+      "failureCode": "AGENT_STEP_UNCERTAIN",
+      "analysisId": "45e804ea-69af-4e2f-bc52-e44d4a61bea6",
+      "point": "TOOL_AFTER_CLAIM",
+      "eventSequences": "1,2,3,4,5",
+      "receiptCount": "2",
+      "actualHttpCalls": 0,
+      "beforeRecovery": "0\tRETRIEVE\t0\t0",
+      "outboxCount": "2",
+      "actualToolReads": 0,
+      "status": "FAILED",
+      "coreChecksum": "fg_core_e2e_20261103214530.accounts\t3656340744\nfg_core_e2e_20261103214530.transactions\t981145641\nfg_core_e2e_20261103214530.import_jobs\t3384373467\nfg_core_e2e_20261103214530.reconciliation_jobs\t3206311154\nfg_core_e2e_20261103214530.reconciliation_results\t3178495594\nfg_core_e2e_20261103214530.risk_hits\t862599926\nfg_core_e2e_20261103214530.review_tasks\t1313571924\nfg_core_e2e_20261103214530.audit_logs\t0",
+      "expectedHttpCalls": 0,
+      "tools": "1\tUNKNOWN",
+      "expectedStatus": "FAILED",
+      "leaseRecovery": "expired ownership timestamp after actual JVM halt; claims and memory untouched",
+      "calls": ""
+    },
+    {
+      "expectedToolReads": 1,
+      "failureCode": "AGENT_STEP_UNCERTAIN",
+      "analysisId": "477c1481-1a78-48bd-98de-c9fafe9f5d7b",
+      "point": "TOOL_AFTER_READ",
+      "eventSequences": "1,2,3,4,5",
+      "receiptCount": "1",
+      "actualHttpCalls": 0,
+      "beforeRecovery": "0\tRETRIEVE\t0\t0",
+      "outboxCount": "1",
+      "actualToolReads": 1,
+      "status": "FAILED",
+      "coreChecksum": "fg_core_e2e_20261103214530.accounts\t3656340744\nfg_core_e2e_20261103214530.transactions\t981145641\nfg_core_e2e_20261103214530.import_jobs\t3384373467\nfg_core_e2e_20261103214530.reconciliation_jobs\t3206311154\nfg_core_e2e_20261103214530.reconciliation_results\t3178495594\nfg_core_e2e_20261103214530.risk_hits\t862599926\nfg_core_e2e_20261103214530.review_tasks\t1313571924\nfg_core_e2e_20261103214530.audit_logs\t0",
+      "expectedHttpCalls": 0,
+      "tools": "1\tUNKNOWN",
+      "expectedStatus": "FAILED",
+      "leaseRecovery": "expired ownership timestamp after actual JVM halt; claims and memory untouched",
+      "calls": ""
+    },
+    {
+      "expectedToolReads": 2,
+      "failureCode": null,
+      "analysisId": "03f5a744-7ae1-436c-b3b1-4a4216cc2344",
+      "point": "TOOL_AFTER_PERSIST",
+      "eventSequences": "1,2,3,4,5,6,7,8,9",
+      "receiptCount": "6",
+      "actualHttpCalls": 2,
+      "beforeRecovery": "0\tRETRIEVE\t0\t0",
+      "outboxCount": "6",
+      "actualToolReads": 2,
+      "status": "SUCCEEDED",
+      "coreChecksum": "fg_core_e2e_20261103214530.accounts\t3656340744\nfg_core_e2e_20261103214530.transactions\t981145641\nfg_core_e2e_20261103214530.import_jobs\t3384373467\nfg_core_e2e_20261103214530.reconciliation_jobs\t3206311154\nfg_core_e2e_20261103214530.reconciliation_results\t3178495594\nfg_core_e2e_20261103214530.risk_hits\t862599926\nfg_core_e2e_20261103214530.review_tasks\t1313571924\nfg_core_e2e_20261103214530.audit_logs\t0",
+      "expectedHttpCalls": 2,
+      "tools": "1\tSUCCEEDED\n2\tSUCCEEDED",
+      "expectedStatus": "SUCCEEDED",
+      "leaseRecovery": "expired ownership timestamp after actual JVM halt; claims and memory untouched",
+      "calls": "1\tSETTLED\tSUCCESS\t0.00000000\t0.00000000\n2\tSETTLED\tSUCCESS\t0.00000000\t0.00000000"
+    },
+    {
+      "expectedToolReads": 2,
+      "failureCode": null,
+      "analysisId": "a03c5f25-ae97-4d15-9224-2df232361ced",
+      "point": "MODEL_BEFORE_CLAIM",
+      "eventSequences": "1,2,3,4,5,6,7,8,9",
+      "receiptCount": "5",
+      "actualHttpCalls": 2,
+      "beforeRecovery": "1\tPLAN\t0\t1",
+      "outboxCount": "5",
+      "actualToolReads": 2,
+      "status": "SUCCEEDED",
+      "coreChecksum": "fg_core_e2e_20261103214530.accounts\t3656340744\nfg_core_e2e_20261103214530.transactions\t981145641\nfg_core_e2e_20261103214530.import_jobs\t3384373467\nfg_core_e2e_20261103214530.reconciliation_jobs\t3206311154\nfg_core_e2e_20261103214530.reconciliation_results\t3178495594\nfg_core_e2e_20261103214530.risk_hits\t862599926\nfg_core_e2e_20261103214530.review_tasks\t1313571924\nfg_core_e2e_20261103214530.audit_logs\t0",
+      "expectedHttpCalls": 2,
+      "tools": "1\tSUCCEEDED\n2\tSUCCEEDED",
+      "expectedStatus": "SUCCEEDED",
+      "leaseRecovery": "expired ownership timestamp after actual JVM halt; claims and memory untouched",
+      "calls": "1\tSETTLED\tSUCCESS\t0.00000000\t0.00000000\n2\tSETTLED\tSUCCESS\t0.00000000\t0.00000000"
+    },
+    {
+      "expectedToolReads": 1,
+      "failureCode": "AGENT_STEP_UNCERTAIN",
+      "analysisId": "1622c952-f4e1-43ab-9f85-76871e52cf4d",
+      "point": "MODEL_AFTER_CLAIM",
+      "eventSequences": "1,2,3,4,5,6",
+      "receiptCount": "3",
+      "actualHttpCalls": 0,
+      "beforeRecovery": "1\tPLAN\t0\t1",
+      "outboxCount": "3",
+      "actualToolReads": 1,
+      "status": "FAILED",
+      "coreChecksum": "fg_core_e2e_20261103214530.accounts\t3656340744\nfg_core_e2e_20261103214530.transactions\t981145641\nfg_core_e2e_20261103214530.import_jobs\t3384373467\nfg_core_e2e_20261103214530.reconciliation_jobs\t3206311154\nfg_core_e2e_20261103214530.reconciliation_results\t3178495594\nfg_core_e2e_20261103214530.risk_hits\t862599926\nfg_core_e2e_20261103214530.review_tasks\t1313571924\nfg_core_e2e_20261103214530.audit_logs\t0",
+      "expectedHttpCalls": 0,
+      "tools": "1\tSUCCEEDED",
+      "expectedStatus": "FAILED",
+      "leaseRecovery": "expired ownership timestamp after actual JVM halt; claims and memory untouched",
+      "calls": "1\tUNKNOWN_HELD\tUNKNOWN\t0.00000000\tNULL"
+    },
+    {
+      "expectedToolReads": 1,
+      "failureCode": "AGENT_STEP_UNCERTAIN",
+      "analysisId": "7e36fc37-1402-4f2d-bc22-ea15eefcbd79",
+      "point": "MODEL_AFTER_RESPONSE",
+      "eventSequences": "1,2,3,4,5,6",
+      "receiptCount": "3",
+      "actualHttpCalls": 1,
+      "beforeRecovery": "1\tPLAN\t0\t1",
+      "outboxCount": "3",
+      "actualToolReads": 1,
+      "status": "FAILED",
+      "coreChecksum": "fg_core_e2e_20261103214530.accounts\t3656340744\nfg_core_e2e_20261103214530.transactions\t981145641\nfg_core_e2e_20261103214530.import_jobs\t3384373467\nfg_core_e2e_20261103214530.reconciliation_jobs\t3206311154\nfg_core_e2e_20261103214530.reconciliation_results\t3178495594\nfg_core_e2e_20261103214530.risk_hits\t862599926\nfg_core_e2e_20261103214530.review_tasks\t1313571924\nfg_core_e2e_20261103214530.audit_logs\t0",
+      "expectedHttpCalls": 1,
+      "tools": "1\tSUCCEEDED",
+      "expectedStatus": "FAILED",
+      "leaseRecovery": "expired ownership timestamp after actual JVM halt; claims and memory untouched",
+      "calls": "1\tUNKNOWN_HELD\tUNKNOWN\t0.00000000\tNULL"
+    },
+    {
+      "expectedToolReads": 1,
+      "failureCode": "AGENT_STEP_UNCERTAIN",
+      "analysisId": "53bac913-93f3-4a94-817e-2ac97434b42b",
+      "point": "MODEL_AFTER_PERSIST",
+      "eventSequences": "1,2,3,4,5,6",
+      "receiptCount": "2",
+      "actualHttpCalls": 1,
+      "beforeRecovery": "1\tPLAN\t0\t1",
+      "outboxCount": "2",
+      "actualToolReads": 1,
+      "status": "FAILED",
+      "coreChecksum": "fg_core_e2e_20261103214530.accounts\t3656340744\nfg_core_e2e_20261103214530.transactions\t981145641\nfg_core_e2e_20261103214530.import_jobs\t3384373467\nfg_core_e2e_20261103214530.reconciliation_jobs\t3206311154\nfg_core_e2e_20261103214530.reconciliation_results\t3178495594\nfg_core_e2e_20261103214530.risk_hits\t862599926\nfg_core_e2e_20261103214530.review_tasks\t1313571924\nfg_core_e2e_20261103214530.audit_logs\t0",
+      "expectedHttpCalls": 1,
+      "tools": "1\tSUCCEEDED",
+      "expectedStatus": "FAILED",
+      "leaseRecovery": "expired ownership timestamp after actual JVM halt; claims and memory untouched",
+      "calls": "1\tSETTLED\tSUCCESS\t0.00000000\t0.00000000"
+    },
+    {
+      "expectedToolReads": 2,
+      "failureCode": null,
+      "analysisId": "e1c67658-9b2b-4c13-8de0-92c215b78930",
+      "point": "CHECKPOINT_AFTER_COMMIT",
+      "eventSequences": "1,2,3,4,5,6,7,8,9",
+      "receiptCount": "6",
+      "actualHttpCalls": 2,
+      "beforeRecovery": "1\tPLAN\t0\t1",
+      "outboxCount": "6",
+      "actualToolReads": 2,
+      "status": "SUCCEEDED",
+      "coreChecksum": "fg_core_e2e_20261103214530.accounts\t3656340744\nfg_core_e2e_20261103214530.transactions\t981145641\nfg_core_e2e_20261103214530.import_jobs\t3384373467\nfg_core_e2e_20261103214530.reconciliation_jobs\t3206311154\nfg_core_e2e_20261103214530.reconciliation_results\t3178495594\nfg_core_e2e_20261103214530.risk_hits\t862599926\nfg_core_e2e_20261103214530.review_tasks\t1313571924\nfg_core_e2e_20261103214530.audit_logs\t0",
+      "expectedHttpCalls": 2,
+      "tools": "1\tSUCCEEDED\n2\tSUCCEEDED",
+      "expectedStatus": "SUCCEEDED",
+      "leaseRecovery": "expired ownership timestamp after actual JVM halt; claims and memory untouched",
+      "calls": "1\tSETTLED\tSUCCESS\t0.00000000\t0.00000000\n2\tSETTLED\tSUCCESS\t0.00000000\t0.00000000"
+    },
+    {
+      "expectedToolReads": 2,
+      "failureCode": null,
+      "analysisId": "70e78418-e3a7-4d59-997c-1c9cb8a484b7",
+      "point": "BEFORE_ACK",
+      "eventSequences": "1,2,3,4,5,6,7,8",
+      "receiptCount": "5",
+      "actualHttpCalls": 2,
+      "beforeRecovery": "5\tDONE\t2\t2",
+      "outboxCount": "5",
+      "actualToolReads": 2,
+      "status": "SUCCEEDED",
+      "coreChecksum": "fg_core_e2e_20261103214530.accounts\t3656340744\nfg_core_e2e_20261103214530.transactions\t981145641\nfg_core_e2e_20261103214530.import_jobs\t3384373467\nfg_core_e2e_20261103214530.reconciliation_jobs\t3206311154\nfg_core_e2e_20261103214530.reconciliation_results\t3178495594\nfg_core_e2e_20261103214530.risk_hits\t862599926\nfg_core_e2e_20261103214530.review_tasks\t1313571924\nfg_core_e2e_20261103214530.audit_logs\t0",
+      "expectedHttpCalls": 2,
+      "tools": "1\tSUCCEEDED\n2\tSUCCEEDED",
+      "expectedStatus": "SUCCEEDED",
+      "leaseRecovery": "expired ownership timestamp after actual JVM halt; claims and memory untouched",
+      "calls": "1\tSETTLED\tSUCCESS\t0.00000000\t0.00000000\n2\tSETTLED\tSUCCESS\t0.00000000\t0.00000000"
+    }
+  ],
+  "servicesLeftRunning": false,
+  "finishedAt": "2026-11-03T21:53:09.2616502+08:00"
+}

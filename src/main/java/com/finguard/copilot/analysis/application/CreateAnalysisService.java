@@ -43,6 +43,17 @@ public class CreateAnalysisService {
     private final AnalysisCreationStore creationStore;
     private final Clock clock;
     private final Duration snapshotRetention;
+    private boolean agentEnabled;
+    private boolean agentRuntimeEnabled;
+    @Autowired
+    public void configureAgentRuntime(@org.springframework.beans.factory.annotation.Value(
+            "${finguard.copilot.agent.runtime-enabled:false}") boolean enabled){agentRuntimeEnabled=enabled;}
+
+    @Autowired
+    public void configureAgent(@org.springframework.beans.factory.annotation.Value(
+            "${finguard.copilot.agent.enabled:false}") boolean enabled) {
+        this.agentEnabled = enabled;
+    }
     private com.finguard.copilot.observability.AnalysisTelemetry telemetry=com.finguard.copilot.observability.AnalysisTelemetry.noop();
     @Autowired public void setTelemetry(com.finguard.copilot.observability.AnalysisTelemetry value) {telemetry=Objects.requireNonNull(value);}
 
@@ -123,6 +134,17 @@ public class CreateAnalysisService {
         }
 
         ReviewTaskContext context = telemetry.call(com.finguard.copilot.observability.AnalysisTelemetry.Stage.CORE_CONTEXT,()->reviewTaskContext(command.reviewTaskId(),bearerToken));
+        if (agentEnabled) {
+            try {
+                var state = coreClient.reviewTaskState(command.reviewTaskId(), bearerToken);
+                if (state == null || context.reviewTask().id() != command.reviewTaskId()
+                        || !state.matches(context.reviewTask())) {
+                    throw new CopilotException(ErrorCode.CONFLICT, "Core task changed during capture");
+                }
+            } catch (CoreClientException exception) {
+                throw mappedCoreException(exception);
+            }
+        }
         FactSnapshot snapshot = telemetry.call(com.finguard.copilot.observability.AnalysisTelemetry.Stage.SNAPSHOT,()->snapshotCodec.capture(context,snapshotRetention));
         UUID analysisId = UUID.randomUUID();
         telemetry.analysisId(analysisId);
@@ -134,7 +156,9 @@ public class CreateAnalysisService {
                 context.reviewTask().version(),
                 idempotencyKey,
                 requestHash,
-                now
+                now,
+                agentEnabled ? "agent-v1" : "p4-v1",
+                agentRuntimeEnabled
         );
         OutboxRecord event = new OutboxRecord(
                 UUID.nameUUIDFromBytes((EVENT_NAMESPACE + ":" + analysisId).getBytes(StandardCharsets.UTF_8)),

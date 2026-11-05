@@ -1,6 +1,6 @@
 # FinGuard Copilot 系统架构
 
-本文同时描述目标架构；当前已实现范围以[TASKS](../TASKS.md)及验收记录为准。P4-3 的实际清单、预算、Redis许可及单主模型边界见[运行说明](operations/phase4-3-governance.md)和[验收记录](acceptance/2026-11-02-p4-3-governance.md)。P4-4 已接入显式、脱敏的 Copilot 阶段 Trace、Langfuse、Prometheus/Grafana 与预算状态指标，范围见[运行说明](operations/phase4-4-observability.md)。P4-5 的事务状态事件、授权 SSE 和 React 审核台见[运行说明](operations/phase4-5-review-console.md)。Core/供应商内部 Span、Graph 和模型工具执行仍属于独立范围。
+本文同时描述目标架构；当前已实现范围以[TASKS](../TASKS.md)及验收记录为准。P4的[预算](operations/phase4-3-governance.md)、[遥测](operations/phase4-4-observability.md)、[审核台](operations/phase4-5-review-console.md)继续保留。Phase5已增加显式Agent运行、原生协议、持久Graph/HITL和本地STDIO MCP，见[运行说明](operations/phase5-agent-workflow.md)。真实native合成组件协议已独立复验12/12通过；Core/供应商内部Span、真实人工/生产模型质量与production-like部署仍另列。
 
 ## 1. 架构目标
 
@@ -24,8 +24,9 @@ flowchart LR
     Queue --> Worker[Analysis Worker]
     Worker --> Flow[Orchestrator / Agent Graph]
     Flow --> Tools[Whitelisted Tools]
-    Tools --> Core
-    Flow --> Checkpoint[(Run Checkpoint)]
+    Tools -->|已授权快照| Runs
+    Tools -->|冻结发布索引| Retrieval
+    Flow --> Checkpoint[(MySQL Run Checkpoint)]
     Flow --> Quota[Quota / Concurrency]
     Quota --> Redis[(Redis)]
     Flow --> Retrieval[Knowledge Retrieval]
@@ -39,6 +40,7 @@ flowchart LR
     Flow --> Metrics[Micrometer Metrics]
     Metrics --> Monitoring[Prometheus / Grafana]
     Eval[Python Evaluation] -->|public API / export| API
+    LocalMCP[本地 STDIO MCP] -->|短期 capability| Tools
     Reviewer -->|人工最终决定| Core
 ```
 
@@ -68,15 +70,18 @@ flowchart LR
 
 ## 4. Core 契约
 
-Copilot 需要 Core 增加两个通用、非 AI 专属的只读接口：
+Copilot使用Core通用、非AI专属的只读接口：
 
 ```text
 GET /api/auth/me
 GET /api/review-tasks/{reviewTaskId}/context
+GET /api/review-tasks/{reviewTaskId}
 ```
 
 `/api/auth/me` 返回当前用户标识和角色。Copilot 要求角色包含 `REVIEWER`；它不保存返回的
 JWT，也不持有 Core 签名密钥。
+
+Agent创建/恢复和MCP签发时，任务详情只投影id/version/status/ruleCode/reasonCode并与context核对；不保存decisionNote或reviewedBy。后台工具不再次调用Core，不持有用户JWT。
 
 `context` 以审核任务版本为一致性边界，返回以下逻辑结构：
 
@@ -128,10 +133,13 @@ stateDiagram-v2
     RETRIEVAL_READY --> PLANNING: Agent 阶段
     RETRIEVAL_READY --> GENERATING: MVP 确定性路径
     PLANNING --> TOOL_RUNNING: 选择只读工具
-    TOOL_RUNNING --> PLANNING: 保存工具结果与 Checkpoint
-    PLANNING --> WAITING_FOR_HUMAN: 需要人工补充或确认
+    RETRIEVAL_READY --> RETRIEVAL_READY: 最多一次补查，占工具槽
+    TOOL_RUNNING --> TOOL_RUNNING: 批次内下一只读工具
+    TOOL_RUNNING --> GENERATING: 工具结果已保存
+    PLANNING --> WAITING_FOR_HUMAN: 工具前确认门槛
     WAITING_FOR_HUMAN --> PLANNING: 恢复且权限/版本复查通过
-    PLANNING --> GENERATING: 证据充分
+    PLANNING --> GENERATING: 首轮仅格式问题，修复一次
+    PLANNING --> VALIDATING: 首轮候选已通过护栏
     GENERATING --> VALIDATING: 获得结构化候选输出
     VALIDATING --> SUCCEEDED: Schema、事实和引用均通过
     CONTEXT_READY --> FAILED
@@ -151,12 +159,10 @@ Schema 失败或安全校验失败使用 `FAILED`，并保存低敏感度 `failu
 创建流程中，API 必须在返回 `202` 前完成身份确认和上下文捕获，并在同一数据库事务中
 写入 `CONTEXT_READY` 运行、事实快照和 Outbox 事件。这保证后台任务不需要保存 JWT，也
 不会出现“API 已接受但任务未入队”的窗口。Outbox Relay 至少一次投递到 RabbitMQ，Worker
-以 `analysisId + stage + attempt` 幂等消费。Core 身份或上下文调用失败时不创建分析运行；
+以持久eventId回执、运行锁和步骤占用幂等消费，MQ attempt不等于模型ordinal。Core 身份或上下文调用失败时不创建分析运行；
 后台工作只读取不可变的脱敏快照。
 
-MVP 走 `RETRIEVAL_READY -> GENERATING` 的确定性路径。阶段 5 才启用 Tool、Graph、
-Checkpoint 和 HITL 分支。暂停恢复时重新验证当前用户权限、运行归属、等待状态和过期时间；
-模型输出不能构造有效恢复凭证。
+旧P4走`RETRIEVAL_READY -> GENERATING`，仍最多一次模型请求。显式冻结的Agent运行使用Graph Core1.1.2.2，关闭MemorySaver，MySQL Checkpoint为唯一恢复真相；CAS同时核对revision、owner和租约。暂停恢复重新验证权限、归属、等待期限、Core状态及规范化事实哈希；模型输出不能构造恢复凭证。真实native默认关闭；2026-11-04新增严格角色/工具配对、显式上界版本及已核对短期价格的受预算路径，首轮失败保留，后续12例合成组件协议复验通过；完整生产质量仍另列，见[原生上界契约](contracts/phase5-native-input-bound-v1.md)。
 
 ## 6. 上下文策略
 
@@ -242,18 +248,22 @@ Copilot MySQL 保存：
 - `analysis_input_snapshot`：最少、脱敏、不可变的 Core 事实及校验和；
 - `analysis_checkpoint`：Graph 节点、运行级状态、剩余预算和等待原因；
 - `analysis_event`：单调递增序号、受控阶段、状态、错误码和最终结果可用标志；
-- `analysis_tool_trace`：工具名、脱敏参数摘要、状态、耗时和结果校验和；
-- `analysis_evidence`：被输出引用的事实路径；
+- `agent_run_policy`与`analysis_tool_execution`：冻结workflow/runtime/来源/索引，原子分配四个工具槽，按stepKey/参数哈希回放已保存结果；
+- `agent_model_policy/call/budget_allocation/budget_event`：两个永久ordinal、独立清单和共用日账户的占用/结算；未知结果保持UNKNOWN_HELD；
+- `analysis_resume_request`：人工动作的revision/请求哈希及幂等回执；
+- `analysis_mcp_capability`：绑定审核员/分析/revision/scope的短期权限摘要；不存明文capability或Core JWT；
 - `outbox_event`：异步分析和恢复事件的可靠发布记录；
 - `knowledge_document` 与 `knowledge_index_version`：数据管道版本；
-- `knowledge_citation`：运行使用的文档、版本、章节和片段；
-- `prompt_version` 与 `model_configuration_version`：可复现实验配置；
+- 发布结果及Working Memory内的结构化引用：文档、版本、章节、checksum及事实路径；
+- `model_versioned_artifact`及运行/逐调用清单：可复现实验配置；
 - `model_usage_ledger`：供应商、模型、Token、估算成本和价格表版本；
-- `evaluation_run` 与 `evaluation_result`：数据集、指标、Judge 和人工校准版本；
+- 版本化评测文件及报告：数据集、指标、Judge和人工校准证据；
 - `review_feedback`：P4-2 当前只存一次提交的受控 `AGREE` / `DISAGREE` / `UNSURE` 枚举和服务端审核员身份；不收备注。
 
 事实快照默认保留 30 天，评测数据使用专门构造的脱敏案例长期保存。删除事实快照后仍可
 保留非敏感运行指标和校验和，但该运行必须标记为不可完整复现。
+
+V13–V16不改历史迁移：工具/模型占用、Checkpoint/人工动作与MCP权限各自持久化。来源过期时清除新增Checkpoint/工具正文、撤销MCP并隔离owner，迟到工具结果不能写回已清理来源。已发布结果沿用既有留存规则。授权轨迹/SSE只投影固定状态、工具枚举、哈希及用量，不提供模型原文或推理链回放。
 
 V8 将快照/结果内容改为带 JSON_VALID 的 LONGTEXT，避免 MySQL 二进制 JSON 对任意精度金额的舍入；模型输出仍为版本一数字契约，Java 解析与响应读取使用 BigDecimal。方向性建议必须由 Core 项目政策、已配置单阈值规则或精确绑定的服务端审定政策包核验；恢复未终态存量结果时也执行该边界。配置与兼容性见[审定政策说明](REVIEWED_POLICIES.md)。
 

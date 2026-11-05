@@ -1,0 +1,86 @@
+{
+  "counts": {
+    "development": {
+      "chinese": 6,
+      "english": 6,
+      "positive": 8,
+      "total": 12,
+      "unsupported": 4
+    },
+    "documents": 8,
+    "holdout": {
+      "chinese": 8,
+      "english": 8,
+      "positive": 12,
+      "total": 16,
+      "unsupported": 4
+    }
+  },
+  "encoding": "UTF-8 without BOM; LF line endings; canonical compact sorted-key JSONL with final LF",
+  "evaluation_discipline": [
+    "Use development queries only to choose any retrieval score cutoff.",
+    "Freeze the chosen configuration before first holdout execution.",
+    "Evaluate unchanged holdout once and preserve every case result.",
+    "If holdout informs repairs, disclose exposure and create a new independent holdout for any new claim."
+  ],
+  "files": {
+    "README.md": {
+      "bytes": 4173,
+      "sha256": "607f2db4d22e36f201d67db95d637cf27e01e8b2874384b8d9e5a0409a1ca512"
+    },
+    "corpus.jsonl": {
+      "bytes": 5664,
+      "sha256": "9fdd43cb211ec5a230f4deaaaf6e0c1d1a7bbc6b8b47e61b82e59e21698fe982"
+    },
+    "development.jsonl": {
+      "bytes": 3721,
+      "sha256": "ff3b5e2f1a5cf10ee3de7101e8b89133882e76963f0fb93c0f41406b44b89b01"
+    },
+    "holdout.jsonl": {
+      "bytes": 5288,
+      "sha256": "56465fb36bd4190c6c8520dddf633a96d8c885e904f360e55e80e7c8beb1a55a"
+    },
+    "validate.py": {
+      "bytes": 4373,
+      "sha256": "48d74a53f8afea19604797665b9acccaca639c9f149a75cd91335c875bde5c95"
+    }
+  },
+  "frozen_at_utc": "2026-11-04T09:21:31+00:00",
+  "hash_scope": "All listed files are hashed over exact bytes; manifest.json is excluded to avoid self-reference.",
+  "label_contract": {
+    "positive": "one expected source; every other source forbidden",
+    "scope": "synthetic semantic relevance only; not human calibration, factual correctness, business decision or production quality",
+    "unit": "stable document source id",
+    "unsupported": "empty expected source set; all corpus sources forbidden"
+  },
+  "limits": [
+    "Character length is an authoring constraint, not an actual tokenizer result.",
+    "Runtime must verify intended single-chunk publication and document/version/section/excerpt mapping.",
+    "Synthetic relevance judgements require no human expert validation claim."
+  ],
+  "pack_id": "semantic-quality-v1",
+  "provenance": {
+    "author": "AI agent, data-author role",
+    "embedding_implementation_inspected": false,
+    "embedding_or_retrieval_outputs_seen": false,
+    "generated_answers_seen": false,
+    "human_or_expert_labels": false,
+    "independent_holdout_wording": true,
+    "inference_or_network_calls_by_data_author": false,
+    "material": "New synthetic project-only demo knowledge and synthetic relevance labels",
+    "paid_model_outputs_or_historical_human_labels_seen": false,
+    "regulatory_or_core_native_authority": false
+  },
+  "source_keys": [
+    "account-status",
+    "data-retention",
+    "euro-review",
+    "incident-infrastructure",
+    "manual-audit",
+    "settlement-reconciliation",
+    "support-faq",
+    "synth-usd-limit"
+  ],
+  "status": "frozen-before-inference",
+  "version": "v1"
+}

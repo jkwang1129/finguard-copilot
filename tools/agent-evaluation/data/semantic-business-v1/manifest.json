@@ -1,0 +1,25 @@
+{
+  "scope": "AI-authored synthetic project-policy business cases; actual human calibration is a separate10-case sample",
+  "componentCases": 11,
+  "processSmokeCase": "QW-012:isolated Core/Copilot/Outbox/Qdrant/semantic embedding/real DeepSeek one-document policy positive workflow",
+  "mainMaxRequests": 23,
+  "mainMaxCny": "1.90",
+  "componentMaxRequests": 22,
+  "componentMaxCny": "1.80",
+  "processSmokeMaxRequests": 1,
+  "processSmokeMaxCny": "0.10",
+  "automaticRetries": 0,
+  "caseSha256": "96958f9ee832423eaf54eb969f49060014918a37a428c08e5a7dda150b9e98f5",
+  "expectedLabelsMustNotEnterPrompts": true,
+  "targets": {
+    "recommendationAccuracy": 1.0,
+    "factCorrectness": 1.0,
+    "citationValidity": 1.0,
+    "schemaSuccess": 1.0
+  },
+  "notes": [
+    "Quality thresholds are project/demo targets, not financial regulatory requirements.",
+    "Protocol success alone does not pass a positive expected recommendation; abstaining on a supported positive is wrong.",
+    "All failures,unknowns and unrun cases stay in denominators; no post-output retuning or automatic retries."
+  ]
+}

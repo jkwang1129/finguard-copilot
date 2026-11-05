@@ -86,7 +86,12 @@ public class RabbitTopologyConfiguration {
 
     @Bean
     MessageConverter rabbitMessageConverter() {
-        return new Jackson2JsonMessageConverter();
+        var converter=new Jackson2JsonMessageConverter();
+        var types=new org.springframework.amqp.support.converter.DefaultJackson2JavaTypeMapper();
+        // Retain the existing wire id while authorizing only this application DTO, not its package.
+        types.setIdClassMapping(Map.of(AnalysisRequestedMessage.class.getName(),AnalysisRequestedMessage.class));
+        converter.setJavaTypeMapper(types);
+        return converter;
     }
 
     @Bean

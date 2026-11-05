@@ -40,6 +40,8 @@ public final class SafeSpanData implements SpanData {
         if(provider!=null) b.put("gen_ai.system",TelemetryVocabulary.provider(provider));
         String model=source.getAttributes().get(AttributeKey.stringKey("gen_ai.request.model"));
         if(model!=null) b.put("gen_ai.request.model",TelemetryVocabulary.model(model));
+        String tool=source.getAttributes().get(AttributeKey.stringKey("finguard.tool_name"));
+        if(tool!=null)b.put("finguard.tool_name",Set.of("get_review_facts","get_task_state","search_review_policy").contains(tool)?tool:"OTHER");
         String error=source.getAttributes().get(AttributeKey.stringKey("finguard.error_code"));
         if(error!=null) b.put("finguard.error_code",errorCode(error));
         String outcome=source.getAttributes().get(AttributeKey.stringKey("finguard.outcome"));

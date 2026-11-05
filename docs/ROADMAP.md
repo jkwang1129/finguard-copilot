@@ -81,6 +81,8 @@ P50/P95 延迟和成本比较；选型有证据，不以流行度决定。
 
 只有前四阶段稳定后才进入本阶段。
 
+2026-11-03 已按[Phase5设计](superpowers/specs/2026-11-03-phase5-agent-workflow-design.md)与[六包计划](superpowers/plans/2026-11-03-phase5-agent-workflow.md)顺序完成P5-1～P5-6本地工程实现及[总验收](acceptance/2026-11-03-phase5-final-acceptance.md)。26例共享契约、原生HTTP分支和持久恢复的进程证据分别记录，当前操作见[Phase5手册](operations/phase5-agent-workflow.md)。真实native模型资格、费用授权、既有依赖安全公告和P4未关闭质量门槛另列，不因工程能力交付而全部通过。
+
 交付顺序：
 
 1. 服务器确定性调用多个 Core 只读端点；

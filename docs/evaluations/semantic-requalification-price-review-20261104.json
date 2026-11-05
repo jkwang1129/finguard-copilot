@@ -1,0 +1,19 @@
+{
+  "checkedAt": "2026-11-04T13:41:42.598642+00:00",
+  "source": "https://api-docs.deepseek.com/zh-cn/quick_start/pricing/",
+  "provider": "deepseek",
+  "model": "deepseek-flash",
+  "advertisedVersion": "DeepSeek-V4.1-Flash-1017",
+  "currency": "CNY",
+  "reviewedInputPerMillion": "2",
+  "reviewedOutputPerMillion": "8",
+  "basis": "conservative peak cache-miss rates, including when actual off-peak/cache-discount may be lower",
+  "validFrom": "2026-11-04T00:00:00Z",
+  "validUntil": "2026-11-05T00:00:00Z",
+  "priceVersion": "deepseek-flash-native-20261104-peak-miss-cny-v1",
+  "batchMaxRequests": 12,
+  "batchCapCny": "1.20",
+  "perCallCapCny": "0.10",
+  "invoiceVerified": false,
+  "sourceCheckedWithWebTool": true
+}

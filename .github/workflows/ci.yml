@@ -11,6 +11,8 @@ permissions:
 jobs:
   java:
     runs-on: ubuntu-latest
+    env:
+      MAVEN_OPTS: -Xmx256m
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -19,7 +21,7 @@ jobs:
           java-version: '17'
           cache: maven
       - name: Test Java service
-        run: bash ./mvnw -B -ntp clean test
+        run: bash ./mvnw -B -ntp clean test -DargLine=-Xmx512m -Dspring.test.context.cache.maxSize=1
 
   python:
     runs-on: ubuntu-latest
@@ -32,11 +34,21 @@ jobs:
         with:
           python-version: '3.12'
           enable-cache: true
-          cache-dependency-glob: tools/agent-evaluation/uv.lock
+          cache-dependency-glob: |
+            tools/agent-evaluation/uv.lock
+            tools/mcp-bridge/uv.lock
       - name: Sync locked Python dependencies
         run: uv sync --locked
       - name: Test evaluation toolkit
         run: uv run pytest -q
+      - name: Test local STDIO bridge
+        run: |
+          uv sync --locked --project ../mcp-bridge
+          uv run --project ../mcp-bridge pytest ../mcp-bridge/tests -q
+      - name: Test semantic embedding runtime offline contracts
+        run: |
+          uv sync --locked --project ../semantic-embedding
+          uv run --project ../semantic-embedding pytest ../semantic-embedding/tests --ignore=../semantic-embedding/tests/test_real_runtime.py -q
 
   frontend:
     runs-on: ubuntu-latest

@@ -17,7 +17,12 @@ public class OpenApiConfiguration {
         return new OpenAPI().info(new Info()
                 .title("FinGuard Copilot API")
                 .version("v1")
-                .description("Read-only AI-assisted review analysis API"));
+                .description("Read-only AI-assisted review analysis API"))
+                .components(new io.swagger.v3.oas.models.Components()
+                    .addSecuritySchemes("CoreReviewerBearer",new io.swagger.v3.oas.models.security.SecurityScheme()
+                        .type(io.swagger.v3.oas.models.security.SecurityScheme.Type.HTTP).scheme("bearer").bearerFormat("JWT"))
+                    .addSecuritySchemes("McpCapability",new io.swagger.v3.oas.models.security.SecurityScheme()
+                        .type(io.swagger.v3.oas.models.security.SecurityScheme.Type.HTTP).scheme("bearer").bearerFormat("short-lived random capability")));
     }
 
     /** The page emits explicit nulls; OpenAPI 3.1 must distinguish null from an absent property. */
@@ -27,7 +32,11 @@ public class OpenApiConfiguration {
             if (api.getComponents() == null || api.getComponents().getSchemas() == null) return;
             var schemas = api.getComponents().getSchemas();
             nullableProperties(schemas.get("Cost"), "estimatedCost", "currency", "heldCny", "inputTokens", "outputTokens");
-            nullableProperties(schemas.get("Page"), "failureCode", "result", "versions", "traceId", "feedbackVerdict");
+            nullableProperties(schemas.get("Page"), "failureCode", "result", "versions", "traceId", "feedbackVerdict", "agent");
+            nullableProperties(schemas.get("Summary"),"waitingReason","waitExpiresAt");
+            nullableProperties(schemas.get("CallTrace"),"estimatedCost","inputTokens","outputTokens");
+            nullableProperties(schemas.get("ToolTrace"),"checksum");
+            nullableProperties(schemas.get("Event"),"agentRevision","agentNode","toolNames");
         };
     }
 

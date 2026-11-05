@@ -21,6 +21,25 @@ class ReviewPageOpenApiIntegrationTest {
     @Container @ServiceConnection static final MySQLContainer<?> MYSQL=new MySQLContainer<>("mysql:8.4.10");
     @Autowired MockMvc mvc;
     @Autowired ObjectMapper json;
+    @Autowired org.springframework.context.ApplicationContext application;
+
+    @Test void applicationDoesNotExposeXsltViewsOrFragmentRenderingHandlers(){
+        assertThat(application.getBeansOfType(org.springframework.web.servlet.view.xslt.XsltView.class)).isEmpty();
+        assertThat(application.getBeansOfType(org.springframework.web.servlet.view.xslt.XsltViewResolver.class)).isEmpty();
+        var mappings=application.getBean("requestMappingHandlerMapping",org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping.class);
+        var handlers=mappings.getHandlerMethods().entrySet().stream()
+            .filter(entry->entry.getValue().getBeanType().getPackageName().startsWith("com.finguard.copilot")).toList();
+        assertThat(handlers).isNotEmpty();
+        for(var entry:handlers){
+            var handler=entry.getValue();
+            assertThat(org.springframework.core.annotation.AnnotatedElementUtils.hasAnnotation(handler.getBeanType(),org.springframework.web.bind.annotation.RestController.class)).isTrue();
+            assertThat(entry.getKey().getPatternValues()).doesNotContain("/**");
+            Class<?> result=handler.getMethod().getReturnType();
+            assertThat(org.springframework.web.servlet.View.class.isAssignableFrom(result)).isFalse();
+            assertThat(org.springframework.web.servlet.ModelAndView.class.isAssignableFrom(result)).isFalse();
+            assertThat(result.getName()).doesNotContain("FragmentsRendering");
+        }
+    }
 
     @Test void documentsExplicitNullsWithoutChangingRequiredExactStringTypesOrLegacyResponse() throws Exception {
         JsonNode api=json.readTree(mvc.perform(get("/v3/api-docs")).andExpect(status().isOk()).andReturn().getResponse().getContentAsString());

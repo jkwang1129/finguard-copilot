@@ -31,7 +31,6 @@ public class SnapshotRetentionJob {
               AND expires_at <= ?
             ORDER BY expires_at, analysis_id
             LIMIT ?
-            FOR UPDATE SKIP LOCKED
             """;
     private static final String DELETE_SNAPSHOT = """
             UPDATE analysis_input_snapshot s
@@ -96,14 +95,29 @@ public class SnapshotRetentionJob {
                     Timestamp.from(expiryCutoff), properties.jobs().batchSize());
             int deleted = 0;
             for (byte[] id : ids) {
+                // Same order as tool claims and checkpoints: parent, then derived/source rows.
+                String run=jdbc.queryForObject("SELECT status FROM analysis_run WHERE id=? FOR UPDATE",String.class,id);
                 if (jdbc.update(DELETE_SNAPSHOT,
                         Timestamp.from(normalizedNow), Timestamp.from(normalizedNow), id,
                         Timestamp.from(expiryCutoff)) > 0) {
+                    int agent=jdbc.queryForObject("SELECT COUNT(*) FROM agent_run_policy p WHERE analysis_id=? AND (runtime_enabled=TRUE OR EXISTS(SELECT 1 FROM analysis_checkpoint c WHERE c.analysis_id=p.analysis_id))",Integer.class,id);
+                    if(agent>0 && !java.util.Set.of("SUCCEEDED","FAILED").contains(run)) {
+                        var store=new com.finguard.copilot.agent.checkpoint.CheckpointStore(jdbc,transactions,
+                            new com.finguard.copilot.events.AnalysisEventRepository(jdbc),new SnapshotCodec(),clock,java.time.Duration.ofMinutes(2));
+                        store.finishFailure(uuid(id),"CONTEXT_STALE");
+                    }
+                    jdbc.update("UPDATE analysis_checkpoint SET memory_json=NULL,owner_token=NULL,lease_until=NULL,waiting=FALSE,wait_expires_at=NULL,revision=revision+1,updated_at=? WHERE analysis_id=?",Timestamp.from(normalizedNow),id);
+                    jdbc.update("UPDATE analysis_tool_execution SET result_json=NULL WHERE analysis_id=?",id);
+                    jdbc.update("UPDATE analysis_mcp_capability SET revoked_at=? WHERE analysis_id=? AND revoked_at IS NULL",Timestamp.from(normalizedNow),id);
                     deleted++;
                 }
             }
             return deleted;
         }));
+    }
+
+    private static java.util.UUID uuid(byte[] value) {
+        var buffer=java.nio.ByteBuffer.wrap(value);return new java.util.UUID(buffer.getLong(),buffer.getLong());
     }
 
     private static int requireCount(Integer count) {

@@ -11,6 +11,13 @@ import static org.mockito.Mockito.*;
 import static org.mockito.ArgumentMatchers.*;
 
 class LedgerMetricsTest {
+    @Test void aggregateQueriesIncludeBothAgentAndLegacyLedgers(){
+        var jdbc=mock(JdbcTemplate.class);when(jdbc.queryForList(anyString())).thenReturn(List.of());
+        when(jdbc.queryForObject(anyString(),eq(Long.class))).thenReturn(0L);
+        var metrics=new LedgerMetrics(jdbc,new SimpleMeterRegistry(),Clock.systemUTC());metrics.refresh();metrics.close();
+        verify(jdbc).queryForList(contains("agent_model_call"));
+        verify(jdbc,atLeastOnce()).queryForObject(contains("agent_model_call"),eq(Long.class));
+    }
     @Test void slowDatabaseDoesNotBlockTheSchedulerOrCreateUnboundedRefreshTasks() throws Exception {
         var entered=new java.util.concurrent.CountDownLatch(1);var release=new java.util.concurrent.CountDownLatch(1);
         var jdbc=mock(JdbcTemplate.class);

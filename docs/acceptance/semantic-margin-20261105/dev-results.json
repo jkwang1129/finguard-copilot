@@ -1,0 +1,181 @@
+{
+  "schemaVersion" : 1,
+  "algorithm" : "single-source-margin-grid-v1",
+  "identity" : {
+    "indexVersion" : "sq-primary-20261104_221513_7669588",
+    "embeddingVersion" : "e5-small-int8-55102a6d5c23b708db337173",
+    "embeddingDescriptor" : {
+      "artifactManifestSha256" : "55102a6d5c23b708db337173e13e93954b1d9cf0fb7632cfa3d2ce42b643d10d",
+      "queryPrefix" : "query: ",
+      "maxTokens" : 512,
+      "pooling" : "attention-masked-mean-l2",
+      "documentPrefix" : "passage: ",
+      "implementation" : "LoopbackSemanticEmbeddingGateway"
+    },
+    "qdrantEndpoint" : "http://127.0.0.1:57215",
+    "dimensions" : 384,
+    "embeddingManifestSha256" : "55102a6d5c23b708db337173e13e93954b1d9cf0fb7632cfa3d2ce42b643d10d",
+    "embeddingEndpoint" : "http://127.0.0.1:8766",
+    "database" : "fg_sq_20261104_221513_7669588",
+    "qdrantPrefix" : "semantic-20261104_221513_7669588"
+  },
+  "retrieval" : {
+    "descriptor" : {
+      "duplicateSource" : "abstain",
+      "topK" : 1,
+      "minimumScore" : 0.825,
+      "mode" : "single-source-margin-v1",
+      "minimumMargin" : 0.01,
+      "singleCandidate" : "abstain",
+      "candidateSelection" : "raw-before-filter",
+      "candidateTopK" : 2
+    },
+    "topK" : 1,
+    "minimumMargin" : 0.01,
+    "minimumScore" : 0.825
+  },
+  "corpusSha256" : "9fdd43cb211ec5a230f4deaaaf6e0c1d1a7bbc6b8b47e61b82e59e21698fe982",
+  "developmentSha256" : "ff3b5e2f1a5cf10ee3de7101e8b89133882e76963f0fb93c0f41406b44b89b01",
+  "rawCandidatesSha256" : "c44cd3245681e2e76ca094c455443132f1114e1f9f3f6c3a5df2847c3c5b1d33",
+  "scope" : "AI-authored bilingual synthetic source relevance with pinned local E5/MySQL/Qdrant retrievePinned; single source per query and one chunk per source; no chat model, Core call, human or production qualification",
+  "holdoutReads" : 0,
+  "holdoutExecutions" : 0,
+  "chatModelCalls" : 0,
+  "coreCalls" : 0,
+  "actual" : [ {
+    "caseId" : "DEV-001",
+    "state" : "EXECUTED",
+    "documentIds" : [ "synth-usd-limit" ],
+    "failureType" : null
+  }, {
+    "caseId" : "DEV-002",
+    "state" : "EXECUTED",
+    "documentIds" : [ "manual-audit" ],
+    "failureType" : null
+  }, {
+    "caseId" : "DEV-003",
+    "state" : "EXECUTED",
+    "documentIds" : [ "account-status" ],
+    "failureType" : null
+  }, {
+    "caseId" : "DEV-004",
+    "state" : "EXECUTED",
+    "documentIds" : [ "data-retention" ],
+    "failureType" : null
+  }, {
+    "caseId" : "DEV-005",
+    "state" : "EXECUTED",
+    "documentIds" : [ "euro-review" ],
+    "failureType" : null
+  }, {
+    "caseId" : "DEV-006",
+    "state" : "EXECUTED",
+    "documentIds" : [ "settlement-reconciliation" ],
+    "failureType" : null
+  }, {
+    "caseId" : "DEV-007",
+    "state" : "EXECUTED",
+    "documentIds" : [ "support-faq" ],
+    "failureType" : null
+  }, {
+    "caseId" : "DEV-008",
+    "state" : "EXECUTED",
+    "documentIds" : [ "incident-infrastructure" ],
+    "failureType" : null
+  }, {
+    "caseId" : "DEV-009",
+    "state" : "EXECUTED",
+    "documentIds" : [ ],
+    "failureType" : null
+  }, {
+    "caseId" : "DEV-010",
+    "state" : "EXECUTED",
+    "documentIds" : [ ],
+    "failureType" : null
+  }, {
+    "caseId" : "DEV-011",
+    "state" : "EXECUTED",
+    "documentIds" : [ ],
+    "failureType" : null
+  }, {
+    "caseId" : "DEV-012",
+    "state" : "EXECUTED",
+    "documentIds" : [ ],
+    "failureType" : null
+  } ],
+  "simulated" : [ {
+    "caseId" : "DEV-001",
+    "state" : "EXECUTED",
+    "documentIds" : [ "synth-usd-limit" ],
+    "failureType" : null
+  }, {
+    "caseId" : "DEV-002",
+    "state" : "EXECUTED",
+    "documentIds" : [ "manual-audit" ],
+    "failureType" : null
+  }, {
+    "caseId" : "DEV-003",
+    "state" : "EXECUTED",
+    "documentIds" : [ "account-status" ],
+    "failureType" : null
+  }, {
+    "caseId" : "DEV-004",
+    "state" : "EXECUTED",
+    "documentIds" : [ "data-retention" ],
+    "failureType" : null
+  }, {
+    "caseId" : "DEV-005",
+    "state" : "EXECUTED",
+    "documentIds" : [ "euro-review" ],
+    "failureType" : null
+  }, {
+    "caseId" : "DEV-006",
+    "state" : "EXECUTED",
+    "documentIds" : [ "settlement-reconciliation" ],
+    "failureType" : null
+  }, {
+    "caseId" : "DEV-007",
+    "state" : "EXECUTED",
+    "documentIds" : [ "support-faq" ],
+    "failureType" : null
+  }, {
+    "caseId" : "DEV-008",
+    "state" : "EXECUTED",
+    "documentIds" : [ "incident-infrastructure" ],
+    "failureType" : null
+  }, {
+    "caseId" : "DEV-009",
+    "state" : "EXECUTED",
+    "documentIds" : [ ],
+    "failureType" : null
+  }, {
+    "caseId" : "DEV-010",
+    "state" : "EXECUTED",
+    "documentIds" : [ ],
+    "failureType" : null
+  }, {
+    "caseId" : "DEV-011",
+    "state" : "EXECUTED",
+    "documentIds" : [ ],
+    "failureType" : null
+  }, {
+    "caseId" : "DEV-012",
+    "state" : "EXECUTED",
+    "documentIds" : [ ],
+    "failureType" : null
+  } ],
+  "simulatorMatchesActual" : true,
+  "metrics" : {
+    "total" : 12,
+    "positives" : 8,
+    "unsupported" : 4,
+    "relevant" : 8,
+    "returned" : 8,
+    "correctRejections" : 4,
+    "pipelineErrors" : 0,
+    "recallAt1" : 1.0,
+    "citationPrecision" : 1.0,
+    "noAnswerAccuracy" : 1.0,
+    "passed" : true
+  }
+}

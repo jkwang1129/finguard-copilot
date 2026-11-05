@@ -1,0 +1,12 @@
+{
+  "fixtureCurrency": "CNY",
+  "fixtureAmount": "100000.100000000000000001",
+  "fixtureThreshold": "100000.10",
+  "scope": "synthetic protocol and workflow regression; not real model quality",
+  "fixturePolicy": "finguard-large-amount-review-policy/v1",
+  "caseCount": 26,
+  "datasetSha256": "01c883a77cbefad1af0c4d458df6003deaeddb8a0208762d385d383092a415ed",
+  "schemaVersion": 1,
+  "toolSchemaSha256": "e0401e9bcd95bd5290d8184e89b2aa97ed164f6fc697f49b3af8780931c7d80f",
+  "frozenAt": "2026-11-03T21:32:57.6798934+08:00"
+}

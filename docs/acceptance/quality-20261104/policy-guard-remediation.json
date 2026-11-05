@@ -1,0 +1,54 @@
+{
+  "status": "OFFLINE_FIX_VERIFIED_PAID_REQUALIFICATION_NOT_RUN",
+  "recordedAt": "2026-11-04T13:22:48.682535+00:00",
+  "rootCause": "Chinese instruction-override pattern joined a benign policy decision word with a later clause across a semicolon",
+  "frozenCorpusSha256": "9fdd43cb211ec5a230f4deaaaf6e0c1d1a7bbc6b8b47e61b82e59e21698fe982",
+  "frozenPolicyContentSha256": "e02ff2a59db6abd5d3437be5c76aed9b43e826b9da7f0f0bf0a7e63a1f383649",
+  "productionDelta": "Treat ASCII/full-width semicolons as Chinese clause boundaries; exact-citation and reviewed-policy hash/authorization checks unchanged",
+  "sourceShas": {
+    "src/main/java/com/finguard/copilot/guardrail/UntrustedInstructionGuard.java": "51daad46abb8a0232164fe7bc25d0a712be43543a2edaa738f97ace401f271fd",
+    "src/test/java/com/finguard/copilot/guardrail/UntrustedInstructionGuardTest.java": "c38fa010bcb30ceb200835b5c6662364e5641ac4a1d27ce0390a39bfdedf3ddc",
+    "src/test/java/com/finguard/copilot/analysis/application/SemanticPolicyValidationRegressionTest.java": "13d3ff95ff616cf2524bc829e5596e1103471df9840f3862551f73b0254460ea"
+  },
+  "guardRed": {
+    "tests": 15,
+    "failures": 4,
+    "errors": 0,
+    "logSha256": "03c6b5d3aff5d41bcaebfc4e8433813234eb0def874153047b39ae8a8a58ec79"
+  },
+  "initialIntegrationRedInvalid": {
+    "reason": "Blank model provider masked the validation error; not accepted as RED evidence",
+    "logSha256": "6b7dbb9b9e56d97fb73ab14f80f1bc9a1d323e6a1a69f1adb5d677d53edd95ea"
+  },
+  "correctedIntegrationRed": {
+    "tests": 7,
+    "failures": 7,
+    "errors": 0,
+    "failureCode": "FACT_VALIDATION_FAILED",
+    "logSha256": "f9fe84675bf89f67f62f0cb64a73fe48b3f9045967df20ee455a071d9505563f"
+  },
+  "correctedGreen": {
+    "tests": 74,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "logSha256": "c2166fb1d8e893060d45060dbc30b8ac44920d6cabf938423e9df8957a2224c1",
+    "scope": "targeted instruction/policy/fact/numeric/P4 orchestrator/schema regression; not full Java suite"
+  },
+  "counterfactualCandidates": 7,
+  "counterfactualMeaning": "Hand-constructed correct local candidates with exact frozen citation, not historical provider output replay or new model-quality scores",
+  "review": {
+    "critical": 0,
+    "important": 0,
+    "minor": 0,
+    "priorEvidenceFindingAddressed": true
+  },
+  "paidRequestsThisRemediation": 0,
+  "estimatedCnyThisRemediation": "0.00000000",
+  "oldPaidScoreUnchanged": "4/11",
+  "soleHistoricalFailureCauseProven": false,
+  "retrievalQualityImprovedClaim": false,
+  "frozenHoldoutReexecuted": false,
+  "productionQualityQualified": false,
+  "commitOrPushAuthorized": false
+}

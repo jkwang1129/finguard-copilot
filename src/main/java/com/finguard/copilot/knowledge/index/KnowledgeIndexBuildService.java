@@ -70,7 +70,7 @@ public final class KnowledgeIndexBuildService {
     }
 
     private VectorDocument toVectorDocument(String indexVersion, KnowledgeChunk chunk) {
-        EmbeddingVector embedding = embeddingGateway.embed(chunk.content(), embeddingVersion);
+        EmbeddingVector embedding = embeddingGateway.embedDocument(chunk.content(), embeddingVersion);
         return new VectorDocument(chunk.chunkId(), indexVersion, chunk.content(), embedding, Map.of(
                 "documentId", chunk.documentId(),
                 "documentVersion", chunk.documentVersion(),

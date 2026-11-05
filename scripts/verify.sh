@@ -17,4 +17,10 @@ bash ./mvnw -B -ntp clean test
     npm run build
 )
 
+(
+    cd tools/mcp-bridge
+    uv sync --locked --python 3.12
+    uv run --python 3.12 pytest -q
+)
+
 git diff --check

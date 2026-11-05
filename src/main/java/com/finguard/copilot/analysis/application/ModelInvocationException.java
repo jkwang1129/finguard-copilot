@@ -17,6 +17,7 @@ public final class ModelInvocationException extends RuntimeException {
     private final String promptVersion;
     private final ModelUsage usage;
     private final String outcome;
+    private final ModelValidationStage validationStage;
 
     public ModelInvocationException(
             ErrorCode errorCode,
@@ -25,6 +26,18 @@ public final class ModelInvocationException extends RuntimeException {
             String promptVersion,
             ModelUsage usage,
             String outcome
+    ) {
+        this(errorCode, provider, modelConfigurationVersion, promptVersion, usage, outcome, ModelValidationStage.UNKNOWN);
+    }
+
+    public ModelInvocationException(
+            ErrorCode errorCode,
+            String provider,
+            String modelConfigurationVersion,
+            String promptVersion,
+            ModelUsage usage,
+            String outcome,
+            ModelValidationStage validationStage
     ) {
         super("model invocation failed: " + Objects.requireNonNull(errorCode, "errorCode must not be null"));
         this.errorCode = errorCode;
@@ -36,6 +49,7 @@ public final class ModelInvocationException extends RuntimeException {
             throw new IllegalArgumentException("outcome is invalid");
         }
         this.outcome = outcome;
+        this.validationStage = Objects.requireNonNull(validationStage, "validationStage must not be null");
     }
 
     public ErrorCode errorCode() {
@@ -60,6 +74,10 @@ public final class ModelInvocationException extends RuntimeException {
 
     public String outcome() {
         return outcome;
+    }
+
+    public ModelValidationStage validationStage() {
+        return validationStage;
     }
 
     private static String requireText(String value, String name) {

@@ -53,6 +53,11 @@ export async function readProgress(
         )
           throw new ApiError("INVALID_STREAM");
         if (BigInt(id) <= cursor) continue;
+        if (event.agentRevision != null && (typeof event.agentRevision !== "string" ||
+          !/^(0|[1-9][0-9]{0,18})$/.test(event.agentRevision) || BigInt(event.agentRevision) > 9223372036854775807n ||
+          !["RETRIEVE","PLAN","TOOLS","GENERATE","REPAIR","COMPLETE","DONE","INVALID"].includes(event.agentNode ?? "") ||
+          !Array.isArray(event.toolNames) || event.toolNames.length > 4 ||
+          !event.toolNames.every((tool) => ["get_review_facts","get_task_state","search_review_policy","OTHER"].includes(tool)))) throw new ApiError("INVALID_STREAM");
         if (BigInt(id) !== cursor + 1n) throw new ApiError("INVALID_STREAM");
         onState(event);
         cursor = BigInt(id);

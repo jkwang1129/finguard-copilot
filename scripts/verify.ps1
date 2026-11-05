@@ -37,5 +37,16 @@ finally {
     Pop-Location
 }
 
+Push-Location tools\mcp-bridge
+try {
+    uv sync --locked --python 3.12
+    Assert-LastExitCode 'MCP bridge dependency sync'
+    uv run --python 3.12 pytest -q
+    Assert-LastExitCode 'MCP STDIO bridge tests'
+}
+finally {
+    Pop-Location
+}
+
 git diff --check
 Assert-LastExitCode 'Git whitespace check'

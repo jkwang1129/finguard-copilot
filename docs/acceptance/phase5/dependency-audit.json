@@ -1,0 +1,1908 @@
+{
+  "source": "OSV querybatch",
+  "classpathSha256": "89d8eb18fd8e129ad54751e3856765cdf201c1d298806de87eabbb605a5a53b8",
+  "packages": 252,
+  "affectedPackages": 24,
+  "rows": [
+    {
+      "ecosystem": "Maven",
+      "name": "ch.qos.logback:logback-classic",
+      "version": "1.5.21",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "ch.qos.logback:logback-core",
+      "version": "1.5.21",
+      "vulnerabilities": [
+        {
+          "id": "GHSA-jhq6-gfmj-v8fx",
+          "modified": "2026-09-10T03:50:50.074688Z"
+        },
+        {
+          "id": "GHSA-p47f-322f-whfh",
+          "modified": "2026-09-10T03:50:47.152421Z"
+        },
+        {
+          "id": "GHSA-qqpg-mvqg-649v",
+          "modified": "2026-09-10T03:50:33.725359Z"
+        }
+      ]
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "com.alibaba.cloud.ai:spring-ai-alibaba-graph-core",
+      "version": "1.1.2.2",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "com.fasterxml.jackson.core:jackson-annotations",
+      "version": "2.19.4",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "com.fasterxml.jackson.core:jackson-core",
+      "version": "2.19.4",
+      "vulnerabilities": [
+        {
+          "id": "GHSA-72hv-8253-57qq",
+          "modified": "2026-09-10T03:50:34.318297Z"
+        },
+        {
+          "id": "GHSA-7hhh-6rmp-j9qf",
+          "modified": "2026-10-01T15:30:05.552671Z"
+        },
+        {
+          "id": "GHSA-p6pp-m3f8-5c89",
+          "modified": "2026-10-01T15:30:13.452657Z"
+        },
+        {
+          "id": "GHSA-r7wm-3cxj-wff9",
+          "modified": "2026-10-02T23:15:06.853935Z"
+        }
+      ]
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "com.fasterxml.jackson.core:jackson-databind",
+      "version": "2.19.4",
+      "vulnerabilities": [
+        {
+          "id": "GHSA-3pjw-73gf-8qr5",
+          "modified": "2026-09-10T03:51:10.312389Z"
+        },
+        {
+          "id": "GHSA-5gvw-p9qm-jgwh",
+          "modified": "2026-10-19T19:45:04.650428Z"
+        },
+        {
+          "id": "GHSA-5jmj-h7xm-6q6v",
+          "modified": "2026-09-10T03:51:08.069993Z"
+        },
+        {
+          "id": "GHSA-cxp5-3px4-pw24",
+          "modified": "2026-09-30T15:46:18.051343Z"
+        },
+        {
+          "id": "GHSA-gx83-3vf8-gh7j",
+          "modified": "2026-09-28T21:00:05.608227Z"
+        },
+        {
+          "id": "GHSA-hgj6-7826-r7m5",
+          "modified": "2026-09-10T03:50:49.909813Z"
+        },
+        {
+          "id": "GHSA-j3rv-43j4-c7qm",
+          "modified": "2026-10-28T10:56:49.472327Z"
+        },
+        {
+          "id": "GHSA-q4xh-88c3-wmh7",
+          "modified": "2026-09-28T20:30:05.315085Z"
+        },
+        {
+          "id": "GHSA-rmj7-2vxq-3g9f",
+          "modified": "2026-09-11T15:45:08.499771Z"
+        },
+        {
+          "id": "GHSA-vvgp-rfg2-7rr6",
+          "modified": "2026-09-28T20:30:05.324367Z"
+        },
+        {
+          "id": "GHSA-wjgm-6hv5-3cvf",
+          "modified": "2026-09-28T20:30:05.331167Z"
+        },
+        {
+          "id": "GHSA-wv8q-qhhj-9h54",
+          "modified": "2026-09-30T15:46:18.451708Z"
+        }
+      ]
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "com.fasterxml.jackson.dataformat:jackson-dataformat-toml",
+      "version": "2.19.4",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml",
+      "version": "2.19.4",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "com.fasterxml.jackson.datatype:jackson-datatype-jdk8",
+      "version": "2.19.4",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "com.fasterxml.jackson.datatype:jackson-datatype-jsr310",
+      "version": "2.19.4",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "com.fasterxml.jackson.module:jackson-module-jsonSchema",
+      "version": "2.19.4",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "com.fasterxml.jackson.module:jackson-module-parameter-names",
+      "version": "2.19.4",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "com.fasterxml:classmate",
+      "version": "1.7.1",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "com.github.docker-java:docker-java-api",
+      "version": "3.4.2",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "com.github.docker-java:docker-java-transport",
+      "version": "3.4.2",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "com.github.docker-java:docker-java-transport-zerodep",
+      "version": "3.4.2",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "com.github.victools:jsonschema-generator",
+      "version": "4.38.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "com.github.victools:jsonschema-module-jackson",
+      "version": "4.38.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "com.github.victools:jsonschema-module-swagger-2",
+      "version": "4.38.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "com.jayway.jsonpath:json-path",
+      "version": "2.9.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "com.knuddels:jtokkit",
+      "version": "1.1.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "com.mysql:mysql-connector-j",
+      "version": "9.5.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "com.rabbitmq:amqp-client",
+      "version": "5.25.0",
+      "vulnerabilities": [
+        {
+          "id": "GHSA-5m9f-rphj-c435",
+          "modified": "2026-09-10T03:51:13.150501Z"
+        },
+        {
+          "id": "GHSA-5xwg-cfvj-gff5",
+          "modified": "2026-09-10T03:51:13.134044Z"
+        },
+        {
+          "id": "GHSA-68mj-5wr7-6fgg",
+          "modified": "2026-09-10T03:51:13.151154Z"
+        },
+        {
+          "id": "GHSA-6g32-pxv4-2wfj",
+          "modified": "2026-09-10T03:51:13.214436Z"
+        },
+        {
+          "id": "GHSA-7822-rcf6-97fx",
+          "modified": "2026-10-07T20:30:07.156315Z"
+        },
+        {
+          "id": "GHSA-93j5-89vc-pph4",
+          "modified": "2026-09-10T03:51:13.771990Z"
+        },
+        {
+          "id": "GHSA-cqgh-8p3p-mx4m",
+          "modified": "2026-10-07T21:00:04.481305Z"
+        },
+        {
+          "id": "GHSA-h6w7-qmcm-q6xr",
+          "modified": "2026-10-19T19:45:04.498976Z"
+        },
+        {
+          "id": "GHSA-jh4v-gfqj-7rhx",
+          "modified": "2026-09-17T15:00:06.805894Z"
+        },
+        {
+          "id": "GHSA-qx7j-jv8m-fppr",
+          "modified": "2026-09-10T03:50:54.002021Z"
+        }
+      ]
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "com.squareup.okhttp3:okhttp",
+      "version": "4.12.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "com.squareup.okio:okio",
+      "version": "3.6.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "com.squareup.okio:okio-jvm",
+      "version": "3.6.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "com.vaadin.external.google:android-json",
+      "version": "0.0.20131108.vaadin1",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "com.zaxxer:HikariCP",
+      "version": "6.3.3",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "commons-codec:commons-codec",
+      "version": "1.18.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "io.lettuce:lettuce-core",
+      "version": "6.6.0.RELEASE",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "io.micrometer:context-propagation",
+      "version": "1.1.3",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "io.micrometer:micrometer-commons",
+      "version": "1.15.6",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "io.micrometer:micrometer-core",
+      "version": "1.15.6",
+      "vulnerabilities": [
+        {
+          "id": "GHSA-g3pr-3p32-fp23",
+          "modified": "2026-09-11T15:45:08.795437Z"
+        },
+        {
+          "id": "GHSA-w737-wx49-qj23",
+          "modified": "2026-09-11T15:45:36.562871Z"
+        }
+      ]
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "io.micrometer:micrometer-jakarta9",
+      "version": "1.15.6",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "io.micrometer:micrometer-observation",
+      "version": "1.15.6",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "io.micrometer:micrometer-registry-prometheus",
+      "version": "1.15.6",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "io.netty:netty-buffer",
+      "version": "4.1.128.Final",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "io.netty:netty-codec",
+      "version": "4.1.128.Final",
+      "vulnerabilities": [
+        {
+          "id": "GHSA-558v-64gr-wgg4",
+          "modified": "2026-09-10T03:50:12.358146Z"
+        },
+        {
+          "id": "GHSA-mj4r-2hfc-f8p6",
+          "modified": "2026-09-10T03:51:06.526589Z"
+        }
+      ]
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "io.netty:netty-common",
+      "version": "4.1.128.Final",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "io.netty:netty-handler",
+      "version": "4.1.128.Final",
+      "vulnerabilities": [
+        {
+          "id": "GHSA-3qp7-7mw8-wx86",
+          "modified": "2026-09-10T03:50:55.436123Z"
+        },
+        {
+          "id": "GHSA-c4c3-7fpv-j4q5",
+          "modified": "2026-09-08T18:27:48.571082Z"
+        },
+        {
+          "id": "GHSA-c653-97m9-rcg9",
+          "modified": "2026-09-10T03:51:08.552933Z"
+        },
+        {
+          "id": "GHSA-fccg-mwvh-qqg4",
+          "modified": "2026-09-08T18:27:48.113951Z"
+        },
+        {
+          "id": "GHSA-x4gw-5cx5-pgmh",
+          "modified": "2026-09-10T03:50:12.401611Z"
+        }
+      ]
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "io.netty:netty-resolver",
+      "version": "4.1.128.Final",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "io.netty:netty-transport",
+      "version": "4.1.128.Final",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "io.netty:netty-transport-native-unix-common",
+      "version": "4.1.128.Final",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "io.opentelemetry:opentelemetry-api",
+      "version": "1.49.0",
+      "vulnerabilities": [
+        {
+          "id": "GHSA-ccrj-gw8r-854m",
+          "modified": "2026-10-28T21:15:04.329194Z"
+        },
+        {
+          "id": "GHSA-rcgg-9c38-7xpx",
+          "modified": "2026-06-09T02:15:07.364273Z"
+        }
+      ]
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "io.opentelemetry:opentelemetry-context",
+      "version": "1.49.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "io.opentelemetry:opentelemetry-exporter-common",
+      "version": "1.49.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "io.opentelemetry:opentelemetry-exporter-otlp",
+      "version": "1.49.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "io.opentelemetry:opentelemetry-exporter-otlp-common",
+      "version": "1.49.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "io.opentelemetry:opentelemetry-exporter-sender-okhttp",
+      "version": "1.49.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "io.opentelemetry:opentelemetry-sdk",
+      "version": "1.49.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "io.opentelemetry:opentelemetry-sdk-common",
+      "version": "1.49.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "io.opentelemetry:opentelemetry-sdk-extension-autoconfigure-spi",
+      "version": "1.49.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "io.opentelemetry:opentelemetry-sdk-logs",
+      "version": "1.49.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "io.opentelemetry:opentelemetry-sdk-metrics",
+      "version": "1.49.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "io.opentelemetry:opentelemetry-sdk-testing",
+      "version": "1.49.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "io.opentelemetry:opentelemetry-sdk-trace",
+      "version": "1.49.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "io.projectreactor:reactor-core",
+      "version": "3.7.13",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "io.prometheus:prometheus-metrics-config",
+      "version": "1.3.10",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "io.prometheus:prometheus-metrics-core",
+      "version": "1.3.10",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "io.prometheus:prometheus-metrics-exposition-formats",
+      "version": "1.3.10",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "io.prometheus:prometheus-metrics-exposition-textformats",
+      "version": "1.3.10",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "io.prometheus:prometheus-metrics-model",
+      "version": "1.3.10",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "io.prometheus:prometheus-metrics-tracer-common",
+      "version": "1.3.10",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "io.swagger.core.v3:swagger-annotations-jakarta",
+      "version": "2.2.38",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "io.swagger.core.v3:swagger-core-jakarta",
+      "version": "2.2.30",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "io.swagger.core.v3:swagger-models-jakarta",
+      "version": "2.2.30",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "jakarta.activation:jakarta.activation-api",
+      "version": "2.1.4",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "jakarta.annotation:jakarta.annotation-api",
+      "version": "2.1.1",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "jakarta.validation:jakarta.validation-api",
+      "version": "3.0.2",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "jakarta.xml.bind:jakarta.xml.bind-api",
+      "version": "4.0.4",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "javax.validation:validation-api",
+      "version": "1.1.0.Final",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "junit:junit",
+      "version": "4.13.2",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "net.bytebuddy:byte-buddy",
+      "version": "1.17.8",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "net.bytebuddy:byte-buddy-agent",
+      "version": "1.17.8",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "net.java.dev.jna:jna",
+      "version": "5.13.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "net.minidev:accessors-smart",
+      "version": "2.5.2",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "net.minidev:json-smart",
+      "version": "2.5.2",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.antlr:ST4",
+      "version": "4.3.4",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.antlr:antlr-runtime",
+      "version": "3.5.3",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.antlr:antlr4-runtime",
+      "version": "4.13.1",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.apache.commons:commons-collections4",
+      "version": "4.4",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.apache.commons:commons-compress",
+      "version": "1.24.0",
+      "vulnerabilities": [
+        {
+          "id": "GHSA-4265-ccf5-phj5",
+          "modified": "2026-09-10T03:50:05.280645Z"
+        },
+        {
+          "id": "GHSA-4g9r-vxhx-9pgx",
+          "modified": "2026-09-10T03:50:05.286961Z"
+        }
+      ]
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.apache.commons:commons-exec",
+      "version": "1.3",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.apache.commons:commons-lang3",
+      "version": "3.17.0",
+      "vulnerabilities": [
+        {
+          "id": "GHSA-j288-q9x7-2f5v",
+          "modified": "2026-09-10T03:50:26.176912Z"
+        }
+      ]
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.apache.logging.log4j:log4j-api",
+      "version": "2.24.3",
+      "vulnerabilities": [
+        {
+          "id": "GHSA-qv9r-c865-cp47",
+          "modified": "2026-09-10T03:50:52.972700Z"
+        }
+      ]
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.apache.logging.log4j:log4j-to-slf4j",
+      "version": "2.24.3",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.apache.tomcat.embed:tomcat-embed-core",
+      "version": "10.1.49",
+      "vulnerabilities": [
+        {
+          "id": "GHSA-563x-q5rq-57qp",
+          "modified": "2026-09-11T08:25:36.344434Z"
+        },
+        {
+          "id": "GHSA-5m62-pw8w-7w9f",
+          "modified": "2026-09-11T08:25:25.696036Z"
+        },
+        {
+          "id": "GHSA-5mp6-jrq3-r938",
+          "modified": "2026-09-11T08:25:26.202863Z"
+        },
+        {
+          "id": "GHSA-9m3c-qcxr-9x87",
+          "modified": "2026-09-11T08:25:31.206255Z"
+        },
+        {
+          "id": "GHSA-9m89-8frq-c98c",
+          "modified": "2026-09-11T08:25:30.451322Z"
+        },
+        {
+          "id": "GHSA-9xv2-5v5q-p794",
+          "modified": "2026-09-11T08:25:52.825871Z"
+        },
+        {
+          "id": "GHSA-fpj8-gq4v-p354",
+          "modified": "2026-09-11T08:25:48.825991Z"
+        },
+        {
+          "id": "GHSA-fv25-8xcx-gqjc",
+          "modified": "2026-09-10T03:51:05.853750Z"
+        },
+        {
+          "id": "GHSA-gcx9-497g-6cp6",
+          "modified": "2026-09-11T08:25:41.300012Z"
+        },
+        {
+          "id": "GHSA-gx5v-xp9w-j4cg",
+          "modified": "2026-09-11T08:25:36.520411Z"
+        },
+        {
+          "id": "GHSA-h3x4-894j-xpx5",
+          "modified": "2026-09-11T08:25:40.118635Z"
+        },
+        {
+          "id": "GHSA-h6fc-48rj-7qqh",
+          "modified": "2026-09-11T08:25:26.501986Z"
+        },
+        {
+          "id": "GHSA-mgp5-rv84-w37q",
+          "modified": "2026-09-10T03:50:35.574464Z"
+        },
+        {
+          "id": "GHSA-r29c-68gh-xp6x",
+          "modified": "2026-09-10T03:50:55.679134Z"
+        },
+        {
+          "id": "GHSA-rv64-5gf8-9qq8",
+          "modified": "2026-09-11T08:25:42.129097Z"
+        },
+        {
+          "id": "GHSA-x4m4-345f-5h5g",
+          "modified": "2026-09-11T08:25:51.806825Z"
+        }
+      ]
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.apache.tomcat.embed:tomcat-embed-el",
+      "version": "10.1.49",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.apache.tomcat.embed:tomcat-embed-websocket",
+      "version": "10.1.49",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.apiguardian:apiguardian-api",
+      "version": "1.1.2",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.assertj:assertj-core",
+      "version": "3.27.6",
+      "vulnerabilities": [
+        {
+          "id": "GHSA-rqfh-9r24-8c9r",
+          "modified": "2026-02-03T03:04:53.356771Z"
+        }
+      ]
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.awaitility:awaitility",
+      "version": "4.2.2",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.flywaydb:flyway-core",
+      "version": "11.7.2",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.flywaydb:flyway-mysql",
+      "version": "11.7.2",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.hamcrest:hamcrest",
+      "version": "3.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.hamcrest:hamcrest-core",
+      "version": "3.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.hdrhistogram:HdrHistogram",
+      "version": "2.2.2",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.hibernate.validator:hibernate-validator",
+      "version": "8.0.3.Final",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.jboss.logging:jboss-logging",
+      "version": "3.6.1.Final",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.jetbrains.kotlin:kotlin-stdlib",
+      "version": "1.9.25",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.jetbrains.kotlin:kotlin-stdlib-common",
+      "version": "1.9.25",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.jetbrains.kotlin:kotlin-stdlib-jdk7",
+      "version": "1.9.25",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.jetbrains.kotlin:kotlin-stdlib-jdk8",
+      "version": "1.9.25",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.jetbrains:annotations",
+      "version": "13.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.jspecify:jspecify",
+      "version": "1.0.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.junit.jupiter:junit-jupiter",
+      "version": "5.12.2",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.junit.jupiter:junit-jupiter-api",
+      "version": "5.12.2",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.junit.jupiter:junit-jupiter-engine",
+      "version": "5.12.2",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.junit.jupiter:junit-jupiter-params",
+      "version": "5.12.2",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.junit.platform:junit-platform-commons",
+      "version": "1.12.2",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.junit.platform:junit-platform-engine",
+      "version": "1.12.2",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.latencyutils:LatencyUtils",
+      "version": "2.0.3",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.mockito:mockito-core",
+      "version": "5.17.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.mockito:mockito-junit-jupiter",
+      "version": "5.17.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.objenesis:objenesis",
+      "version": "3.3",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.opentest4j:opentest4j",
+      "version": "1.3.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.ow2.asm:asm",
+      "version": "9.7.1",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.reactivestreams:reactive-streams",
+      "version": "1.0.4",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.rnorth.duct-tape:duct-tape",
+      "version": "1.0.8",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.skyscreamer:jsonassert",
+      "version": "1.5.3",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.slf4j:jul-to-slf4j",
+      "version": "2.0.17",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.slf4j:slf4j-api",
+      "version": "2.0.17",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springdoc:springdoc-openapi-starter-common",
+      "version": "2.8.8",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springdoc:springdoc-openapi-starter-webmvc-api",
+      "version": "2.8.8",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springdoc:springdoc-openapi-starter-webmvc-ui",
+      "version": "2.8.8",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework.ai:spring-ai-commons",
+      "version": "1.1.6",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework.ai:spring-ai-deepseek",
+      "version": "1.1.6",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework.ai:spring-ai-model",
+      "version": "1.1.6",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework.ai:spring-ai-template-st",
+      "version": "1.1.6",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework.ai:spring-ai-zhipuai",
+      "version": "1.1.6",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework.amqp:spring-amqp",
+      "version": "3.2.8",
+      "vulnerabilities": [
+        {
+          "id": "GHSA-p5f7-rjhp-pxvc",
+          "modified": "2026-08-12T16:41:04.343426Z"
+        },
+        {
+          "id": "GHSA-p8qj-fj6r-w7q9",
+          "modified": "2026-08-12T16:41:04.276553Z"
+        }
+      ]
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework.amqp:spring-rabbit",
+      "version": "3.2.8",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework.boot:spring-boot",
+      "version": "3.5.8",
+      "vulnerabilities": [
+        {
+          "id": "GHSA-wwpq-f5c3-7hvx",
+          "modified": "2026-09-10T03:51:04.035674Z"
+        }
+      ]
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework.boot:spring-boot-actuator",
+      "version": "3.5.8",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework.boot:spring-boot-actuator-autoconfigure",
+      "version": "3.5.8",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework.boot:spring-boot-autoconfigure",
+      "version": "3.5.8",
+      "vulnerabilities": [
+        {
+          "id": "GHSA-ggg2-9786-hwc8",
+          "modified": "2026-09-10T03:51:08.972811Z"
+        }
+      ]
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework.boot:spring-boot-starter",
+      "version": "3.5.8",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework.boot:spring-boot-starter-actuator",
+      "version": "3.5.8",
+      "vulnerabilities": [
+        {
+          "id": "GHSA-8hfc-fq58-r658",
+          "modified": "2026-09-10T03:50:38.468261Z"
+        },
+        {
+          "id": "GHSA-mgvc-8q2h-5pgc",
+          "modified": "2026-09-10T03:50:40.101209Z"
+        }
+      ]
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework.boot:spring-boot-starter-amqp",
+      "version": "3.5.8",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework.boot:spring-boot-starter-data-redis",
+      "version": "3.5.8",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework.boot:spring-boot-starter-jdbc",
+      "version": "3.5.8",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework.boot:spring-boot-starter-json",
+      "version": "3.5.8",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework.boot:spring-boot-starter-logging",
+      "version": "3.5.8",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework.boot:spring-boot-starter-test",
+      "version": "3.5.8",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework.boot:spring-boot-starter-tomcat",
+      "version": "3.5.8",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework.boot:spring-boot-starter-validation",
+      "version": "3.5.8",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework.boot:spring-boot-starter-web",
+      "version": "3.5.8",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework.boot:spring-boot-test",
+      "version": "3.5.8",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework.boot:spring-boot-test-autoconfigure",
+      "version": "3.5.8",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework.boot:spring-boot-testcontainers",
+      "version": "3.5.8",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework.data:spring-data-commons",
+      "version": "3.5.6",
+      "vulnerabilities": [
+        {
+          "id": "GHSA-5m4m-73w9-8433",
+          "modified": "2026-09-10T03:51:08.050596Z"
+        },
+        {
+          "id": "GHSA-5vpf-xvv7-c8vh",
+          "modified": "2026-09-10T03:51:08.062104Z"
+        },
+        {
+          "id": "GHSA-88fw-v6x4-3f58",
+          "modified": "2026-09-10T03:51:11.064911Z"
+        },
+        {
+          "id": "GHSA-9fw2-h3hf-293r",
+          "modified": "2026-09-10T03:50:49.419423Z"
+        }
+      ]
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework.data:spring-data-keyvalue",
+      "version": "3.5.6",
+      "vulnerabilities": [
+        {
+          "id": "GHSA-xg2j-3hj6-pc24",
+          "modified": "2026-09-10T03:50:12.497826Z"
+        }
+      ]
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework.data:spring-data-redis",
+      "version": "3.5.6",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework.retry:spring-retry",
+      "version": "2.0.12",
+      "vulnerabilities": [
+        {
+          "id": "GHSA-2827-2mxx-j8pv",
+          "modified": "2026-07-29T18:41:44.617631Z"
+        }
+      ]
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework:spring-aop",
+      "version": "6.2.14",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework:spring-beans",
+      "version": "6.2.14",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework:spring-context",
+      "version": "6.2.14",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework:spring-context-support",
+      "version": "6.2.14",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework:spring-core",
+      "version": "6.2.14",
+      "vulnerabilities": [
+        {
+          "id": "GHSA-659m-px2c-25wj",
+          "modified": "2026-09-10T03:50:48.636887Z"
+        }
+      ]
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework:spring-expression",
+      "version": "6.2.14",
+      "vulnerabilities": [
+        {
+          "id": "GHSA-9f52-rjqv-25qv",
+          "modified": "2026-09-10T03:50:49.325466Z"
+        },
+        {
+          "id": "GHSA-r5w3-xv2f-j59q",
+          "modified": "2026-09-10T03:50:50.592219Z"
+        },
+        {
+          "id": "GHSA-wxpp-56q6-5pcg",
+          "modified": "2026-09-10T03:50:51.051005Z"
+        }
+      ]
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework:spring-jcl",
+      "version": "6.2.14",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework:spring-jdbc",
+      "version": "6.2.14",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework:spring-messaging",
+      "version": "6.2.14",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework:spring-oxm",
+      "version": "6.2.14",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework:spring-test",
+      "version": "6.2.14",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework:spring-tx",
+      "version": "6.2.14",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework:spring-web",
+      "version": "6.2.14",
+      "vulnerabilities": [
+        {
+          "id": "GHSA-7m2p-62gw-p8qq",
+          "modified": "2026-08-06T19:41:01.624958Z"
+        }
+      ]
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.springframework:spring-webmvc",
+      "version": "6.2.14",
+      "vulnerabilities": [
+        {
+          "id": "GHSA-3chg-m5w7-qfv5",
+          "modified": "2026-09-10T03:50:55.485813Z"
+        },
+        {
+          "id": "GHSA-4773-3jfm-qmx3",
+          "modified": "2026-09-10T03:50:37.345211Z"
+        },
+        {
+          "id": "GHSA-6hcq-hmm3-jj3c",
+          "modified": "2026-09-10T03:51:00.075344Z"
+        },
+        {
+          "id": "GHSA-6p4f-wcwh-5vvm",
+          "modified": "2026-09-10T03:50:43.783544Z"
+        },
+        {
+          "id": "GHSA-72pg-x5f8-j25j",
+          "modified": "2026-09-10T03:50:49.015129Z"
+        },
+        {
+          "id": "GHSA-957g-f97v-vppc",
+          "modified": "2026-09-10T03:50:49.221153Z"
+        },
+        {
+          "id": "GHSA-cjpg-rgq5-fr37",
+          "modified": "2026-09-10T03:51:08.751198Z"
+        },
+        {
+          "id": "GHSA-h3qp-gqrc-q736",
+          "modified": "2026-09-10T03:50:49.910720Z"
+        },
+        {
+          "id": "GHSA-j9f9-w8pj-32f8",
+          "modified": "2026-10-07T13:30:04.802772Z"
+        },
+        {
+          "id": "GHSA-mq64-j8f9-9gcj",
+          "modified": "2026-09-10T03:51:09.434155Z"
+        },
+        {
+          "id": "GHSA-pc63-qcmh-9cmg",
+          "modified": "2026-10-05T23:30:04.884745Z"
+        },
+        {
+          "id": "GHSA-wg35-8jpf-2xv3",
+          "modified": "2026-09-10T03:51:04.065980Z"
+        },
+        {
+          "id": "GHSA-x23c-287f-qqv5",
+          "modified": "2026-09-10T03:50:51.456648Z"
+        }
+      ]
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.testcontainers:database-commons",
+      "version": "1.21.4",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.testcontainers:jdbc",
+      "version": "1.21.4",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.testcontainers:junit-jupiter",
+      "version": "1.21.4",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.testcontainers:mysql",
+      "version": "1.21.4",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.testcontainers:rabbitmq",
+      "version": "1.21.4",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.testcontainers:testcontainers",
+      "version": "1.21.4",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.webjars:swagger-ui",
+      "version": "5.21.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.webjars:webjars-locator-lite",
+      "version": "1.1.2",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.xmlunit:xmlunit-core",
+      "version": "2.10.4",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "org.yaml:snakeyaml",
+      "version": "2.4",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "Maven",
+      "name": "redis.clients.authentication:redis-authx-core",
+      "version": "0.1.1-beta2",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "annotated-types",
+      "version": "0.8.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "anyio",
+      "version": "4.16.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "attrs",
+      "version": "26.1.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "certifi",
+      "version": "2026.10.23",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "cffi",
+      "version": "2.1.1",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "charset-normalizer",
+      "version": "3.5.2",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "click",
+      "version": "8.5.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "colorama",
+      "version": "0.4.6",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "cryptography",
+      "version": "50.0.2",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "distro",
+      "version": "1.9.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "h11",
+      "version": "0.16.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "httpcore",
+      "version": "1.0.9",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "httpcore2",
+      "version": "2.16.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "httpx",
+      "version": "0.28.1",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "httpx-sse",
+      "version": "0.4.3",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "httpx2",
+      "version": "2.16.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "httpx2-jsfetch",
+      "version": "1.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "idna",
+      "version": "3.20",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "iniconfig",
+      "version": "2.3.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "iniconfig",
+      "version": "2.3.1",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "jsonpatch",
+      "version": "1.38",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "jsonpointer",
+      "version": "3.6",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "jsonschema",
+      "version": "4.26.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "jsonschema-specifications",
+      "version": "2025.9.1",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "langchain-core",
+      "version": "1.7.3",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "langchain-protocol",
+      "version": "0.0.20",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "langgraph",
+      "version": "1.2.19",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "langgraph-checkpoint",
+      "version": "4.3.1",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "langgraph-prebuilt",
+      "version": "1.1.1",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "langgraph-sdk",
+      "version": "0.4.11",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "langsmith",
+      "version": "0.14.16",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "mcp",
+      "version": "1.30.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "numpy",
+      "version": "2.5.2",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "orjson",
+      "version": "3.13.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "ormsgpack",
+      "version": "1.13.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "packaging",
+      "version": "26.3",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "pandas",
+      "version": "2.3.3",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "pluggy",
+      "version": "1.6.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "pluggy",
+      "version": "1.7.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "pycparser",
+      "version": "3.12",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "pydantic",
+      "version": "2.13.4",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "pydantic",
+      "version": "2.14.2",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "pydantic-core",
+      "version": "2.46.4",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "pydantic-core",
+      "version": "2.50.2",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "pydantic-settings",
+      "version": "2.16.2",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "pygments",
+      "version": "2.21.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "pyjwt",
+      "version": "2.15.1",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "pytest",
+      "version": "9.2.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "python-dateutil",
+      "version": "2.9.0.post0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "python-dotenv",
+      "version": "1.2.4",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "python-multipart",
+      "version": "0.0.33",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "pytz",
+      "version": "2026.3.post1",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "pywin32",
+      "version": "312",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "pyyaml",
+      "version": "6.0.3",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "referencing",
+      "version": "0.37.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "requests",
+      "version": "2.34.2",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "requests-toolbelt",
+      "version": "1.0.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "rpds-py",
+      "version": "2026.9.1",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "six",
+      "version": "1.17.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "sniffio",
+      "version": "1.3.1",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "sse-starlette",
+      "version": "3.6.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "starlette",
+      "version": "1.10.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "tenacity",
+      "version": "9.2.1",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "truststore",
+      "version": "0.10.5",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "typing-extensions",
+      "version": "4.16.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "typing-inspection",
+      "version": "0.4.4",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "tzdata",
+      "version": "2026.3",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "urllib3",
+      "version": "2.8.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "uuid-utils",
+      "version": "0.19.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "uvicorn",
+      "version": "0.54.0",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "websockets",
+      "version": "17.4",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "xxhash",
+      "version": "4.0.2",
+      "vulnerabilities": []
+    },
+    {
+      "ecosystem": "PyPI",
+      "name": "zstandard",
+      "version": "0.25.0",
+      "vulnerabilities": []
+    }
+  ]
+}

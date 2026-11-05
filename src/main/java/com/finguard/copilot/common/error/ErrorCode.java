@@ -22,7 +22,13 @@ public enum ErrorCode {
     ANALYSIS_RETRY_EXHAUSTED("Analysis retries were exhausted"),
     ANALYSIS_WORKER_FAILED("Analysis worker failed"),
     SERVICE_UNAVAILABLE("Service unavailable"),
-    INTERNAL_ERROR("Internal server error");
+    INTERNAL_ERROR("Internal server error"),
+    CONTEXT_STALE("Captured context changed or expired"),
+    WAIT_EXPIRED("Human review wait expired"),
+    ANALYSIS_CANCELLED("Analysis cancelled"),
+    AGENT_CHECKPOINT_INVALID("Agent checkpoint invalid"),
+    AGENT_STEP_UNCERTAIN("Agent step outcome uncertain"),
+    TOOL_OUTCOME_UNKNOWN("Tool outcome unknown");
 
     private final String title;
 

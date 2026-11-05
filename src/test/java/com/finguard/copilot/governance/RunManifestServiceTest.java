@@ -19,6 +19,31 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 class RunManifestServiceTest {
+    @Test void activeRetrievalConfigurationIsFrozenAsContentBoundArtifact() throws Exception {
+        service("CNY","2","price-v1");
+        var model=new CopilotProperties.Model("deepseek","deepseek-flash",URI.create("https://api.deepseek.com"),
+            new SecretValue("test-only"),"/chat/completions",32000,2000,Duration.ofSeconds(20),"price-v1","CNY",new BigDecimal("2"),new BigDecimal("8"));
+        var props=new CopilotProperties(null,new CopilotProperties.Embedding(8),new CopilotProperties.Retrieval(1),null,null,
+            model,new CopilotProperties.Prompt("review-analysis-v2"),CopilotProperties.Budget.defaults());
+        var descriptor=new HashMap<String,Object>(Map.of("mode","single-source-margin-v1","minimumScore",.8,"minimumMargin",.02,"candidateTopK",2,"topK",1));
+        RunManifestService active;
+        try {
+            active=RunManifestService.class.getConstructor(VersionedArtifactStore.class,KnowledgeIndexRepository.class,CopilotProperties.class,
+                NumericGuardProperties.class,ReviewedPolicyProperties.class,String.class,GovernanceProperties.class,Clock.class,CallAdmission.class,
+                com.finguard.copilot.knowledge.port.EmbeddingGateway.class,Map.class)
+                .newInstance(store,indexes,props,new NumericGuardProperties(List.of()),new ReviewedPolicyProperties(List.of()),"fixed-v1",
+                    GovernanceProperties.defaults(),Clock.fixed(at,ZoneOffset.UTC),null,null,descriptor);
+        } catch(NoSuchMethodException e) {throw new AssertionError("retrieval manifest contract missing",e);}
+        descriptor.put("minimumMargin",.5);
+        active.prepare(id,snapshot(),request("x"),List.of(),"idx-1");
+        var manifest=ArgumentCaptor.forClass(ObjectNode.class);
+        @SuppressWarnings("unchecked") ArgumentCaptor<List<VersionedArtifactStore.Artifact>> artifacts=ArgumentCaptor.forClass(List.class);
+        verify(store).freeze(eq(id),manifest.capture(),artifacts.capture());
+        var artifact=artifacts.getValue().stream().filter(a->a.kind().equals("retrieval")).findFirst().orElseThrow();
+        assertThat(artifact.content().path("minimumMargin").asDouble()).isEqualTo(.02);
+        assertThat(manifest.getValue().path("retrieval").path("sha256").asText()).isEqualTo(CanonicalJson.hash(artifact.content()));
+        assertThat(artifact.version()).isEqualTo("retrieval-"+CanonicalJson.hash(artifact.content()));
+    }
     final UUID id=UUID.randomUUID();
     final Instant at=Instant.parse("2026-11-02T06:00:00Z");
     final VersionedArtifactStore store=mock(VersionedArtifactStore.class);
@@ -69,6 +94,21 @@ class RunManifestServiceTest {
         assertThat(manifest.path("index").path("version").asText()).isEqualTo("idx-1");
         assertThat(manifest.path("price").path("currency").asText()).isEqualTo("CNY");
         assertThat(manifest.path("inputUpperBound").asInt()).isGreaterThan(resourceSchema().length());
+        assertThat(manifest.has("retrieval")).isFalse();
+    }
+    @Test void semanticManifestIdentifiesActualModelArtifactsInsteadOfFixedVectors() {
+        service("CNY","2","price-v1"); // initialize published membership
+        var model=new CopilotProperties.Model("deepseek","deepseek-flash",URI.create("https://api.deepseek.com"),
+            new SecretValue("test-only"),"/chat/completions",32000,2000,Duration.ofSeconds(20),"price-v1","CNY",new BigDecimal("2"),new BigDecimal("8"));
+        var props=new CopilotProperties(null,new CopilotProperties.Embedding(384),new CopilotProperties.Retrieval(5),null,null,
+            model,new CopilotProperties.Prompt("review-analysis-v2"),CopilotProperties.Budget.defaults());
+        var embedding=new com.finguard.copilot.knowledge.embedding.LoopbackSemanticEmbeddingGateway(URI.create("http://127.0.0.1:8766"),"e5-test","a".repeat(64),384,Duration.ofSeconds(2));
+        var service=new RunManifestService(store,indexes,props,new NumericGuardProperties(List.of()),new ReviewedPolicyProperties(List.of()),
+            "e5-test",GovernanceProperties.defaults(),Clock.fixed(at,ZoneOffset.UTC),null,embedding);
+        service.prepare(id,snapshot(),request("context"),List.of(),"idx-1");
+        var artifacts=ArgumentCaptor.forClass(List.class);verify(store).freeze(eq(id),any(),artifacts.capture());
+        var serialized=CanonicalJson.encode(artifacts.getValue());
+        assertThat(serialized).contains("LoopbackSemanticEmbeddingGateway","artifactManifestSha256","a".repeat(64)).doesNotContain("FixedEmbeddingGateway");
     }
     @Test void rejectsUnpricedZeroOrWrongCurrencyBeforeFreezing() {
         for(var config:List.of(List.of("CNY","0","price-v1"),List.of("USD","2","price-v1"),List.of("CNY","2","e2e-unpriced-v1"))) {

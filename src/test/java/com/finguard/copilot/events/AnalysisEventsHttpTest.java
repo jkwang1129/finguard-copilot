@@ -17,6 +17,22 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 class AnalysisEventsHttpTest {
+    @Test void structuredEventDataCannotInjectSseFramingOrBecomeAViewFragment() throws Exception {
+        var id=UUID.randomUUID();var access=mock(GetAnalysisService.class);var events=mock(AnalysisEventRepository.class);
+        when(access.authorize(id,"token")).thenReturn(new GetAnalysisService.AuthorizedAnalysis("reviewer",new AnalysisView(id,AnalysisStatus.FAILED,"CONTROLLED",null)));
+        when(events.head(id)).thenReturn(1L);
+        var event=new AnalysisEventRepository.Event(id,"1","STATE_CHANGED",AnalysisStatus.FAILED,"<xsl:stylesheet>\r\nevent:forged\r\nid:999",false,Instant.now());
+        when(events.after(eq(id),anyLong(),eq(64))).thenReturn(List.of(event));
+        try(var streams=new AnalysisEventStream(access,events,new AnalysisWakeups(),Duration.ofSeconds(2),Duration.ofMillis(10))){
+            var mvc=MockMvcBuilders.standaloneSetup(new AnalysisEventsController(streams)).build();
+            var request=mvc.perform(get("/api/copilot/review-analyses/{id}/events",id).header("Authorization","Bearer token")).andReturn();
+            request.getAsyncResult(3000);
+            String body=mvc.perform(asyncDispatch(request)).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+            assertThat(body.lines().filter(line->line.startsWith("event:")).toList()).containsExactly("event:analysis-state");
+            assertThat(body.lines().filter(line->line.startsWith("id:")).toList()).containsExactly("id:1");
+            assertThat(body).contains("\\r\\nevent:forged","data:{");
+        }
+    }
     @Test void authorizationFailureAfterOpeningSendsOnlyControlledError() throws Exception {
         var id=UUID.randomUUID();var access=mock(GetAnalysisService.class);var events=mock(AnalysisEventRepository.class);
         when(access.authorize(id,"token")).thenReturn(new GetAnalysisService.AuthorizedAnalysis("reviewer",new AnalysisView(id,AnalysisStatus.GENERATING,null,null)))

@@ -1,0 +1,12 @@
+{"case_id":"NQ-001","scenario":"tool","tools":["get_task_state"],"amount":"100.00","account":"Synthetic"}
+{"case_id":"NQ-002","scenario":"tool","tools":["get_review_facts"],"amount":"100.00","account":"Synthetic"}
+{"case_id":"NQ-003","scenario":"tool","tools":["search_review_policy"],"amount":"100.00","account":"Synthetic"}
+{"case_id":"NQ-004","scenario":"direct","tools":[],"amount":"100.00","account":"Synthetic"}
+{"case_id":"NQ-005","scenario":"runner","tools":[],"amount":"100.00","account":"Synthetic"}
+{"case_id":"NQ-006","scenario":"runner","tools":[],"amount":"100.123456789012345678","account":"Synthetic precision"}
+{"case_id":"NQ-007","scenario":"tool","tools":["get_task_state","get_review_facts"],"amount":"100.00","account":"Synthetic"}
+{"case_id":"NQ-008","scenario":"tool","tools":["get_review_facts"],"amount":"100.00","account":"合成账户 Synthetic Unicode"}
+{"case_id":"NQ-009","scenario":"reject_model","tools":[],"amount":"100.00","account":"Synthetic"}
+{"case_id":"NQ-010","scenario":"reject_unicode","tools":[],"amount":"100.00","account":"Synthetic"}
+{"case_id":"NQ-011","scenario":"reject_context","tools":[],"amount":"100.00","account":"Synthetic"}
+{"case_id":"NQ-012","scenario":"reject_budget","tools":[],"amount":"100.00","account":"Synthetic"}

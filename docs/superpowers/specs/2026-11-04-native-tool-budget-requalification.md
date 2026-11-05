@@ -1,0 +1,11 @@
+# Native tool budget communication and independent requalification
+
+User requested: 修正模型对剩余工具额度的理解，另设复验批次。 Existing paid-call authorization and inline execution remain applicable; no commit/push/deployment. This implements the previously proposed correction without another approval loop.
+
+Root cause: RETRIEVE consumes one or two of four total tool slots. PLAN checks the remaining slots only after a model response; its prompt never reports that retrieval has already consumed slots. NQ-006 requested more than two remaining tools and failed safely. Raising caps or silently trimming the batch would weaken the contract.
+
+Use a new agent-review-v2 static prompt and a server-generated EXECUTION_BUDGET object before CORE_FACTS in the user message. Derive total=4, used and remaining from durable AgentWorkingState, plus maxToolCallsThisTurn=remaining only during PLAN and0 for GENERATE/REPAIR. Explain that automatic policy retrieval/retries count, existing facts need no duplicate read and empty evidence need not trigger another identical search. The second model turn must produce a final result, even if some analysis slots remain. Keep prompt identity constant across the two model calls and freeze actual message/policy hashes as before. Persisted state, not counters in model prose, determines limits. Keep every existing hard guard and default-deny flag.
+
+Keep v1 prompt, original12-case data, proposal/report and one-time lock. Create a separate RQ-001..012 dataset with the same scenarios/amounts/tools and source-case mapping, a new proposal, batch, SQL database, output and exclusive lock. Limits remain12 cases/24 requests/0.10CNY per call/2.00CNY batch, no automatic retries. RQ-005/006 exercise the real runner. Record request tool quotas and actual chosen tool counts, sanitized outcomes, exact usage and estimates. A full12/12 pass qualifies only this synthetic component protocol, not production/human quality.
+
+Before paid calls: RED→GREEN quota/restart/repair/oversized-tool-plan tests, pack identity/old-batch refusal checks, focused Graph/native HTTP tests, one fresh read-only review and full Java regression. Freeze all touched executable sources, v2 prompt and both schemas in the new manifest; verify the still-valid reviewed provider price. Stop on any unknown billing state. Retain both outcomes regardless of success.

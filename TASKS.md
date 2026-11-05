@@ -3,9 +3,17 @@
 本清单由 [实施路线图](docs/ROADMAP.md) 展开。勾选任务前必须保留对应测试、运行或文档
 证据；阶段未通过验收时不提前宣称后续能力完成。
 
-## 当前交接状态（2026-11-02）
+## 当前交接状态（2026-11-05）
 
-P4-1 已实现护栏与 P4-2 工程能力可以作为 P4-3 的开发基线；P4-2 已按用户指定的 AI 模拟方式完成[校准交付](docs/acceptance/2026-11-02-p4-2-simulated-calibration-closeout.md)，原计划的真实人工标签条件保留为后续质量门槛，未用模拟结果勾选。三项短收尾的版本快照、最新进程冒烟及调用/费用契约见 [P4-3 入口收尾](docs/acceptance/2026-11-02-p4-3-entry-closeout.md)。以下历史记录保留当时结果，当前状态以本段及细分勾选项为准。
+最新限定验证已完成：真人/Judge10/10；主模型新批次11/11、真实进程36/36；新RAG独立32题达到预设门槛（召回22/24、精度22/24、拒答6/8）。见[完整验收](docs/acceptance/2026-11-05-semantic-margin-quality.md)。默认配置未改，项目合成范围不等于生产或通用Agent质量。
+
+### 11月4日交接快照（历史）
+
+Phase5本地工程及原生协议资格已完成限定范围验证；依赖维护和资格复验见相应11月4日报告。真人10例与真实Judge一致10/10，已关闭该抽样校准项。新增真实语义RAG保留集召回7/12、精度7/8未达标，实际主模型组件质量4/11通过；付费配置完整进程在调用前因日期格式错误启动失败（已修复、未付费重跑）。后续离线确认政策分号触发注入防护误报，已最小修复并通过74项定向回归，[新复验准备](docs/acceptance/2026-11-04-semantic-policy-guard-fix.md)单独记录，旧成绩未改写，尚未以新代码付费复验。详见[真人校准](docs/acceptance/2026-11-04-human-judge-calibration.md)及[真实RAG/主模型质量](docs/acceptance/2026-11-04-real-rag-main-quality.md)。质量门槛仍未通过，不能据此宣称Phase6生产部署就绪。
+
+### 历史交接快照（2026-11-02）
+
+P4-1 已实现护栏与 P4-2 工程能力可以作为 P4-3 的开发基线；P4-2 已按用户指定的 AI 模拟方式完成[校准交付](docs/acceptance/2026-11-02-p4-2-simulated-calibration-closeout.md)，当时真实人工标签条件保留为后续质量门槛，未用模拟结果勾选。三项短收尾的版本快照、当时进程冒烟及调用/费用契约见 [P4-3 入口收尾](docs/acceptance/2026-11-02-p4-3-entry-closeout.md)。下表保留历史结果，当前状态以上方11月4日说明及细分勾选项为准。
 
 | 阶段 | 已有工程证据 | 仍需完善及归属 |
 | --- | --- | --- |
@@ -101,10 +109,10 @@ Java 265 项、Python 100 项及前端 lint/测试/构建通过；Phase 3 工程
 - [x] 实现 Prompt、模型配置、索引成员及价格表不可变版本与内容哈希管理（V9；不冒充远端权重哈希）。
 - [x] 建立 Python 3.12、uv、pytest、Pydantic 和 Pandas 评测工具。
 - [x] 建立共享案例/输出契约的 LangGraph 离线参考基线，并与 Java Worker 同批比较（原16例及独立24例；参考两项漏报保留，不是生产执行路径）。
-- [ ] 引入模型工具时补共享 Tool Schema 对照（Phase 5；当前无模型工具执行能力）。
+- [x] Phase5补共享Tool Schema对照：Java/native/MCP同源资源，26例离线LangGraph对照与原生协议回归；不替代真实模型质量。
 - [x] 实现规则评测、版本化 LLM-as-Judge、校准计算和报告；真实 DeepSeek Judge 已运行固定10例。
 - [x] 按用户指定方式完成 10 例 AI 模拟审核填写、逐例理由及冻结 Judge 结果复算（[收尾记录](docs/acceptance/2026-11-02-p4-2-simulated-calibration-closeout.md)；与真实人工校准分开记录）。
-- [ ] 取得真实人工标签并完成 Judge 抽样校准（AI 模拟标签不替代此项）。
+- [x] 取得真实人工标签并完成 Judge 抽样校准：2026-11-04本项目用户提交10个标签，新冻结样本/真实Judge批次一致10/10，0缺失；只覆盖项目合成政策，不认证金融专家或生产质量。见[真人标签来源](docs/evaluations/phase4-human-label-provenance-20261104.json)和[实际校准](docs/evaluations/phase4-human-calibration-20261104-v1.json)。原AI模拟记录及历史Judge保留。
 - [x] 实现 Bad Case 分类、已知坏案例回归及独立新集复验（Java16/16、24/24）。
 - [ ] 实现 Agent Trace 及真实审核反馈到回归集的完整闭环（Trace 在 P4-4、页面反馈在 P4-5）。
 - [x] 将合成 H03 数值边界纳入已知回归，增加确定性数值兜底及受控建议枚举诊断；另冻结独立新集（不声称重放了未保存的历史真实输出）。
@@ -118,7 +126,7 @@ Java 265 项、Python 100 项及前端 lint/测试/构建通过；Phase 3 工程
 - [x] 完成列明的受控输入/恶意文档注入与多条件/冲突政策回归（固定案例范围；检测仍可能漏报未知变体）。
 - [ ] 新增公共自由审核文本时补 API 全链路注入验收；当前仅有组件输入路径。
 - [x] 完成现有权限、知识准入 URL/秘密及模型工具调用响应拒绝测试（非全面渗透测试）。
-- [ ] Phase 5 开放工具执行时补工具参数、URL、权限和副作用治理验收。
+- [x] Phase5补工具参数、URL、权限、共享槽与只读副作用治理验收，见[P5-1](docs/acceptance/2026-11-03-p5-1-readonly-tools.md)及[P5-5](docs/acceptance/2026-11-03-p5-5-local-mcp.md)。
 - [x] 处理 2026-10-22 提交前 npm audit 发现的 5 项前端开发工具链告警（3 high、2 moderate）并复测；[2026-10-27 验收记录](docs/acceptance/2026-10-27-phase4-first-batch.md)。
 - [x] 接入 OpenTelemetry、Langfuse、Prometheus 和 Grafana（本地实例与业务替身链路已运行，见P4-4记录）。
 - [x] 在P4-4统一已验证用量、未知费用、未发送占用和供应商调用尝试的Trace/指标口径（账本为真相，采样快照注明新鲜度）。
@@ -131,18 +139,27 @@ Java 265 项、Python 100 项及前端 lint/测试/构建通过；Phase 3 工程
 
 ## 阶段 5：Agent Workflow 与 Tool Use
 
-- [ ] 将多个只读 Core 查询建模为服务器确定性工具。
-- [ ] 定义模型可选工具白名单及参数 Schema。
-- [ ] 实现权限、参数、次数和预算的服务器端强制校验。
-- [ ] 在真实分支需求出现后实现 Graph 状态流。
-- [ ] 实现 HITL 暂停、恢复和过期处理。
-- [ ] 实现运行级 Working Memory 和持久化 Checkpoint。
-- [ ] 将已验证只读工具暴露为 MCP Server。
-- [ ] 实现工具结果回查、审计和评测。
-- [ ] 实现 Agent Trace 回放和消息重投幂等验证。
-- [ ] 验证模型无法注册、构造或调用任意工具。
+2026-11-03 P5-1～P5-6本地工程实现与总验收已完成，见[工具基础](docs/acceptance/2026-11-03-p5-1-readonly-tools.md)、[预算](docs/acceptance/2026-11-03-p5-2-call-budget.md)、[原生协议](docs/acceptance/2026-11-03-p5-3-native-tool-calling.md)、[Graph/HITL](docs/acceptance/2026-11-03-p5-4-durable-graph.md)与[本地MCP](docs/acceptance/2026-11-03-p5-5-local-mcp.md)。[总验收](docs/acceptance/2026-11-03-phase5-final-acceptance.md)：Java535/Python187/MCP桥4/前端18及lint/build、26例两端一致、最终制品87项进程检查通过，独立复核3项Important已修复；真实native供应商资格、明确费用授权及既有质量/依赖门槛继续单列。
+
+- [x] 将多个只读 Core 查询建模为服务器确定性能力并建立快照只读工具。
+- [x] 定义模型可选工具白名单及参数 Schema。
+- [x] 实现权限、参数、次数和预算的服务器端强制校验。
+- [x] 实现真实条件Graph：检索补查、原生工具选择、一次格式修复、人工门槛与失败。
+- [x] 实现 HITL 暂停、恢复、取消和过期处理。
+- [x] 实现运行级 Working Memory 和MySQL持久化Checkpoint/CAS/owner恢复。
+- [x] 将已验证只读工具暴露为本地STDIO MCP，短期capability与Graph共用四槽。
+- [x] 实现工具结果回查、审计和26例共享契约评测（替身/离线边界）。
+- [x] 实现授权Agent Trace回放、来源清理和消息重投幂等验证。
+- [x] 验证模型只能选择三种固定工具，不能注册工具或指定任意URL/资源身份。
+- [x] P5-6最终完整套件、新制品复验与独立代码复核。
+- [x] 独立原生输入上界、短期价格冻结与用户授权的真实模型批次已执行：14次请求、11/12通过、估算0.08109CNY、未知持有0；[真实验证记录](docs/acceptance/2026-11-04-native-provider-qualification.md)。
+- [x] 真实native合成组件协议复验：额度提示修正后，新RQ批次12/12通过（8个有效输出、4个零HTTP准入负例），13次请求、估算0.089994CNY、未知持有0；原NQ006对应RQ006通过，完整JSON回读保持18位小数。仅关闭该合成协议范围，不代表人工/生产质量；[独立复验记录](docs/acceptance/2026-11-04-native-tool-budget-requalification.md)。旧11/12结果及锁保留，未自动重试。
+- [ ] 真实人工/模型质量及P4未关闭门槛：真人抽样校准已完成；旧RAG保留集失败保留；新独立RAG集及已知主模型业务/进程复验通过，生产与广泛Agent质量仍独立待验，不能用替身通过数替代（[11月4日测量](docs/acceptance/2026-11-04-real-rag-main-quality.md)）。
 
 ## 阶段 6：production-like 部署
+
+- [x] 既有24个Java公告匹配包完成兼容维护及当前应用适用性核查：23包命中消除；Spring WebMVC仍有2条原始版本命中，当前无触发视图路径；依赖快照全套539通过。
+- [ ] 将剩余2条MVC原始版本命中随适配平台升级消除；新增XSLT/视图片段功能前重新核查，不能将当前功能不适用判断当作上游已修复。
 
 - [ ] 创建 Java 服务和 React 页面所需的非 root、多阶段 Docker 镜像。
 - [ ] 创建隔离的开发和集成 Compose 环境。

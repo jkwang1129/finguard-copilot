@@ -182,14 +182,15 @@ public final class ModelAnalysisOrchestrator implements AnalysisOrchestrator {
         }
         if (response == null) {
             throw failure(ErrorCode.MODEL_OUTPUT_INVALID, modelConfigurationVersion, promptVersion,
-                    new ModelUsage(0, 0, elapsedSince(started)), "FAILURE");
+                    new ModelUsage(0, 0, elapsedSince(started)), "FAILURE", ModelValidationStage.OUTPUT_SCHEMA);
         }
 
+        ValidationProgress validation = new ValidationProgress();
         try {
             AnalysisResult result = telemetry.call(com.finguard.copilot.observability.AnalysisTelemetry.Stage.VALIDATION,()->{
                 AnalysisResult parsed=parser.parse(response.structuredContent());
                 if(!analysisId.equals(parsed.analysisId())) throw new CopilotException(ErrorCode.MODEL_OUTPUT_INVALID,"model output analysis id does not match request");
-                validatePolicy(snapshot,parsed,assembled);return parsed;
+                validatePolicy(snapshot,parsed,assembled,validation);return parsed;
             });
             if (!analysisId.equals(result.analysisId())) {
                 throw new CopilotException(ErrorCode.MODEL_OUTPUT_INVALID,
@@ -200,7 +201,7 @@ public final class ModelAnalysisOrchestrator implements AnalysisOrchestrator {
         } catch (CopilotException exception) {
             LOG.warn("Model result rejected: code={}", exception.code());
             throw failure(exception.code(), modelConfigurationVersion, promptVersion,
-                    response.usage(), "FAILURE");
+                    response.usage(), "FAILURE", validation.stage);
         }
     }
 
@@ -215,21 +216,46 @@ public final class ModelAnalysisOrchestrator implements AnalysisOrchestrator {
         validatePolicy(snapshot,result,assembled);
     }
 
+    /** Agent uses the same final policy authority against its explicitly retained, pinned evidence. */
+    public AnalysisResult validateAgentCandidate(UUID id,FactSnapshot snapshot,String content,List<KnowledgeEvidence> evidence) {
+        AnalysisResult result=parser.parseForAgent(content);
+        new com.finguard.copilot.guardrail.FactConsistencyValidator().validate(id,snapshot,result);
+        var assembled=contextAssembler.assembleRetrieved(snapshot.facts(),evidence,defaultReviewerInput(snapshot));
+        validatePolicy(snapshot,result,assembled);
+        return result;
+    }
+
     private void validatePolicy(FactSnapshot snapshot,AnalysisResult result,ContextAssembler.AssembledContext assembled) {
+        validatePolicy(snapshot,result,assembled,new ValidationProgress());
+    }
+
+    private void validatePolicy(FactSnapshot snapshot,AnalysisResult result,ContextAssembler.AssembledContext assembled,
+                                ValidationProgress validation) {
+        validation.stage=ModelValidationStage.CITATION;
         validateKnowledgeCitations(result,assembled);
+        validation.stage=ModelValidationStage.UNTRUSTED_INSTRUCTION;
         new UntrustedInstructionGuard().validate(assembled.sections().get("reviewerInput"),assembled.retainedEvidence(),result.recommendation());
+        validation.stage=ModelValidationStage.CORE_FACTS;
         new CoreLargeAmountFactGuard().validate(snapshot.facts(),result.recommendation());
+        validation.stage=ModelValidationStage.CORE_POLICY;
         new CoreLargeAmountPolicyGuard().validate(snapshot.facts(),result,assembled.retainedEvidence());
         if(result.recommendation()==AnalysisRecommendation.INSUFFICIENT_EVIDENCE) return;
+        validation.stage=ModelValidationStage.REVIEWED_POLICY;
         String rule=snapshot.facts().reviewTask().ruleCode();
         if(rule==null) throw new CopilotException(ErrorCode.FACT_VALIDATION_FAILED,"directional output requires a reviewed rule");
         if("LARGE_AMOUNT".equals(rule)) {
+            validation.stage=ModelValidationStage.CORE_POLICY;
             if(assembled.retainedEvidence().size()!=1) throw new CopilotException(ErrorCode.FACT_VALIDATION_FAILED,"unreviewed additional Core policy evidence");
         } else if(numericThresholdGuard.ruleCodes().contains(rule)) {
             numericThresholdGuard.validate(snapshot.facts(),result,assembled.retainedEvidence());
         } else {
             reviewedPolicyGuard.validate(snapshot.facts(),result,assembled.retainedEvidence());
         }
+    }
+
+    /** Per-execution state survives the telemetry lambda without retaining a candidate or exception. */
+    private static final class ValidationProgress {
+        private ModelValidationStage stage=ModelValidationStage.OUTPUT_SCHEMA;
     }
 
     private ModelInvocationException failure(
@@ -239,8 +265,19 @@ public final class ModelAnalysisOrchestrator implements AnalysisOrchestrator {
             ModelUsage usage,
             String outcome
     ) {
+        return failure(code, modelConfigurationVersion, promptVersion, usage, outcome, ModelValidationStage.UNKNOWN);
+    }
+
+    private ModelInvocationException failure(
+            ErrorCode code,
+            String modelConfigurationVersion,
+            String promptVersion,
+            ModelUsage usage,
+            String outcome,
+            ModelValidationStage validationStage
+    ) {
         return new ModelInvocationException(code, model.provider(), modelConfigurationVersion,
-                promptVersion, usage, outcome);
+                promptVersion, usage, outcome, validationStage);
     }
 
     private String renderContext(UUID analysisId, ContextAssembler.AssembledContext context) {

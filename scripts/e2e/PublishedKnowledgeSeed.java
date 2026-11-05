@@ -25,9 +25,15 @@ public class PublishedKnowledgeSeed {
         var mapper = new ObjectMapper();
         var documents = new JdbcKnowledgeDocumentRepository(jdbc, mapper);
         var indexes = new JdbcKnowledgeIndexRepository(jdbc);
-        var embedding = new FixedEmbeddingGateway(8);
+        boolean semantic="semantic".equals(System.getenv("COPILOT_EMBEDDING_MODE"));
+        int dimensions=semantic?384:8;
+        String embeddingVersion=semantic?System.getenv("COPILOT_EMBEDDING_VERSION"):"fixed-v1";
+        com.finguard.copilot.knowledge.port.EmbeddingGateway embedding=semantic?
+            new com.finguard.copilot.knowledge.embedding.LoopbackSemanticEmbeddingGateway(
+                URI.create(System.getenv("COPILOT_EMBEDDING_ENDPOINT")),embeddingVersion,System.getenv("COPILOT_EMBEDDING_MANIFEST_SHA256"),384,Duration.ofSeconds(10)):
+            new FixedEmbeddingGateway(8);
         var configuration = new QdrantConfiguration(URI.create(System.getenv("COPILOT_QDRANT_ENDPOINT")),
-                System.getenv("COPILOT_QDRANT_COLLECTION_PREFIX"), Duration.ofSeconds(2), Duration.ofSeconds(5), 8);
+                System.getenv("COPILOT_QDRANT_COLLECTION_PREFIX"), Duration.ofSeconds(2), Duration.ofSeconds(5), dimensions);
         var vectors = new QdrantVectorStore(new QdrantHttpClient(configuration, mapper), configuration.collectionPrefix());
         String version = System.getenv("E2E_INDEX_VERSION");
         String documentId = com.finguard.copilot.guardrail.CoreLargeAmountPolicyGuard.DOCUMENT_ID;
@@ -52,14 +58,14 @@ public class PublishedKnowledgeSeed {
                 KnowledgeSourceType.POLICY, "Isolated review policy", "v1", selectedPolicy)));
         var chunks = documents.findChunks(documentId, "v1");
         transactions.executeWithoutResult(status -> new KnowledgeIndexBuildService(embedding, vectors,
-                indexes, "fixed-v1", Instant::now).build(version, chunks));
+                indexes, embeddingVersion, Instant::now).build(version, chunks));
         var evaluation = new KnowledgeIndexEvaluationService(embedding, vectors, indexes,
-                "fixed-v1", "e2e-smoke-v1", 1, -1.0).evaluate(version, List.of(new RagCase(
+                embeddingVersion, "e2e-smoke-v1", 1, -1.0).evaluate(version, List.of(new RagCase(
                 "large-amount", "LARGE_AMOUNT AMOUNT_AT_OR_ABOVE_THRESHOLD",
                 List.of(chunks.get(0).chunkId()), documentId, "v1", List.of())));
         transactions.executeWithoutResult(status -> new KnowledgeIndexPublicationService(indexes,
                 new PublicationThresholds(1.0, 1.0, 1.0)).publish(version, evaluation));
-        var evidence = new KnowledgeRetrievalService(indexes, embedding, vectors, "fixed-v1", 1, -1.0,
+        var evidence = new KnowledgeRetrievalService(indexes, embedding, vectors, embeddingVersion, 1, -1.0,
                 documents).retrieve("LARGE_AMOUNT AMOUNT_AT_OR_ABOVE_THRESHOLD", 1);
         if (evidence.size() != 1 || !version.equals(evidence.get(0).citation().indexVersion())) {
             throw new IllegalStateException("Published evidence retrieval did not match the seeded index");
@@ -69,6 +75,6 @@ public class PublishedKnowledgeSeed {
                 "documentId", documentId, "chunkCount", chunks.size(),
                 "retrievedChunk", evidence.get(0).citation().chunkId(),
                 "recallAtK", evaluation.recallAtK(), "citationPrecision", evaluation.citationPrecision(),
-                "embeddingVersion", "fixed-v1", "scope", "synthetic smoke case, not semantic quality evaluation")));
+                "embeddingVersion", embeddingVersion, "scope", semantic?"pinned semantic embedding, single-document process smoke, not broad retrieval quality":"synthetic smoke case, not semantic quality evaluation")));
     }
 }

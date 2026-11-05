@@ -34,6 +34,14 @@ management:
 
 finguard:
   copilot:
+    agent:
+      enabled: ${COPILOT_AGENT_ENABLED:false}
+      runtime-enabled: ${COPILOT_AGENT_RUNTIME_ENABLED:false}
+      native-bound-version: ${COPILOT_AGENT_NATIVE_BOUND_VERSION:}
+      max-analysis-cny: ${COPILOT_AGENT_MAX_ANALYSIS_CNY:}
+      human-gate: ${COPILOT_AGENT_HUMAN_GATE:false}
+      fixture-fault-point: ${COPILOT_AGENT_FIXTURE_FAULT_POINT:}
+      fixture-probes: ${COPILOT_AGENT_FIXTURE_PROBES:false}
     events:
       redis-enabled: ${COPILOT_EVENTS_REDIS_ENABLED:false}
     telemetry:
@@ -84,6 +92,7 @@ finguard:
 
 logging:
   level:
+    com.alibaba.cloud.ai.graph: "OFF"
     io.opentelemetry.exporter: OFF
   pattern:
     level: "%5p [trace=%X{traceId:-} span=%X{spanId:-} analysis=%X{analysisId:-}]"

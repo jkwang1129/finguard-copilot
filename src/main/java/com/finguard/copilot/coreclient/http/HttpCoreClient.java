@@ -64,6 +64,18 @@ public final class HttpCoreClient implements CoreClient {
         }
     }
 
+    @Override
+    public com.finguard.copilot.coreclient.port.ReviewTaskState reviewTaskState(long reviewTaskId, String bearerToken) {
+        if (reviewTaskId < 1) throw invalidResponse("review task state");
+        var response = get("review task state", "/api/review-tasks/{reviewTaskId}", bearerToken,
+                CoreReviewTaskStateResponse.class, reviewTaskId);
+        try {
+            return response.toPort();
+        } catch (RuntimeException exception) {
+            throw invalidResponse("review task state");
+        }
+    }
+
     private <T> T get(String endpoint, String path, String bearerToken, Class<T> responseType, Object... uriVariables) {
         requireBearerToken(bearerToken);
         try {

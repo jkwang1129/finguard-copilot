@@ -20,6 +20,12 @@ public class AnalysisPageService {
     private final JdbcTemplate jdbc;
     private final AnalysisOutputSchemaValidator validator;
     private final ObjectMapper json=new ObjectMapper().enable(DeserializationFeature.USE_BIG_DECIMAL_FOR_FLOATS);
+    private com.finguard.copilot.agent.budget.AgentCallLedger agentLedger;
+    @org.springframework.beans.factory.annotation.Autowired(required=false)
+    public void setAgentLedger(com.finguard.copilot.agent.budget.AgentCallLedger value){this.agentLedger=value;}
+    private com.finguard.copilot.agent.graph.AgentTraceService agentTraces;
+    @org.springframework.beans.factory.annotation.Autowired(required=false)
+    public void setAgentTraces(com.finguard.copilot.agent.graph.AgentTraceService value){this.agentTraces=value;}
     public AnalysisPageService(GetAnalysisService access,JdbcTemplate jdbc,AnalysisOutputSchemaValidator validator) {
         this.access=access;this.jdbc=jdbc;this.validator=validator;
     }
@@ -28,7 +34,8 @@ public class AnalysisPageService {
     public record Versions(String manifestSha256,String modelFingerprint,String promptFingerprint,String indexFingerprint,
                            String priceFingerprint,String provider,String model) {}
     public record Page(int schemaVersion,UUID analysisId,String reviewTaskId,AnalysisStatus status,String failureCode,
-                       ObjectNode result,Cost cost,Versions versions,String traceId,String feedbackVerdict) {}
+                       ObjectNode result,Cost cost,Versions versions,String traceId,String feedbackVerdict,
+                       com.finguard.copilot.agent.graph.AgentTraceService.Summary agent) {}
 
     public Page view(UUID id,String token) {
         var allowed=access.authorize(id,token);var run=allowed.view();byte[] key=JdbcAnalysisRunRepository.uuidBytes(id);
@@ -46,10 +53,16 @@ public class AnalysisPageService {
                 result=present(parsed,json);
             } catch(Exception ignored){throw new CopilotException(ErrorCode.INTERNAL_ERROR,"Validated analysis result is unavailable");}
         }
+        Cost displayedCost=cost(usage,reservation,claimed);
+        if(agentLedger!=null && agentLedger.isAgentRun(id)) {
+            var totals=agentLedger.totals(id);
+            if(totals.calls()>0) displayedCost=agentCost(totals);
+        }
         return new Page(1,id,integer(identity.get("review_task_id")),run.status(),
                 run.status()==AnalysisStatus.FAILED?SafeSpanData.errorCode(run.failureCode()):null,result,
-                cost(usage,reservation,claimed),versions(manifest),safeHash(identity.get("trace_id"),32),
-                feedback.isEmpty()?null:(String)feedback.get("verdict"));
+                displayedCost,
+                versions(manifest),safeHash(identity.get("trace_id"),32),
+                feedback.isEmpty()?null:(String)feedback.get("verdict"),agentTraces==null?null:agentTraces.summaryAfterAuthorization(id));
     }
     private Map<String,Object> one(String sql,Object... args) {
         var rows=jdbc.queryForList(sql,args);return rows.isEmpty()?Map.of():rows.get(0);
@@ -63,6 +76,13 @@ public class AnalysisPageService {
             evidence.put("amount",item.get("amount").decimalValue().toPlainString());
         }
         return node;
+    }
+    public static Cost agentCost(com.finguard.copilot.agent.budget.AgentCallLedger.Totals totals) {
+        boolean recorded=totals.calls()>0;
+        boolean settled="SETTLED".equals(totals.accountingStatus());
+        return new Cost(totals.accountingStatus(),totals.estimatedCost()==null?null:money(totals.estimatedCost()),
+                recorded?"CNY":null,recorded?money(totals.heldCny()):null,
+                settled?Long.toString(totals.inputTokens()):null,settled?Long.toString(totals.outputTokens()):null,recorded);
     }
     public static Cost cost(Map<String,Object> usage,Map<String,Object> reservation,boolean claimed) {
         if(!reservation.isEmpty()) {

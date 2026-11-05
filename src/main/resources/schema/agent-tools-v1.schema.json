@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "tools": [
+    {
+      "name": "get_review_facts",
+      "description": "Read the authorized immutable review fact snapshot; this is not a live Core query.",
+      "parameters": {"type": "object", "properties": {}, "required": [], "additionalProperties": false}
+    },
+    {
+      "name": "get_task_state",
+      "description": "Read task state verified during snapshot capture; this is not live task state.",
+      "parameters": {"type": "object", "properties": {}, "required": [], "additionalProperties": false}
+    },
+    {
+      "name": "search_review_policy",
+      "description": "Search only this run's frozen, still published policy index.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "query": {"type": "string", "minLength": 1, "maxLength": 256},
+          "topK": {"type": "integer", "minimum": 1, "maximum": 5}
+        },
+        "required": ["query", "topK"],
+        "additionalProperties": false
+      }
+    }
+  ]
+}

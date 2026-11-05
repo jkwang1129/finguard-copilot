@@ -21,6 +21,8 @@ C:\dev\finguard-copilot    AI 审核辅助系统（本仓库）
 
 ## 当前阶段
 
+Phase5已按P5-1至P5-6顺序完成本地工程实现和[总验收](docs/acceptance/2026-11-03-phase5-final-acceptance.md)：Java535、Python187、MCP桥4、前端18项及lint/build通过；26例跨运行时一致，最终制品87项真实进程检查通过。运行入口见[Phase5手册](docs/operations/phase5-agent-workflow.md)、[本地MCP手册](docs/operations/phase5-mcp.md)。真实native供应商资格、真实人工/模型质量及部署门槛仍在[TASKS](TASKS.md)单列，不由合成验收替代。
+
 2026-11-03：P4-4 可观测性与 P4-5 事务事件、SSE 和审核页面已完成本地工程验收；[P4-6总验收](docs/acceptance/2026-11-03-p4-6-final-acceptance.md)完成404项Java、183项Python、11项前端及六场景224项进程检查，最后OpenAPI文档修正后另有17项相关测试和新制品38项进程检查通过。最新操作入口见[审核页面手册](docs/operations/phase4-5-review-console.md)、[可观测性手册](docs/operations/phase4-4-observability.md)及[Phase4计划](docs/PHASE4_TASK_PLAN.md)。真实人工校准、合格备用模型和生产质量/部署仍单列待验收。以下保留各阶段的历史范围与证据。
 
 2026-10-22 提交前复核发现三条异常路径：模型 HTTP 超时未接线、数据库回滚后可能重复请求模型、失败用量记录异常可能导致消息丢弃。2026-10-24 已补修复和离线回归，见[异常路径修复验收](docs/acceptance/2026-10-24-phase3-failure-recovery.md)；既有真实模型质量结论不因此改变。
@@ -82,10 +84,15 @@ v3 开发集旧/新 Prompt 对比各 6 次，两组建议、事实和引用均�
 .\mvnw.cmd -B -ntp clean test
 Push-Location tools\agent-evaluation; uv sync --locked --python 3.12; uv run pytest -q; Pop-Location
 Push-Location frontend; npm ci; npm run lint; npm run test -- --run; npm run build; Pop-Location
+uv run --project tools/mcp-bridge pytest tools/mcp-bridge/tests -q
 ```
 
 Linux 或 CI 等价入口为 `bash scripts/verify.sh`。Java 集成测试需要可用的 Docker
 环境，以启动真实 MySQL 8.4.10 Testcontainer；普通测试不需要模型密钥或付费 API。
+
+2026-11-04依赖维护已将公告匹配包24降至1，剩余2条视图相关原始命中保留。首轮真实模型14次请求、11/12未通过的[记录](docs/acceptance/2026-11-04-native-provider-qualification.md)保留。修正剩余工具额度提示后，独立[复验](docs/acceptance/2026-11-04-native-tool-budget-requalification.md)12/12通过、13次请求、估算0.089994CNY、未知持有0；仅证明合成native组件协议，非生产质量。最新Java全量552通过，默认真实Agent未启用。
+
+Phase5原生HTTP组件测试与`run-phase5-e2e.ps1`固定使用18765，必须串行执行；STDIO测试也要与实际Copilot进程错开。进程验收脚本只使用本地模型替身，没有付费调用选项。
 
 Phase 3 专用提示词对照入口默认独立评测模型，不需要启动业务服务。模型配置由 Git 忽略的
 `.env.local` 加载，显式进程环境变量优先；文件不会自动被 Spring 加载。先看计划，再按需执行：

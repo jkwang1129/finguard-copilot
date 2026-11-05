@@ -18,12 +18,14 @@ class SafeSpanDataTest {
             span.setAttribute("finguard.stage","MODEL");
             span.setAttribute("finguard.analysis_id","SECRET");
             span.setAttribute("prompt","SECRET");
+            span.setAttribute("finguard.tool_name","SECRET");
             span.setAttribute("gen_ai.request.model","SECRET");
             span.addEvent("SECRET"); span.recordException(new RuntimeException("SECRET"));
             span.setStatus(StatusCode.ERROR,"SECRET"); span.end();
             var safe=SafeSpanData.copy(exporter.getFinishedSpanItems().get(0));
             assertThat(safe.getName()).isEqualTo("copilot.model");
             assertThat(safe.getAttributes().toString()).doesNotContain("SECRET");
+            assertThat(safe.getAttributes().get(io.opentelemetry.api.common.AttributeKey.stringKey("finguard.tool_name"))).isEqualTo("OTHER");
             assertThat(safe.getEvents()).isEmpty(); assertThat(safe.getLinks()).isEmpty();
             assertThat(safe.getStatus().getDescription()).isEmpty();
             assertThat(safe.getResource().getAttributes().toString()).doesNotContain("SECRET");

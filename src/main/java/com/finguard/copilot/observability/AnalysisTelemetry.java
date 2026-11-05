@@ -16,7 +16,7 @@ import org.slf4j.MDC;
 /** Explicit, bounded-vocabulary telemetry. Never accepts business text or exceptions as attributes. */
 public final class AnalysisTelemetry {
     public enum Stage { API_CREATE, CORE_CONTEXT, SNAPSHOT, OUTBOX_PUBLISH, WORKER, RETRIEVAL,
-        CONTEXT, PREFLIGHT, MODEL, VALIDATION, ACCOUNTING, PERSISTENCE }
+        CONTEXT, PREFLIGHT, MODEL, VALIDATION, ACCOUNTING, PERSISTENCE, AGENT_GRAPH, AGENT_TOOL, CHECKPOINT, HUMAN_RESUME }
     private static final ContextKey<java.util.concurrent.atomic.AtomicReference<UUID>> ANALYSIS=ContextKey.named("finguard.analysis");
     private static final AnalysisTelemetry NOOP=new AnalysisTelemetry(OpenTelemetry.noop().getTracer("noop"),null);
     private final Tracer tracer;
@@ -83,6 +83,10 @@ public final class AnalysisTelemetry {
     }
     public void providerAttempt(String provider) {
         if(meters!=null) safely(()->meters.counter("copilot.provider.request.attempts","provider",TelemetryVocabulary.provider(provider)).increment());
+    }
+    public void toolName(String name){
+        String fixed=name!=null && java.util.Set.of("get_review_facts","get_task_state","search_review_policy").contains(name)?name:"OTHER";
+        safely(()->Span.current().setAttribute("finguard.tool_name",fixed));
     }
     public final class TraceScope implements AutoCloseable {
         private final Stage stage; private final Span span; private final Scope scope;

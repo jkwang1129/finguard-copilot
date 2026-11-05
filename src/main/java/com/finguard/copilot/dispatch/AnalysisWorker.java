@@ -48,6 +48,14 @@ import org.slf4j.LoggerFactory;
         havingValue = "true",
         matchIfMissing = true)
 public class AnalysisWorker {
+    private com.finguard.copilot.agent.graph.AgentFaultHooks agentFaults=com.finguard.copilot.agent.graph.AgentFaultHooks.none();
+    @Autowired(required=false) public void setAgentFaults(com.finguard.copilot.agent.graph.AgentFaultHooks value){agentFaults=value;}
+    private com.finguard.copilot.agent.graph.ReviewAgentGraph agentGraph;
+    @Autowired(required=false)
+    public void setAgentGraph(com.finguard.copilot.agent.graph.ReviewAgentGraph value){agentGraph=value;}
+    private com.finguard.copilot.agent.checkpoint.CheckpointStore agentCheckpoints;
+    @Autowired(required=false)
+    public void setAgentCheckpoints(com.finguard.copilot.agent.checkpoint.CheckpointStore value){agentCheckpoints=value;}
 
     private static final String ATTEMPT_HEADER = "x-worker-attempt";
     private static final String RETRYABLE_ERROR = "ANALYSIS_RETRY_EXHAUSTED";
@@ -183,6 +191,8 @@ public class AnalysisWorker {
             if (outcome == WorkerOutcome.PUBLISH_FAILED) {
                 channel.basicNack(message.getMessageProperties().getDeliveryTag(), false, true);
             } else {
+                if(outcome==WorkerOutcome.COMPLETED && agentGraph!=null && agentGraph.handles(request.analysisId()))
+                    agentFaults.hit(com.finguard.copilot.agent.graph.AgentFaultHooks.Point.BEFORE_ACK,request.analysisId());
                 channel.basicAck(message.getMessageProperties().getDeliveryTag(), false);
             }
         } catch (RuntimeException exception) {
@@ -210,6 +220,10 @@ public class AnalysisWorker {
     private WorkerOutcome processObserved(AnalysisRequestedMessage message,int attempt) {
         if (message == null || attempt < 1) {
             throw new IllegalArgumentException("worker message and attempt are invalid");
+        }
+        if(agentCheckpoints!=null && agentCheckpoints.requiresGraph(message.analysisId())){
+            if(agentGraph!=null)return agentGraph.process(message);
+            agentCheckpoints.deferDisabled(message);return WorkerOutcome.NOOP;
         }
         if (orchestrator.requiresModelCall()) {
             return processModel(message, attempt);

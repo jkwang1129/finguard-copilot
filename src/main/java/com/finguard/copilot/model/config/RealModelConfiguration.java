@@ -94,8 +94,15 @@ public class RealModelConfiguration {
     }
 
     @Bean
-    EmbeddingGateway realEmbeddingGateway(CopilotProperties properties) {
-        return new FixedEmbeddingGateway(properties.embedding().dimensions());
+    EmbeddingGateway realEmbeddingGateway(CopilotProperties properties,Environment environment) {
+        String mode=environment.getProperty("COPILOT_EMBEDDING_MODE","fixed");
+        if("fixed".equals(mode))return new FixedEmbeddingGateway(properties.embedding().dimensions());
+        if(!"semantic".equals(mode))throw new IllegalArgumentException("Unknown embedding mode");
+        return new com.finguard.copilot.knowledge.embedding.LoopbackSemanticEmbeddingGateway(
+            java.net.URI.create(environment.getRequiredProperty("COPILOT_EMBEDDING_ENDPOINT")),
+            environment.getRequiredProperty("COPILOT_EMBEDDING_VERSION"),
+            environment.getRequiredProperty("COPILOT_EMBEDDING_MANIFEST_SHA256"),properties.embedding().dimensions(),
+            DurationStyle.detectAndParse(environment.getProperty("COPILOT_EMBEDDING_TIMEOUT","10s")));
     }
 
     @Bean
@@ -129,10 +136,13 @@ public class RealModelConfiguration {
             CopilotProperties properties,
             Environment environment
     ) {
+        double minimumMargin=Double.parseDouble(environment.getProperty("COPILOT_RETRIEVAL_MINIMUM_MARGIN", "0"));
+        if(minimumMargin>0 && !"semantic".equals(environment.getProperty("COPILOT_EMBEDDING_MODE")))
+            throw new IllegalArgumentException("margin retrieval requires explicit semantic embedding mode");
         return new KnowledgeRetrievalService(indexRepository, embeddingGateway, vectorStore,
                 environment.getProperty("COPILOT_EMBEDDING_VERSION", "fixed-v1"), properties.retrieval().topK(),
                 Double.parseDouble(environment.getProperty("COPILOT_RETRIEVAL_MINIMUM_SCORE", "-1.0")),
-                documentRepository);
+                documentRepository,minimumMargin);
     }
 
     @Bean
@@ -155,7 +165,8 @@ public class RealModelConfiguration {
             ObjectProvider<com.finguard.copilot.governance.BudgetReservations> budgets,
             com.finguard.copilot.governance.CallAdmission admission,
             NumericGuardProperties numeric,ReviewedPolicyProperties reviewed,
-            com.finguard.copilot.governance.GovernanceProperties governance,Environment environment) {
+            com.finguard.copilot.governance.GovernanceProperties governance,Environment environment,EmbeddingGateway embedding,
+            ObjectProvider<KnowledgeRetrievalService> retrieval) {
         return new com.finguard.copilot.governance.ModelCallPreflight() {
           @Override public boolean managesReservation() {return true;}
           @Override public void outcomeUnknown(java.util.UUID id) {budgets.getObject().markUnknown(id,"MODEL_CALL_OUTCOME_UNKNOWN");}
@@ -170,7 +181,8 @@ public class RealModelConfiguration {
             return new com.finguard.copilot.governance.RunManifestService(
                     new com.finguard.copilot.governance.VersionedArtifactStore(jdbc.getObject(),transactions.getObject()),
                     indexes.getObject(),properties,numeric,reviewed,environment.getProperty("COPILOT_EMBEDDING_VERSION","fixed-v1"),
-                    governance,java.time.Clock.systemUTC(),admission).prepare(id,snapshot,request,evidence,indexVersion);
+                    governance,java.time.Clock.systemUTC(),admission,embedding,
+                    retrieval.getIfAvailable()==null?java.util.Map.of():retrieval.getObject().descriptor()).prepare(id,snapshot,request,evidence,indexVersion);
           }
         };
     }

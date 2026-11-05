@@ -13,7 +13,8 @@ import com.finguard.copilot.knowledge.retrieval.KnowledgeEvidence;
 /** A narrow fail-closed check for known instruction-override patterns. */
 public final class UntrustedInstructionGuard {
     private static final Pattern CHINESE_OVERRIDE = Pattern.compile(
-            "忽略[^\\r\\n。！!?]{0,24}(规则|政策|指令|系统|事实|证据|要求)");
+            // Keep independent policy clauses separate, e.g. "低于阈值则忽略；规则版本为v1".
+            "忽略[^\\r\\n。；;！!?]{0,24}(规则|政策|指令|系统|事实|证据|要求)");
     private static final Pattern ENGLISH_OVERRIDE = Pattern.compile(
             "\\bignore\\s+(?:(?:all|the)\\s+)?(?:(?:previous|prior|earlier|system)\\s+)?"
                     + "(?:instructions?|rules?|polic(?:y|ies))\\b",

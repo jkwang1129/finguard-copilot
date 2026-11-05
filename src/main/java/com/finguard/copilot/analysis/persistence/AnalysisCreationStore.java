@@ -165,6 +165,15 @@ public class AnalysisCreationStore {
                     throw new ActiveReservationConflictException();
                 }
                 expectOne(insertSnapshot(analysis.analysisId(), snapshot, canonicalFacts));
+                if ("agent-v1".equals(analysis.workflowVersion())) {
+                    expectOne(jdbc.update("""
+                            INSERT INTO agent_run_policy(analysis_id,workflow_version,snapshot_sha256,index_version,runtime_enabled)
+                            VALUES(:id,'agent-v1',:sha,
+                              (SELECT index_version FROM knowledge_index_version WHERE status='PUBLISHED'
+                               ORDER BY published_at DESC,index_version LIMIT 1),:runtime)
+                            """, new MapSqlParameterSource("id",JdbcAnalysisRunRepository.uuidBytes(analysis.analysisId()))
+                            .addValue("sha",snapshot.sha256()).addValue("runtime",analysis.runtimeEnabled())));
+                }
                 expectOne(insertOutbox(event));
             });
         } catch (ActiveReservationConflictException exception) {
@@ -299,10 +308,25 @@ public class AnalysisCreationStore {
             long reviewTaskVersion,
             String idempotencyKey,
             byte[] requestHash,
-            Instant createdAt
+            Instant createdAt,
+            String workflowVersion,
+            boolean runtimeEnabled
     ) {
 
+        public NewAnalysis(UUID analysisId, String reviewerUsername, long reviewTaskId, long reviewTaskVersion,
+                           String idempotencyKey, byte[] requestHash, Instant createdAt) {
+            this(analysisId,reviewerUsername,reviewTaskId,reviewTaskVersion,idempotencyKey,requestHash,createdAt,"p4-v1",false);
+        }
+        public NewAnalysis(UUID analysisId,String reviewerUsername,long reviewTaskId,long reviewTaskVersion,
+                           String idempotencyKey,byte[] requestHash,Instant createdAt,String workflowVersion){
+            this(analysisId,reviewerUsername,reviewTaskId,reviewTaskVersion,idempotencyKey,requestHash,createdAt,workflowVersion,false);
+        }
+
         public NewAnalysis {
+            if (!"p4-v1".equals(workflowVersion) && !"agent-v1".equals(workflowVersion)) {
+                throw new IllegalArgumentException("unsupported workflow version");
+            }
+            if(runtimeEnabled && !"agent-v1".equals(workflowVersion))throw new IllegalArgumentException("Agent runtime requires captured Agent scope");
             if (analysisId == null) {
                 throw new IllegalArgumentException("analysisId must not be null");
             }
@@ -338,6 +362,8 @@ public class AnalysisCreationStore {
                     && analysisId.equals(other.analysisId)
                     && reviewerUsername.equals(other.reviewerUsername)
                     && idempotencyKey.equals(other.idempotencyKey)
+                    && workflowVersion.equals(other.workflowVersion)
+                    && runtimeEnabled==other.runtimeEnabled
                     && Arrays.equals(requestHash, other.requestHash)
                     && createdAt.equals(other.createdAt);
         }
@@ -350,7 +376,7 @@ public class AnalysisCreationStore {
                     reviewTaskId,
                     reviewTaskVersion,
                     idempotencyKey,
-                    createdAt
+                    createdAt, workflowVersion, runtimeEnabled
             ) + Arrays.hashCode(requestHash);
         }
     }

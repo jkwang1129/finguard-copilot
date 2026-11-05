@@ -1,0 +1,21 @@
+{
+  "date": "2026-11-04",
+  "label_version": "project-user-human-20261104-v1",
+  "source": "current chat: user supplied complete Markdown table and identified reviewer as self",
+  "reviewer_role": "project user",
+  "actual_human_labels": true,
+  "professional_expertise_verified": false,
+  "blindness_independently_verified": false,
+  "dataset_sha256": "a2d1e749ffef619767153799cb0c8a90796e11b0555608754ad813c0348c5742",
+  "sample_count": 10,
+  "scope": "fixed synthetic project-policy cases; not production financial expert labels",
+  "label_file": "phase4-human-labels-20261104-v1.jsonl",
+  "label_sha256": "cd25c2723fda4cae4fb718140b7485176140e7e9f6c2decd4336fe18d345ca5d",
+  "notes": [
+    "Human labels are exact values supplied by the project user in this chat; no AI inference/amendment.",
+    "Historic Judge manifest did not match current sample; no historical data or outputs were rewritten. A fresh10-call batch bound to the actual selected sample was used.",
+    "The generic calibration CLI retains unverified provenance flags; this separate record identifies actual chat sourcing, without expertise or independent-blindness certification."
+  ],
+  "judge_output_file": "phase4-human-judge-20261104-v1.jsonl",
+  "judge_output_sha256": "b88be25bb36a0fc530c2f9ca432ed2c45a549dfd6ac70918f1af96a4cb5b1cdd"
+}

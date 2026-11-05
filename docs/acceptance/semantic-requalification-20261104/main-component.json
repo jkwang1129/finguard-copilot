@@ -1,0 +1,794 @@
+{
+  "status" : "QUALITY_PASSED",
+  "rawScope" : "Eleven AI-authored synthetic project-policy business cases using actual P4 ModelAnalysisOrchestrator, semantic top-1 retrieval, adapter, immutable manifest, SQL call/budget ledger, Redis admission, schema/policy/fact validators; component quality only; no Core/API/UI process E2E, general Agent quality, human expertise or production accuracy certification",
+  "maxRequests" : 11,
+  "caseDenominator" : 11,
+  "componentCapCny" : "1.10",
+  "invoiceVerified" : false,
+  "knownEstimatedCny" : "0.10775000",
+  "heldCny" : "0",
+  "providerClaims" : 11,
+  "providerAttempts" : 11,
+  "automaticRetries" : 0,
+  "rows" : [ {
+    "case_id" : "QW-001",
+    "execution" : "EXECUTED",
+    "protocolPassed" : true,
+    "qualityPassed" : true,
+    "validationStage" : "UNKNOWN",
+    "controlledFailureCode" : null,
+    "providerAttempts" : 1,
+    "expectedRecommendation" : "CONFIRMED",
+    "actualRecommendation" : "CONFIRMED",
+    "validatedResult" : {
+      "schemaVersion" : 1,
+      "analysisId" : "e04cf136-9d47-3323-8264-c4b5a5487aa6",
+      "reviewTaskSummary" : "Review task 42 (SYNTH_LIMIT, reason: USD amount threshold policy review) for transaction 2 on account 3, amount 100 USD, reconciliation result SUSPICIOUS with matchMethod NONE.",
+      "riskRuleExplanation" : "The synthetic policy for ruleCode SYNTH_LIMIT applies to USD amounts: with SYNTH_OPERATOR GTE and SYNTH_THRESHOLD 100.00, a currentAmount at or above 100.00 yields CONFIRMED, below 100.00 yields IGNORED. The captured amount is exactly 100 USD, which meets the threshold (100.00 >= 100.00), so the rule condition is satisfied.",
+      "businessEvidence" : [ {
+        "transactionId" : 2,
+        "accountId" : 3,
+        "amount" : 100,
+        "currency" : "USD",
+        "ruleCode" : "SYNTH_LIMIT",
+        "reasonCode" : "USD amount threshold policy review",
+        "sourcePaths" : [ "transaction.id", "transaction.accountId", "transaction.amount", "transaction.currency", "reviewTask.ruleCode", "reviewTask.reasonCode" ]
+      } ],
+      "policyCitations" : [ {
+        "documentId" : "synth-usd-limit",
+        "version" : "v1",
+        "sourcePath" : "Document",
+        "excerpt" : "Project-only synthetic demo policy; not regulations or Core-native truth. For ruleCode SYNTH_LIMIT, currency USD, SYNTH_OPERATOR GTE, and SYNTH_THRESHOLD 100.00, currentAmount at or above 100.00 yields CONFIRMED; below 100.00 yields IGNORED. Required evidence cites documentId=synth-usd-limit, version=v1, sectionPath=Document and an exact relevant excerpt. Any missing or wrong prerequisite, absent exact policy citation, or missing/unparseable currentAmount yields INSUFFICIENT_EVIDENCE. Amounts are exact decimal strings; never round across the boundary. 中文：仅项目合成规则，美元金额大于等于100.00确认，小于100.00忽略；规则、币种、GTE、阈值100.00及精确政策引用缺一或错误均证据不足。"
+      } ],
+      "recommendation" : "CONFIRMED",
+      "reasoningSummary" : "All prerequisites match: ruleCode SYNTH_LIMIT, currency USD, operator GTE, threshold 100.00, and an exact policy citation is supplied. The transaction amount is exactly 100 USD, which is at the threshold (100.00 >= 100.00), so the synthetic policy yields CONFIRMED. The reconciliation result is SUSPICIOUS with matchMethod NONE, consistent with routing to manual review; this analysis does not adjudicate fraud or mutate Core.",
+      "missingInformation" : [ "No counterparty or matched record is identified for the SUSPICIOUS reconciliation result (matchMethod NONE), so the mismatch cannot be resolved from supplied facts.", "No reviewer-supplied justification or additional context beyond the captured Core facts." ],
+      "limitations" : [ "This is a synthetic project-only demo policy, not a regulation or Core-native truth; it supports a review recommendation only.", "CONFIRMED means the supplied facts satisfy the cited rule; it is not proof of fraud, a final adjudication, or permission to change Core state.", "A human FinGuard reviewer must make the final decision; no tools, URLs, or external services were accessed." ]
+    },
+    "usageVerified" : true,
+    "knownEstimatedCny" : 0.00980800,
+    "heldCny" : 0,
+    "latencyMillis" : 5281,
+    "contextIndexVersion" : "sq-primary-20261104_221513_7669588",
+    "embeddingVersion" : "e5-small-int8-55102a6d5c23b708db337173",
+    "analysisId" : "e04cf136-9d47-3323-8264-c4b5a5487aa6",
+    "scenario" : "p4-primary",
+    "publication" : "primary",
+    "inputAmount" : "100.00",
+    "invoiceVerified" : false,
+    "snapshotSha256" : "08f5be1ae5cae0e0dec64e85b35330960b0d32615bf4c05687bc02d5d0b6bc45",
+    "validatedAmounts" : [ "100" ],
+    "reportedUsage" : {
+      "latencyMillis" : 4363,
+      "outputTokens" : 715,
+      "inputTokens" : 2044
+    },
+    "budgetReservations" : [ {
+      "status" : "SETTLED",
+      "reserved_cny" : 0.03530000,
+      "settled_cny" : 0.00980800,
+      "input_tokens" : 2044,
+      "output_tokens" : 715
+    } ],
+    "contextManifestSha256" : "82f045db30c5189964708f3cecea205f985d014263e39723f30ff90a60604200",
+    "contextIndexSha256" : "283fed6d1ba2ba42e5ba1ff80dd0526740423eac24a99ad0c212133cfd07d60a",
+    "contextEmbeddingSha256" : "01eaf7fb54027a16b5429cfde05eff691ecc08f93a90cc75a4601836495154cf"
+  }, {
+    "case_id" : "QW-002",
+    "execution" : "EXECUTED",
+    "protocolPassed" : true,
+    "qualityPassed" : true,
+    "validationStage" : "UNKNOWN",
+    "controlledFailureCode" : null,
+    "providerAttempts" : 1,
+    "expectedRecommendation" : "IGNORED",
+    "actualRecommendation" : "IGNORED",
+    "validatedResult" : {
+      "schemaVersion" : 1,
+      "analysisId" : "4aacb8e8-60a8-3791-8163-e1248e1ac4f8",
+      "reviewTaskSummary" : "Review task 42 (ruleCode SYNTH_LIMIT, reasonCode 'USD amount threshold policy review') for transaction 2 on account 3, amount 99.99 USD, flagged by reconciliation as SUSPICIOUS with matchMethod NONE.",
+      "riskRuleExplanation" : "The synthetic policy for SYNTH_LIMIT applies to USD amounts with operator GTE and threshold 100.00: an amount at or above 100.00 yields CONFIRMED, below 100.00 yields IGNORED, and any missing or wrong prerequisite yields INSUFFICIENT_EVIDENCE. Here the transaction amount is 99.99 USD, which is below the 100.00 threshold, so the threshold condition for confirmation is not met.",
+      "businessEvidence" : [ {
+        "transactionId" : 2,
+        "accountId" : 3,
+        "amount" : 99.99,
+        "currency" : "USD",
+        "ruleCode" : "SYNTH_LIMIT",
+        "reasonCode" : "USD amount threshold policy review",
+        "sourcePaths" : [ "transaction.id", "transaction.accountId", "transaction.amount", "transaction.currency", "reviewTask.ruleCode", "reviewTask.reasonCode" ]
+      } ],
+      "policyCitations" : [ {
+        "documentId" : "synth-usd-limit",
+        "version" : "v1",
+        "sourcePath" : "Document",
+        "excerpt" : "Project-only synthetic demo policy; not regulations or Core-native truth. For ruleCode SYNTH_LIMIT, currency USD, SYNTH_OPERATOR GTE, and SYNTH_THRESHOLD 100.00, currentAmount at or above 100.00 yields CONFIRMED; below 100.00 yields IGNORED. Required evidence cites documentId=synth-usd-limit, version=v1, sectionPath=Document and an exact relevant excerpt. Any missing or wrong prerequisite, absent exact policy citation, or missing/unparseable currentAmount yields INSUFFICIENT_EVIDENCE. Amounts are exact decimal strings; never round across the boundary. 中文：仅项目合成规则，美元金额大于等于100.00确认，小于100.00忽略；规则、币种、GTE、阈值100.00及精确政策引用缺一或错误均证据不足。"
+      } ],
+      "recommendation" : "IGNORED",
+      "reasoningSummary" : "All prerequisites match the supplied synthetic policy: ruleCode SYNTH_LIMIT, currency USD, operator GTE, threshold 100.00, and a parseable amount of 99.99. Comparing exactly, 99.99 is below 100.00, so the policy directs IGNORED rather than CONFIRMED. The reconciliation result of SUSPICIOUS with matchMethod NONE is noted but the policy's amount comparison does not support confirmation.",
+      "missingInformation" : [ "No counterparty or matched transaction details are supplied to explain the SUSPICIOUS reconciliation result with matchMethod NONE." ],
+      "limitations" : [ "This is a synthetic project-only policy, not a regulation or Core-native truth; the recommendation is advisory and requires human FinGuard reviewer judgment.", "The reconciliation SUSPICIOUS flag is not resolved by the amount-threshold policy alone and may warrant separate manual review." ]
+    },
+    "usageVerified" : true,
+    "knownEstimatedCny" : 0.00951600,
+    "heldCny" : 0,
+    "latencyMillis" : 4176,
+    "contextIndexVersion" : "sq-primary-20261104_221513_7669588",
+    "embeddingVersion" : "e5-small-int8-55102a6d5c23b708db337173",
+    "analysisId" : "4aacb8e8-60a8-3791-8163-e1248e1ac4f8",
+    "scenario" : "p4-primary",
+    "publication" : "primary",
+    "inputAmount" : "99.99",
+    "invoiceVerified" : false,
+    "snapshotSha256" : "ca7a27a7daebb6dc676ac5679c3cbdc71cbd742b775868bb9adc1f98845404bb",
+    "validatedAmounts" : [ "99.99" ],
+    "reportedUsage" : {
+      "latencyMillis" : 3656,
+      "outputTokens" : 677,
+      "inputTokens" : 2050
+    },
+    "budgetReservations" : [ {
+      "status" : "SETTLED",
+      "reserved_cny" : 0.03530400,
+      "settled_cny" : 0.00951600,
+      "input_tokens" : 2050,
+      "output_tokens" : 677
+    } ],
+    "contextManifestSha256" : "082993dfa62327d0ae6be7dd69d2f8d4c66d53b7a37034369ea0ae911d06905d",
+    "contextIndexSha256" : "283fed6d1ba2ba42e5ba1ff80dd0526740423eac24a99ad0c212133cfd07d60a",
+    "contextEmbeddingSha256" : "01eaf7fb54027a16b5429cfde05eff691ecc08f93a90cc75a4601836495154cf"
+  }, {
+    "case_id" : "QW-003",
+    "execution" : "EXECUTED",
+    "protocolPassed" : true,
+    "qualityPassed" : true,
+    "validationStage" : "UNKNOWN",
+    "controlledFailureCode" : null,
+    "providerAttempts" : 1,
+    "expectedRecommendation" : "IGNORED",
+    "actualRecommendation" : "IGNORED",
+    "validatedResult" : {
+      "schemaVersion" : 1,
+      "analysisId" : "33e9676d-5305-3ac2-9a1f-be68bff5bd3c",
+      "reviewTaskSummary" : "Review task 42 (ruleCode SYNTH_LIMIT, reasonCode 'USD amount threshold policy review') for transaction 2 on account 3, a USD CSV-imported transaction, to determine whether the amount meets the synthetic USD threshold.",
+      "riskRuleExplanation" : "Under the supplied synthetic policy, ruleCode SYNTH_LIMIT with currency USD, SYNTH_OPERATOR GTE and SYNTH_THRESHOLD 100.00 yields CONFIRMED when the current amount is at or above 100.00 and IGNORED when below 100.00. Amounts must be compared as exact decimals without rounding across the boundary. The captured amount is 99.999999999999999999 USD, which is strictly below 100.00, so the threshold is not met.",
+      "businessEvidence" : [ {
+        "transactionId" : 2,
+        "accountId" : 3,
+        "amount" : 99.999999999999999999,
+        "currency" : "USD",
+        "ruleCode" : "SYNTH_LIMIT",
+        "reasonCode" : "USD amount threshold policy review",
+        "sourcePaths" : [ "transaction.id", "transaction.accountId", "transaction.amount", "transaction.currency", "reviewTask.ruleCode", "reviewTask.reasonCode" ]
+      } ],
+      "policyCitations" : [ {
+        "documentId" : "synth-usd-limit",
+        "version" : "v1",
+        "sourcePath" : "Document",
+        "excerpt" : "Project-only synthetic demo policy; not regulations or Core-native truth. For ruleCode SYNTH_LIMIT, currency USD, SYNTH_OPERATOR GTE, and SYNTH_THRESHOLD 100.00, currentAmount at or above 100.00 yields CONFIRMED; below 100.00 yields IGNORED. Required evidence cites documentId=synth-usd-limit, version=v1, sectionPath=Document and an exact relevant excerpt. Any missing or wrong prerequisite, absent exact policy citation, or missing/unparseable currentAmount yields INSUFFICIENT_EVIDENCE. Amounts are exact decimal strings; never round across the boundary. 中文：仅项目合成规则，美元金额大于等于100.00确认，小于100.00忽略；规则、币种、GTE、阈值100.00及精确政策引用缺一或错误均证据不足。"
+      } ],
+      "recommendation" : "IGNORED",
+      "reasoningSummary" : "All policy prerequisites are present: ruleCode SYNTH_LIMIT, currency USD, SYNTH_OPERATOR GTE, SYNTH_THRESHOLD 100.00, and an exact policy citation. The exact amount 99.999999999999999999 USD is below 100.00 (not rounded across the boundary), so the synthetic policy directs IGNORED. The reconciliation resultType SUSPICIOUS with matchMethod NONE is noted but is not the basis of this rule determination.",
+      "missingInformation" : [ "No counterparty or matched transaction is supplied for the SUSPICIOUS reconciliation result, so the reconciliation mismatch cannot be resolved from the provided facts." ],
+      "limitations" : [ "This is a synthetic project-only policy, not a regulation or Core-native truth; the recommendation is advisory and requires human FinGuard review.", "The reconciliation resultType SUSPICIOUS (matchMethod NONE) is not explained by the supplied evidence and may warrant separate manual review.", "No Core state was accessed or changed; this analysis is limited to the supplied facts and citation." ]
+    },
+    "usageVerified" : true,
+    "knownEstimatedCny" : 0.00993600,
+    "heldCny" : 0,
+    "latencyMillis" : 4311,
+    "contextIndexVersion" : "sq-primary-20261104_221513_7669588",
+    "embeddingVersion" : "e5-small-int8-55102a6d5c23b708db337173",
+    "analysisId" : "33e9676d-5305-3ac2-9a1f-be68bff5bd3c",
+    "scenario" : "p4-primary",
+    "publication" : "primary",
+    "inputAmount" : "99.999999999999999999",
+    "invoiceVerified" : false,
+    "snapshotSha256" : "2574ecc0e052a1ad97a2525d388c07fc2d90adc7762e7b1944412d8c40c55801",
+    "validatedAmounts" : [ "99.999999999999999999" ],
+    "reportedUsage" : {
+      "latencyMillis" : 3755,
+      "outputTokens" : 728,
+      "inputTokens" : 2056
+    },
+    "budgetReservations" : [ {
+      "status" : "SETTLED",
+      "reserved_cny" : 0.03536600,
+      "settled_cny" : 0.00993600,
+      "input_tokens" : 2056,
+      "output_tokens" : 728
+    } ],
+    "contextManifestSha256" : "512d07bea309fb45c5178e3b42dd08e096aeac8ad50e3a80ca479b1f2c8a3787",
+    "contextIndexSha256" : "283fed6d1ba2ba42e5ba1ff80dd0526740423eac24a99ad0c212133cfd07d60a",
+    "contextEmbeddingSha256" : "01eaf7fb54027a16b5429cfde05eff691ecc08f93a90cc75a4601836495154cf"
+  }, {
+    "case_id" : "QW-004",
+    "execution" : "EXECUTED",
+    "protocolPassed" : true,
+    "qualityPassed" : true,
+    "validationStage" : "UNKNOWN",
+    "controlledFailureCode" : null,
+    "providerAttempts" : 1,
+    "expectedRecommendation" : "CONFIRMED",
+    "actualRecommendation" : "CONFIRMED",
+    "validatedResult" : {
+      "schemaVersion" : 1,
+      "analysisId" : "6b427f12-5572-370d-b37c-273975c65818",
+      "reviewTaskSummary" : "Review task 42 (SYNTH_LIMIT, reason: USD amount threshold policy review) for transaction 2 on account 3, amount 100.000000000000000001 USD, source CSV_IMPORT; reconciliation result SUSPICIOUS with matchMethod NONE.",
+      "riskRuleExplanation" : "The supplied synthetic policy states that for ruleCode SYNTH_LIMIT, currency USD, SYNTH_OPERATOR GTE and SYNTH_THRESHOLD 100.00, a currentAmount at or above 100.00 yields CONFIRMED and below 100.00 yields IGNORED. Amounts are exact decimal strings and must not be rounded across the boundary. The captured amount is 100.000000000000000001 USD, which is exactly at or above the 100.00 threshold, so the rule's condition is met.",
+      "businessEvidence" : [ {
+        "transactionId" : 2,
+        "accountId" : 3,
+        "amount" : 100.000000000000000001,
+        "currency" : "USD",
+        "ruleCode" : "SYNTH_LIMIT",
+        "reasonCode" : "USD amount threshold policy review",
+        "sourcePaths" : [ "transaction.id", "transaction.accountId", "transaction.amount", "transaction.currency", "reviewTask.ruleCode", "reviewTask.reasonCode" ]
+      } ],
+      "policyCitations" : [ {
+        "documentId" : "synth-usd-limit",
+        "version" : "v1",
+        "sourcePath" : "Document",
+        "excerpt" : "Project-only synthetic demo policy; not regulations or Core-native truth. For ruleCode SYNTH_LIMIT, currency USD, SYNTH_OPERATOR GTE, and SYNTH_THRESHOLD 100.00, currentAmount at or above 100.00 yields CONFIRMED; below 100.00 yields IGNORED. Required evidence cites documentId=synth-usd-limit, version=v1, sectionPath=Document and an exact relevant excerpt. Any missing or wrong prerequisite, absent exact policy citation, or missing/unparseable currentAmount yields INSUFFICIENT_EVIDENCE. Amounts are exact decimal strings; never round across the boundary. 中文：仅项目合成规则，美元金额大于等于100.00确认，小于100.00忽略；规则、币种、GTE、阈值100.00及精确政策引用缺一或错误均证据不足。"
+      } ],
+      "recommendation" : "CONFIRMED",
+      "reasoningSummary" : "All prerequisites are present: ruleCode SYNTH_LIMIT, currency USD, SYNTH_OPERATOR GTE, SYNTH_THRESHOLD 100.00, and an exact policy citation. The exact amount 100.000000000000000001 USD is at or above 100.00 without rounding, so the synthetic threshold rule is satisfied. The SUSPICIOUS reconciliation result with no match method is consistent with a threshold review but is not itself resolved here.",
+      "missingInformation" : [ "No counterparty or matched transaction is identified for the SUSPICIOUS reconciliation result (matchMethod NONE).", "No Core-native or regulatory policy was supplied; only a project-synthetic demo policy is available." ],
+      "limitations" : [ "This is an assistive analysis for a human FinGuard reviewer, not a final adjudication or proof of fraud.", "The cited policy is explicitly project-only synthetic demo content, not regulations or Core-native truth.", "No Core state was accessed or changed; the reviewer must verify facts and decide any follow-up action." ]
+    },
+    "usageVerified" : true,
+    "knownEstimatedCny" : 0.00995800,
+    "heldCny" : 0,
+    "latencyMillis" : 4441,
+    "contextIndexVersion" : "sq-primary-20261104_221513_7669588",
+    "embeddingVersion" : "e5-small-int8-55102a6d5c23b708db337173",
+    "analysisId" : "6b427f12-5572-370d-b37c-273975c65818",
+    "scenario" : "p4-primary",
+    "publication" : "primary",
+    "inputAmount" : "100.000000000000000001",
+    "invoiceVerified" : false,
+    "snapshotSha256" : "b2490f99528a12e78572c26b2c7411faaae19b4a814de914853e04f506a94b7c",
+    "validatedAmounts" : [ "100.000000000000000001" ],
+    "reportedUsage" : {
+      "latencyMillis" : 3936,
+      "outputTokens" : 732,
+      "inputTokens" : 2051
+    },
+    "budgetReservations" : [ {
+      "status" : "SETTLED",
+      "reserved_cny" : 0.03536800,
+      "settled_cny" : 0.00995800,
+      "input_tokens" : 2051,
+      "output_tokens" : 732
+    } ],
+    "contextManifestSha256" : "079a63973fc0d4bb617cd8a40a8e5b241bb29d5f442606f775926aa7d6d0ef87",
+    "contextIndexSha256" : "283fed6d1ba2ba42e5ba1ff80dd0526740423eac24a99ad0c212133cfd07d60a",
+    "contextEmbeddingSha256" : "01eaf7fb54027a16b5429cfde05eff691ecc08f93a90cc75a4601836495154cf"
+  }, {
+    "case_id" : "QW-005",
+    "execution" : "EXECUTED",
+    "protocolPassed" : true,
+    "qualityPassed" : true,
+    "validationStage" : "UNKNOWN",
+    "controlledFailureCode" : null,
+    "providerAttempts" : 1,
+    "expectedRecommendation" : "CONFIRMED",
+    "actualRecommendation" : "CONFIRMED",
+    "validatedResult" : {
+      "schemaVersion" : 1,
+      "analysisId" : "f0bb3db3-bc39-3c5e-969c-f214289b87f1",
+      "reviewTaskSummary" : "Review task 42 (ruleCode SYNTH_LIMIT, reasonCode 'USD amount threshold policy review') for transaction 2 on account 3, a USD 250 CSV-imported transaction flagged under the synthetic USD amount threshold policy.",
+      "riskRuleExplanation" : "Under the supplied synthetic policy, ruleCode SYNTH_LIMIT with currency USD, SYNTH_OPERATOR GTE and SYNTH_THRESHOLD 100.00 yields CONFIRMED when the current amount is at or above 100.00, and IGNORED when below 100.00. The Core risk facts supply SYNTH_OPERATOR=GTE and SYNTH_THRESHOLD=100.00, and the transaction amount is 250 USD, which is at or above the 100.00 threshold.",
+      "businessEvidence" : [ {
+        "transactionId" : 2,
+        "accountId" : 3,
+        "amount" : 250,
+        "currency" : "USD",
+        "ruleCode" : "SYNTH_LIMIT",
+        "reasonCode" : "USD amount threshold policy review",
+        "sourcePaths" : [ "transaction.id", "transaction.accountId", "transaction.amount", "transaction.currency", "reviewTask.ruleCode", "reviewTask.reasonCode" ]
+      } ],
+      "policyCitations" : [ {
+        "documentId" : "synth-usd-limit",
+        "version" : "v1",
+        "sourcePath" : "Document",
+        "excerpt" : "Project-only synthetic demo policy; not regulations or Core-native truth. For ruleCode SYNTH_LIMIT, currency USD, SYNTH_OPERATOR GTE, and SYNTH_THRESHOLD 100.00, currentAmount at or above 100.00 yields CONFIRMED; below 100.00 yields IGNORED. Required evidence cites documentId=synth-usd-limit, version=v1, sectionPath=Document and an exact relevant excerpt. Any missing or wrong prerequisite, absent exact policy citation, or missing/unparseable currentAmount yields INSUFFICIENT_EVIDENCE. Amounts are exact decimal strings; never round across the boundary. 中文：仅项目合成规则，美元金额大于等于100.00确认，小于100.00忽略；规则、币种、GTE、阈值100.00及精确政策引用缺一或错误均证据不足。"
+      } ],
+      "recommendation" : "CONFIRMED",
+      "reasoningSummary" : "All policy prerequisites are present: ruleCode SYNTH_LIMIT, currency USD, SYNTH_OPERATOR GTE, SYNTH_THRESHOLD 100.00, and an exact citation to synth-usd-limit v1. The transaction amount of 250 USD is at or above the 100.00 threshold, so the synthetic rule's CONFIRMED condition is met. This reflects satisfaction of the review rule only, not a finding of fraud or a final adjudication.",
+      "missingInformation" : [ ],
+      "limitations" : [ "This is a synthetic project demo policy, not a regulation or Core-native truth; the recommendation is not a fraud determination or final adjudication.", "The reconciliation result is SUSPICIOUS with matchMethod NONE and reasonCode REVIEW; no counterparty or reconciliation evidence was supplied, so the mismatch is not resolved here.", "A human FinGuard reviewer must validate the facts and policy applicability before any action; no Core state was or should be changed by this analysis." ]
+    },
+    "usageVerified" : true,
+    "knownEstimatedCny" : 0.00973000,
+    "heldCny" : 0,
+    "latencyMillis" : 4138,
+    "contextIndexVersion" : "sq-primary-20261104_221513_7669588",
+    "embeddingVersion" : "e5-small-int8-55102a6d5c23b708db337173",
+    "analysisId" : "f0bb3db3-bc39-3c5e-969c-f214289b87f1",
+    "scenario" : "p4-primary",
+    "publication" : "primary",
+    "inputAmount" : "250.00",
+    "invoiceVerified" : false,
+    "snapshotSha256" : "59d433184cc73cef9314f42d2609befa83879326a4fc86171aa077a3f183d1b7",
+    "validatedAmounts" : [ "250" ],
+    "reportedUsage" : {
+      "latencyMillis" : 3623,
+      "outputTokens" : 705,
+      "inputTokens" : 2045
+    },
+    "budgetReservations" : [ {
+      "status" : "SETTLED",
+      "reserved_cny" : 0.03530000,
+      "settled_cny" : 0.00973000,
+      "input_tokens" : 2045,
+      "output_tokens" : 705
+    } ],
+    "contextManifestSha256" : "cd95dce64f1d3e50e8c225cafcdf684ab9085fcc56c39318d9f8b9efb36f5438",
+    "contextIndexSha256" : "283fed6d1ba2ba42e5ba1ff80dd0526740423eac24a99ad0c212133cfd07d60a",
+    "contextEmbeddingSha256" : "01eaf7fb54027a16b5429cfde05eff691ecc08f93a90cc75a4601836495154cf"
+  }, {
+    "case_id" : "QW-006",
+    "execution" : "EXECUTED",
+    "protocolPassed" : true,
+    "qualityPassed" : true,
+    "validationStage" : "UNKNOWN",
+    "controlledFailureCode" : null,
+    "providerAttempts" : 1,
+    "expectedRecommendation" : "IGNORED",
+    "actualRecommendation" : "IGNORED",
+    "validatedResult" : {
+      "schemaVersion" : 1,
+      "analysisId" : "9549ca66-2ba8-3b71-a8ed-e3401c98ad03",
+      "reviewTaskSummary" : "Review task 42 (ruleCode SYNTH_LIMIT, reasonCode 'USD amount threshold policy review') for transaction 2 on account 3, a USD 0 CSV-imported transaction flagged by reconciliation as SUSPICIOUS with matchMethod NONE.",
+      "riskRuleExplanation" : "The supplied synthetic policy applies to ruleCode SYNTH_LIMIT with currency USD, operator GTE and threshold 100.00: a current amount at or above 100.00 yields CONFIRMED, below 100.00 yields IGNORED, and any missing or wrong prerequisite or missing/unparseable amount yields INSUFFICIENT_EVIDENCE. Here the transaction amount is 0 USD, which is below the 100.00 threshold, so the threshold condition is not met.",
+      "businessEvidence" : [ {
+        "transactionId" : 2,
+        "accountId" : 3,
+        "amount" : 0,
+        "currency" : "USD",
+        "ruleCode" : "SYNTH_LIMIT",
+        "reasonCode" : "USD amount threshold policy review",
+        "sourcePaths" : [ "transaction.id", "transaction.accountId", "transaction.amount", "transaction.currency", "reviewTask.ruleCode", "reviewTask.reasonCode" ]
+      } ],
+      "policyCitations" : [ {
+        "documentId" : "synth-usd-limit",
+        "version" : "v1",
+        "sourcePath" : "Document",
+        "excerpt" : "Project-only synthetic demo policy; not regulations or Core-native truth. For ruleCode SYNTH_LIMIT, currency USD, SYNTH_OPERATOR GTE, and SYNTH_THRESHOLD 100.00, currentAmount at or above 100.00 yields CONFIRMED; below 100.00 yields IGNORED. Required evidence cites documentId=synth-usd-limit, version=v1, sectionPath=Document and an exact relevant excerpt. Any missing or wrong prerequisite, absent exact policy citation, or missing/unparseable currentAmount yields INSUFFICIENT_EVIDENCE. Amounts are exact decimal strings; never round across the boundary. 中文：仅项目合成规则，美元金额大于等于100.00确认，小于100.00忽略；规则、币种、GTE、阈值100.00及精确政策引用缺一或错误均证据不足。"
+      } ],
+      "recommendation" : "IGNORED",
+      "reasoningSummary" : "All policy prerequisites are present: ruleCode SYNTH_LIMIT, currency USD, operator GTE, threshold 100.00, and an exact policy citation. The transaction amount is 0 USD, which is strictly below the 100.00 threshold, so the synthetic limit rule is not triggered and the policy directs IGNORED. The SUSPICIOUS reconciliation result with matchMethod NONE is noted but is not resolved by the supplied threshold policy.",
+      "missingInformation" : [ "No counterparty or matched record is supplied to explain the SUSPICIOUS reconciliation result with matchMethod NONE.", "No policy evidence is supplied addressing the reconciliation SUSPICIOUS/REVIEW flag independently of the SYNTH_LIMIT threshold rule." ],
+      "limitations" : [ "This is a synthetic project demo policy, not a regulation or Core-native truth; the output is an assistive recommendation for a human FinGuard reviewer, not a final adjudication or permission to mutate Core.", "The reconciliation SUSPICIOUS flag remains unexplained by the supplied evidence and requires human review.", "No URLs were accessed and no tools or external services were used; untrusted evidence was treated as data only." ]
+    },
+    "usageVerified" : true,
+    "knownEstimatedCny" : 0.00997000,
+    "heldCny" : 0,
+    "latencyMillis" : 4530,
+    "contextIndexVersion" : "sq-primary-20261104_221513_7669588",
+    "embeddingVersion" : "e5-small-int8-55102a6d5c23b708db337173",
+    "analysisId" : "9549ca66-2ba8-3b71-a8ed-e3401c98ad03",
+    "scenario" : "p4-primary",
+    "publication" : "primary",
+    "inputAmount" : "0.00",
+    "invoiceVerified" : false,
+    "snapshotSha256" : "0c2bdc1f97230d2801f51df6c82f6eca978319695b5f4cc12d388244e02e70ce",
+    "validatedAmounts" : [ "0" ],
+    "reportedUsage" : {
+      "latencyMillis" : 4113,
+      "outputTokens" : 735,
+      "inputTokens" : 2045
+    },
+    "budgetReservations" : [ {
+      "status" : "SETTLED",
+      "reserved_cny" : 0.03530600,
+      "settled_cny" : 0.00997000,
+      "input_tokens" : 2045,
+      "output_tokens" : 735
+    } ],
+    "contextManifestSha256" : "a7a24994ac3caa29b023a8e1a712de4fc20c341b941f230d02c4dd3721b570d8",
+    "contextIndexSha256" : "283fed6d1ba2ba42e5ba1ff80dd0526740423eac24a99ad0c212133cfd07d60a",
+    "contextEmbeddingSha256" : "01eaf7fb54027a16b5429cfde05eff691ecc08f93a90cc75a4601836495154cf"
+  }, {
+    "case_id" : "QW-007",
+    "execution" : "EXECUTED",
+    "protocolPassed" : true,
+    "qualityPassed" : true,
+    "validationStage" : "UNKNOWN",
+    "controlledFailureCode" : null,
+    "providerAttempts" : 1,
+    "expectedRecommendation" : "INSUFFICIENT_EVIDENCE",
+    "actualRecommendation" : "INSUFFICIENT_EVIDENCE",
+    "validatedResult" : {
+      "schemaVersion" : 1,
+      "analysisId" : "e06f4f28-4674-3fd3-98ed-23945a1bc64e",
+      "reviewTaskSummary" : "Review task 42 (ruleCode SYNTH_LIMIT, reasonCode 'USD amount threshold policy review') for transaction 2 on account 3, amount 250 EUR, flagged by reconciliation as SUSPICIOUS with matchMethod NONE.",
+      "riskRuleExplanation" : "The supplied synthetic policy applies ruleCode SYNTH_LIMIT only to currency USD, with SYNTH_OPERATOR GTE and SYNTH_THRESHOLD 100.00: a currentAmount at or above 100.00 yields CONFIRMED, below 100.00 yields IGNORED, and any missing or wrong prerequisite (including wrong currency) yields INSUFFICIENT_EVIDENCE. The transaction currency is EUR, not USD, so the policy's currency prerequisite is not met and the threshold comparison cannot be applied.",
+      "businessEvidence" : [ {
+        "transactionId" : 2,
+        "accountId" : 3,
+        "amount" : 250,
+        "currency" : "EUR",
+        "ruleCode" : "SYNTH_LIMIT",
+        "reasonCode" : "USD amount threshold policy review",
+        "sourcePaths" : [ "transaction.id", "transaction.accountId", "transaction.amount", "transaction.currency", "reviewTask.ruleCode", "reviewTask.reasonCode" ]
+      } ],
+      "policyCitations" : [ {
+        "documentId" : "synth-usd-limit",
+        "version" : "v1",
+        "sourcePath" : "Document",
+        "excerpt" : "Project-only synthetic demo policy; not regulations or Core-native truth. For ruleCode SYNTH_LIMIT, currency USD, SYNTH_OPERATOR GTE, and SYNTH_THRESHOLD 100.00, currentAmount at or above 100.00 yields CONFIRMED; below 100.00 yields IGNORED. Required evidence cites documentId=synth-usd-limit, version=v1, sectionPath=Document and an exact relevant excerpt. Any missing or wrong prerequisite, absent exact policy citation, or missing/unparseable currentAmount yields INSUFFICIENT_EVIDENCE. Amounts are exact decimal strings; never round across the boundary. 中文：仅项目合成规则，美元金额大于等于100.00确认，小于100.00忽略；规则、币种、GTE、阈值100.00及精确政策引用缺一或错误均证据不足。"
+      } ],
+      "recommendation" : "INSUFFICIENT_EVIDENCE",
+      "reasoningSummary" : "The policy requires currency USD for ruleCode SYNTH_LIMIT, but the Core transaction currency is EUR, so a stated prerequisite is not satisfied and the 100.00 threshold cannot be meaningfully compared to the 250 EUR amount. The reconciliation result is SUSPICIOUS with matchMethod NONE, providing no counterparty evidence to resolve the flag. Per the cited policy, a wrong prerequisite yields INSUFFICIENT_EVIDENCE.",
+      "missingInformation" : [ "A USD-denominated transaction amount (currentAmount) for ruleCode SYNTH_LIMIT, since the captured transaction is in EUR", "Policy guidance on how to treat non-USD amounts under SYNTH_LIMIT, or a currency-conversion basis", "Reconciliation counterparty or match details explaining the SUSPICIOUS result with matchMethod NONE" ],
+      "limitations" : [ "This is an assistive analysis for a human FinGuard reviewer, not a final adjudication or proof of fraud.", "The only supplied policy is a project-only synthetic demo policy, not regulation or Core-native truth.", "No tools or external lookups were used; conclusions are limited to the supplied Core facts and policy evidence." ]
+    },
+    "usageVerified" : true,
+    "knownEstimatedCny" : 0.01005400,
+    "heldCny" : 0,
+    "latencyMillis" : 4282,
+    "contextIndexVersion" : "sq-primary-20261104_221513_7669588",
+    "embeddingVersion" : "e5-small-int8-55102a6d5c23b708db337173",
+    "analysisId" : "e06f4f28-4674-3fd3-98ed-23945a1bc64e",
+    "scenario" : "p4-primary",
+    "publication" : "primary",
+    "inputAmount" : "250.00",
+    "invoiceVerified" : false,
+    "snapshotSha256" : "1f51a833a28a2112c9c6b91bbb8d14357d878750936fcec5f5cadcd6331992e7",
+    "validatedAmounts" : [ "250" ],
+    "reportedUsage" : {
+      "latencyMillis" : 3823,
+      "outputTokens" : 745,
+      "inputTokens" : 2047
+    },
+    "budgetReservations" : [ {
+      "status" : "SETTLED",
+      "reserved_cny" : 0.03533000,
+      "settled_cny" : 0.01005400,
+      "input_tokens" : 2047,
+      "output_tokens" : 745
+    } ],
+    "contextManifestSha256" : "2ee97e3f75cadba7ff1ca30508257c1c94a2f15f5549ea277128c96737a27b59",
+    "contextIndexSha256" : "283fed6d1ba2ba42e5ba1ff80dd0526740423eac24a99ad0c212133cfd07d60a",
+    "contextEmbeddingSha256" : "01eaf7fb54027a16b5429cfde05eff691ecc08f93a90cc75a4601836495154cf"
+  }, {
+    "case_id" : "QW-008",
+    "execution" : "EXECUTED",
+    "protocolPassed" : true,
+    "qualityPassed" : true,
+    "validationStage" : "UNKNOWN",
+    "controlledFailureCode" : null,
+    "providerAttempts" : 1,
+    "expectedRecommendation" : "INSUFFICIENT_EVIDENCE",
+    "actualRecommendation" : "INSUFFICIENT_EVIDENCE",
+    "validatedResult" : {
+      "schemaVersion" : 1,
+      "analysisId" : "711bc74d-4600-316a-819e-c45a16ee40b1",
+      "reviewTaskSummary" : "Pending review task 42 (ruleCode SYNTH_OTHER, reasonCode 'USD amount threshold policy review') for transaction 2 on account 3, amount 250 USD, with reconciliation result SUSPICIOUS and matchMethod NONE.",
+      "riskRuleExplanation" : "The supplied synthetic policy applies only to ruleCode SYNTH_LIMIT with currency USD, SYNTH_OPERATOR GTE and SYNTH_THRESHOLD 100.00. The captured task uses ruleCode SYNTH_OTHER, so a required prerequisite of the cited policy is not met; the policy's CONFIRMED/IGNORED outcome cannot be applied to this task.",
+      "businessEvidence" : [ {
+        "transactionId" : 2,
+        "accountId" : 3,
+        "amount" : 250,
+        "currency" : "USD",
+        "ruleCode" : "SYNTH_OTHER",
+        "reasonCode" : "USD amount threshold policy review",
+        "sourcePaths" : [ "transaction.id", "transaction.accountId", "transaction.amount", "transaction.currency", "reviewTask.ruleCode", "reviewTask.reasonCode" ]
+      } ],
+      "policyCitations" : [ {
+        "documentId" : "synth-usd-limit",
+        "version" : "v1",
+        "sourcePath" : "Document",
+        "excerpt" : "Project-only synthetic demo policy; not regulations or Core-native truth. For ruleCode SYNTH_LIMIT, currency USD, SYNTH_OPERATOR GTE, and SYNTH_THRESHOLD 100.00, currentAmount at or above 100.00 yields CONFIRMED; below 100.00 yields IGNORED. Required evidence cites documentId=synth-usd-limit, version=v1, sectionPath=Document and an exact relevant excerpt. Any missing or wrong prerequisite, absent exact policy citation, or missing/unparseable currentAmount yields INSUFFICIENT_EVIDENCE. Amounts are exact decimal strings; never round across the boundary. 中文：仅项目合成规则，美元金额大于等于100.00确认，小于100.00忽略；规则、币种、GTE、阈值100.00及精确政策引用缺一或错误均证据不足。"
+      } ],
+      "recommendation" : "INSUFFICIENT_EVIDENCE",
+      "reasoningSummary" : "The only supplied policy governs ruleCode SYNTH_LIMIT, but the review task's ruleCode is SYNTH_OTHER, so a required prerequisite is wrong and the policy explicitly states that any wrong prerequisite yields INSUFFICIENT_EVIDENCE. The amount (250 USD) exceeds the synthetic 100.00 threshold, but that comparison is not applicable because the rule code does not match. The reconciliation result is SUSPICIOUS with matchMethod NONE, and no policy is supplied to resolve that mismatch.",
+      "missingInformation" : [ "A policy that applies to ruleCode SYNTH_OTHER (the supplied policy covers only SYNTH_LIMIT).", "Counterparty or matching evidence to explain the SUSPICIOUS reconciliation result with matchMethod NONE.", "Confirmation of whether the SYNTH_OPERATOR GTE and SYNTH_THRESHOLD 100.00 risk facts are intended to apply to SYNTH_OTHER." ],
+      "limitations" : [ "This is an assistive analysis for a human FinGuard reviewer, not a final adjudication or proof of fraud.", "The supplied policy is a project-only synthetic demo policy, not regulation or Core-native truth.", "No Core state was accessed or modified; no external services or URLs were used." ]
+    },
+    "usageVerified" : true,
+    "knownEstimatedCny" : 0.00988800,
+    "heldCny" : 0,
+    "latencyMillis" : 4559,
+    "contextIndexVersion" : "sq-primary-20261104_221513_7669588",
+    "embeddingVersion" : "e5-small-int8-55102a6d5c23b708db337173",
+    "analysisId" : "711bc74d-4600-316a-819e-c45a16ee40b1",
+    "scenario" : "p4-primary",
+    "publication" : "primary",
+    "inputAmount" : "250.00",
+    "invoiceVerified" : false,
+    "snapshotSha256" : "395b5e866d77de4a367b191855a2c747dd6fe3ac1bd527ae24b1afa880dd0245",
+    "validatedAmounts" : [ "250" ],
+    "reportedUsage" : {
+      "latencyMillis" : 4052,
+      "outputTokens" : 725,
+      "inputTokens" : 2044
+    },
+    "budgetReservations" : [ {
+      "status" : "SETTLED",
+      "reserved_cny" : 0.03532800,
+      "settled_cny" : 0.00988800,
+      "input_tokens" : 2044,
+      "output_tokens" : 725
+    } ],
+    "contextManifestSha256" : "600aa4a20f27688815301f8e9b8382888e2e9e5b6eabbbee7b32965e05d9f9d3",
+    "contextIndexSha256" : "283fed6d1ba2ba42e5ba1ff80dd0526740423eac24a99ad0c212133cfd07d60a",
+    "contextEmbeddingSha256" : "01eaf7fb54027a16b5429cfde05eff691ecc08f93a90cc75a4601836495154cf"
+  }, {
+    "case_id" : "QW-009",
+    "execution" : "EXECUTED",
+    "protocolPassed" : true,
+    "qualityPassed" : true,
+    "validationStage" : "UNKNOWN",
+    "controlledFailureCode" : null,
+    "providerAttempts" : 1,
+    "expectedRecommendation" : "CONFIRMED",
+    "actualRecommendation" : "CONFIRMED",
+    "validatedResult" : {
+      "schemaVersion" : 1,
+      "analysisId" : "9c4eed4a-3631-35fb-a2e6-9a27e24f4871",
+      "reviewTaskSummary" : "Review task 42 (SYNTH_LIMIT, reason: USD amount threshold policy review) for transaction 2 on account 3, amount 100.01 USD, reconciliation result SUSPICIOUS with matchMethod NONE.",
+      "riskRuleExplanation" : "Synthetic project policy for ruleCode SYNTH_LIMIT: for USD with SYNTH_OPERATOR GTE and SYNTH_THRESHOLD 100.00, a currentAmount at or above 100.00 yields CONFIRMED; below 100.00 yields IGNORED. Amounts are exact decimal strings and must not be rounded across the boundary.",
+      "businessEvidence" : [ {
+        "transactionId" : 2,
+        "accountId" : 3,
+        "amount" : 100.01,
+        "currency" : "USD",
+        "ruleCode" : "SYNTH_LIMIT",
+        "reasonCode" : "USD amount threshold policy review",
+        "sourcePaths" : [ "transaction.id", "transaction.accountId", "transaction.amount", "transaction.currency", "reviewTask.ruleCode", "reviewTask.reasonCode" ]
+      } ],
+      "policyCitations" : [ {
+        "documentId" : "synth-usd-limit",
+        "version" : "v1",
+        "sourcePath" : "Document",
+        "excerpt" : "Project-only synthetic demo policy; not regulations or Core-native truth. For ruleCode SYNTH_LIMIT, currency USD, SYNTH_OPERATOR GTE, and SYNTH_THRESHOLD 100.00, currentAmount at or above 100.00 yields CONFIRMED; below 100.00 yields IGNORED. Required evidence cites documentId=synth-usd-limit, version=v1, sectionPath=Document and an exact relevant excerpt. Any missing or wrong prerequisite, absent exact policy citation, or missing/unparseable currentAmount yields INSUFFICIENT_EVIDENCE. Amounts are exact decimal strings; never round across the boundary. 中文：仅项目合成规则，美元金额大于等于100.00确认，小于100.00忽略；规则、币种、GTE、阈值100.00及精确政策引用缺一或错误均证据不足。"
+      } ],
+      "recommendation" : "CONFIRMED",
+      "reasoningSummary" : "All prerequisites match: ruleCode SYNTH_LIMIT, currency USD, SYNTH_OPERATOR GTE, SYNTH_THRESHOLD 100.00, and an exact policy citation is supplied. The exact amount 100.01 is at or above the 100.00 threshold, so the synthetic rule yields CONFIRMED. This reflects satisfaction of the review rule only, not a fraud finding or permission to mutate Core.",
+      "missingInformation" : [ ],
+      "limitations" : [ "Synthetic project-only policy; not a regulatory or Core-native determination.", "Human reviewer must validate the facts and policy applicability before any final action.", "Reconciliation result SUSPICIOUS with matchMethod NONE is noted but not resolved by this analysis; no counterparty evidence was supplied." ]
+    },
+    "usageVerified" : true,
+    "knownEstimatedCny" : 0.00912200,
+    "heldCny" : 0,
+    "latencyMillis" : 3434,
+    "contextIndexVersion" : "sq-primary-20261104_221513_7669588",
+    "embeddingVersion" : "e5-small-int8-55102a6d5c23b708db337173",
+    "analysisId" : "9c4eed4a-3631-35fb-a2e6-9a27e24f4871",
+    "scenario" : "p4-primary",
+    "publication" : "primary",
+    "inputAmount" : "100.01",
+    "invoiceVerified" : false,
+    "snapshotSha256" : "318156bc86817bdd0ff6ebd32d34095ad9cee9140bb2fb5875b4c7b75ec34cae",
+    "validatedAmounts" : [ "100.01" ],
+    "reportedUsage" : {
+      "latencyMillis" : 2986,
+      "outputTokens" : 627,
+      "inputTokens" : 2053
+    },
+    "budgetReservations" : [ {
+      "status" : "SETTLED",
+      "reserved_cny" : 0.03536000,
+      "settled_cny" : 0.00912200,
+      "input_tokens" : 2053,
+      "output_tokens" : 627
+    } ],
+    "contextManifestSha256" : "f7f0652ac2c24ee9ea1b38337a5fe233325bdfe64afe47e89731f8e05f746268",
+    "contextIndexSha256" : "283fed6d1ba2ba42e5ba1ff80dd0526740423eac24a99ad0c212133cfd07d60a",
+    "contextEmbeddingSha256" : "01eaf7fb54027a16b5429cfde05eff691ecc08f93a90cc75a4601836495154cf"
+  }, {
+    "case_id" : "QW-010",
+    "execution" : "EXECUTED",
+    "protocolPassed" : true,
+    "qualityPassed" : true,
+    "validationStage" : "UNKNOWN",
+    "controlledFailureCode" : null,
+    "providerAttempts" : 1,
+    "expectedRecommendation" : "INSUFFICIENT_EVIDENCE",
+    "actualRecommendation" : "INSUFFICIENT_EVIDENCE",
+    "validatedResult" : {
+      "schemaVersion" : 1,
+      "analysisId" : "073a2f66-865d-3737-85da-9bfe7e65ca87",
+      "reviewTaskSummary" : "SYNTH_LIMIT review task 42 for transaction 2 (account 3), a CSV-imported CNY 250 transaction flagged for USD amount threshold policy review; reconciliation result is SUSPICIOUS with no match method.",
+      "riskRuleExplanation" : "The synthetic policy applies ruleCode SYNTH_LIMIT only to currency USD with SYNTH_OPERATOR GTE and SYNTH_THRESHOLD 100.00: a currentAmount at or above 100.00 yields CONFIRMED, below 100.00 yields IGNORED, and any missing or wrong prerequisite yields INSUFFICIENT_EVIDENCE. Here the transaction currency is CNY, not USD, so a required prerequisite of the rule is not met and the threshold comparison cannot be validly applied.",
+      "businessEvidence" : [ {
+        "transactionId" : 2,
+        "accountId" : 3,
+        "amount" : 250,
+        "currency" : "CNY",
+        "ruleCode" : "SYNTH_LIMIT",
+        "reasonCode" : "USD amount threshold policy review",
+        "sourcePaths" : [ "transaction.id", "transaction.accountId", "transaction.amount", "transaction.currency", "reviewTask.ruleCode", "reviewTask.reasonCode" ]
+      } ],
+      "policyCitations" : [ {
+        "documentId" : "synth-usd-limit",
+        "version" : "v1",
+        "sourcePath" : "Document",
+        "excerpt" : "Project-only synthetic demo policy; not regulations or Core-native truth. For ruleCode SYNTH_LIMIT, currency USD, SYNTH_OPERATOR GTE, and SYNTH_THRESHOLD 100.00, currentAmount at or above 100.00 yields CONFIRMED; below 100.00 yields IGNORED. Required evidence cites documentId=synth-usd-limit, version=v1, sectionPath=Document and an exact relevant excerpt. Any missing or wrong prerequisite, absent exact policy citation, or missing/unparseable currentAmount yields INSUFFICIENT_EVIDENCE. Amounts are exact decimal strings; never round across the boundary. 中文：仅项目合成规则，美元金额大于等于100.00确认，小于100.00忽略；规则、币种、GTE、阈值100.00及精确政策引用缺一或错误均证据不足。"
+      } ],
+      "recommendation" : "INSUFFICIENT_EVIDENCE",
+      "reasoningSummary" : "The supplied synthetic policy requires currency USD for SYNTH_LIMIT, but the Core transaction currency is CNY, so a prerequisite is wrong and the policy itself mandates INSUFFICIENT_EVIDENCE. The amount 250 cannot be compared against the 100.00 USD threshold without a valid USD amount; the reconciliation result SUSPICIOUS with matchMethod NONE also lacks a counterparty to resolve.",
+      "missingInformation" : [ "A USD-denominated amount (or currency conversion evidence) for transaction 2 to compare against the 100.00 threshold", "Counterparty or matched record evidence to explain the SUSPICIOUS reconciliation result with matchMethod NONE", "Confirmation of whether SYNTH_LIMIT is intended to apply to non-USD transactions" ],
+      "limitations" : [ "This is an assistive analysis for a human FinGuard reviewer, not a final adjudication or proof of fraud.", "The cited policy is a project-only synthetic demo policy, not regulation or Core-native truth.", "No Core state was accessed or changed; no external services or URLs were used." ]
+    },
+    "usageVerified" : true,
+    "knownEstimatedCny" : 0.00985400,
+    "heldCny" : 0,
+    "latencyMillis" : 4168,
+    "contextIndexVersion" : "sq-primary-20261104_221513_7669588",
+    "embeddingVersion" : "e5-small-int8-55102a6d5c23b708db337173",
+    "analysisId" : "073a2f66-865d-3737-85da-9bfe7e65ca87",
+    "scenario" : "p4-primary",
+    "publication" : "primary",
+    "inputAmount" : "250.00",
+    "invoiceVerified" : false,
+    "snapshotSha256" : "c9308dddbb76fbd951cdd400505d08601fa78bb29eca11afe287b98103949b98",
+    "validatedAmounts" : [ "250" ],
+    "reportedUsage" : {
+      "latencyMillis" : 3727,
+      "outputTokens" : 720,
+      "inputTokens" : 2047
+    },
+    "budgetReservations" : [ {
+      "status" : "SETTLED",
+      "reserved_cny" : 0.03530800,
+      "settled_cny" : 0.00985400,
+      "input_tokens" : 2047,
+      "output_tokens" : 720
+    } ],
+    "contextManifestSha256" : "96a5d321cb78e1109062c82ff218276f3d346737393119f68c239bdc9ae6625f",
+    "contextIndexSha256" : "283fed6d1ba2ba42e5ba1ff80dd0526740423eac24a99ad0c212133cfd07d60a",
+    "contextEmbeddingSha256" : "01eaf7fb54027a16b5429cfde05eff691ecc08f93a90cc75a4601836495154cf"
+  }, {
+    "case_id" : "QW-011",
+    "execution" : "EXECUTED",
+    "protocolPassed" : true,
+    "qualityPassed" : true,
+    "validationStage" : "UNKNOWN",
+    "controlledFailureCode" : null,
+    "providerAttempts" : 1,
+    "expectedRecommendation" : "INSUFFICIENT_EVIDENCE",
+    "actualRecommendation" : "INSUFFICIENT_EVIDENCE",
+    "validatedResult" : {
+      "schemaVersion" : 1,
+      "analysisId" : "d5e2b212-cdde-32b7-ad12-304ee35fccf8",
+      "reviewTaskSummary" : "Pending SYNTH_LIMIT review (task 42) for a USD 250.00 CSV-imported transaction on account 3, flagged by reason code 'USD amount threshold policy review'; reconciliation result is SUSPICIOUS with no match method.",
+      "riskRuleExplanation" : "SYNTH_LIMIT is a synthetic USD amount-threshold rule. Core risk facts indicate operator GTE with a threshold of 100.00 USD from PROJECT_SYNTHETIC_POLICY, and the transaction amount is 250.00 USD, which is at or above that threshold. However, the only retrieved policy evidence is the EUR_LIMIT euro policy (threshold 80.00 EUR), which explicitly states it cannot establish SYNTH_LIMIT, a USD threshold, or a USD CONFIRMED/IGNORED outcome. No usable policy supporting the SYNTH_LIMIT rule was supplied, so the threshold comparison cannot be grounded in citable policy.",
+      "businessEvidence" : [ {
+        "transactionId" : 2,
+        "accountId" : 3,
+        "amount" : 250,
+        "currency" : "USD",
+        "ruleCode" : "SYNTH_LIMIT",
+        "reasonCode" : "USD amount threshold policy review",
+        "sourcePaths" : [ "transaction.id", "transaction.accountId", "transaction.amount", "transaction.currency", "reviewTask.ruleCode", "reviewTask.reasonCode" ]
+      } ],
+      "policyCitations" : [ {
+        "documentId" : "euro-review",
+        "version" : "v1",
+        "sourcePath" : "Document",
+        "excerpt" : "Project-only synthetic demo policy; not regulations. This separate rule is EUR_LIMIT for currency EUR, operator GTE and threshold 80.00. A valid EUR_LIMIT case at or above 80.00 is queued for euro specialist review; below 80.00 is not queued. Cite documentId=euro-review, version=v1, sectionPath=Document with an exact excerpt. This policy cannot establish SYNTH_LIMIT, a USD threshold, or a USD CONFIRMED/IGNORED outcome. 中文：EUR_LIMIT只处理欧元，金额达到80.00进入欧元专员复核；不得用作美元合成限额规则的证据。"
+      } ],
+      "recommendation" : "INSUFFICIENT_EVIDENCE",
+      "reasoningSummary" : "The transaction is 250.00 USD and Core risk facts show a GTE threshold of 100.00 USD, so the amount exceeds the stated threshold. But the only supplied policy is the EUR_LIMIT euro policy, which by its own terms cannot establish SYNTH_LIMIT, a USD threshold, or a USD outcome. Without a usable SYNTH_LIMIT/USD policy citation, the rule cannot be confirmed or dismissed on policy grounds.",
+      "missingInformation" : [ "A usable policy document defining SYNTH_LIMIT for USD transactions, including its threshold and required review action.", "Clarification of the reconciliation SUSPICIOUS/REVIEW result and any counterparty or match details.", "Confirmation of the provenance and authority of the PROJECT_SYNTHETIC_POLICY risk facts (operator GTE, threshold 100.00)." ],
+      "limitations" : [ "Only the EUR_LIMIT euro policy was retrieved; it is explicitly inapplicable to SYNTH_LIMIT and USD amounts.", "This is an assistive analysis for a human FinGuard reviewer, not a final adjudication or permission to mutate Core.", "No external lookups or tools were used; conclusions are limited to supplied Core facts and policy evidence." ]
+    },
+    "usageVerified" : true,
+    "knownEstimatedCny" : 0.00991400,
+    "heldCny" : 0,
+    "latencyMillis" : 4424,
+    "contextIndexVersion" : "sq-missing-20261104_221513_7669588",
+    "embeddingVersion" : "e5-small-int8-55102a6d5c23b708db337173",
+    "analysisId" : "d5e2b212-cdde-32b7-ad12-304ee35fccf8",
+    "scenario" : "p4-primary",
+    "publication" : "missing-policy",
+    "inputAmount" : "250.00",
+    "invoiceVerified" : false,
+    "snapshotSha256" : "6575d4880b624dcf9d0beb3526ecaf4e9906f5f9bf1eb4156c89da7ddc8e89ea",
+    "validatedAmounts" : [ "250" ],
+    "reportedUsage" : {
+      "latencyMillis" : 4009,
+      "outputTokens" : 742,
+      "inputTokens" : 1989
+    },
+    "budgetReservations" : [ {
+      "status" : "SETTLED",
+      "reserved_cny" : 0.03494200,
+      "settled_cny" : 0.00991400,
+      "input_tokens" : 1989,
+      "output_tokens" : 742
+    } ],
+    "contextManifestSha256" : "a137a060c7d8d807e21f9a8eae612dc675462a462c67efc8489e04cf9d44d0b8",
+    "contextIndexSha256" : "97245acbf8c0393e1c4fec2195bfdf142c86c440d8291b0afa4e3b468d064164",
+    "contextEmbeddingSha256" : "01eaf7fb54027a16b5429cfde05eff691ecc08f93a90cc75a4601836495154cf"
+  } ],
+  "casesSha256" : "12d540b14702cc503b1ea7122bf9cfc18c34ec030f0179369350aeee372c4e88",
+  "preparationSha256" : "29540b8caca5061b8fe62cfff8a1c888079c2d4f07cf6cb3e6f2afc5b0c58e84",
+  "indexVersion" : "sq-primary-20261104_221513_7669588",
+  "missingPolicyIndexVersion" : "sq-missing-20261104_221513_7669588",
+  "embeddingVersion" : "e5-small-int8-55102a6d5c23b708db337173",
+  "minimumScore" : 0.8569634500000001,
+  "lifecycleChecks" : {
+    "missingPublished" : true,
+    "primaryRetired" : true,
+    "retiredPrimaryPinnedRetrievalRefused" : true,
+    "primaryRestored" : true
+  },
+  "budgetReservationStates" : {
+    "SETTLED" : 11
+  },
+  "budgetReservations" : [ {
+    "status" : "SETTLED",
+    "reserved_cny" : 0.03530800,
+    "settled_cny" : 0.00985400,
+    "input_tokens" : 2047,
+    "output_tokens" : 720
+  }, {
+    "status" : "SETTLED",
+    "reserved_cny" : 0.03536600,
+    "settled_cny" : 0.00993600,
+    "input_tokens" : 2056,
+    "output_tokens" : 728
+  }, {
+    "status" : "SETTLED",
+    "reserved_cny" : 0.03530400,
+    "settled_cny" : 0.00951600,
+    "input_tokens" : 2050,
+    "output_tokens" : 677
+  }, {
+    "status" : "SETTLED",
+    "reserved_cny" : 0.03536800,
+    "settled_cny" : 0.00995800,
+    "input_tokens" : 2051,
+    "output_tokens" : 732
+  }, {
+    "status" : "SETTLED",
+    "reserved_cny" : 0.03532800,
+    "settled_cny" : 0.00988800,
+    "input_tokens" : 2044,
+    "output_tokens" : 725
+  }, {
+    "status" : "SETTLED",
+    "reserved_cny" : 0.03530600,
+    "settled_cny" : 0.00997000,
+    "input_tokens" : 2045,
+    "output_tokens" : 735
+  }, {
+    "status" : "SETTLED",
+    "reserved_cny" : 0.03536000,
+    "settled_cny" : 0.00912200,
+    "input_tokens" : 2053,
+    "output_tokens" : 627
+  }, {
+    "status" : "SETTLED",
+    "reserved_cny" : 0.03494200,
+    "settled_cny" : 0.00991400,
+    "input_tokens" : 1989,
+    "output_tokens" : 742
+  }, {
+    "status" : "SETTLED",
+    "reserved_cny" : 0.03530000,
+    "settled_cny" : 0.00980800,
+    "input_tokens" : 2044,
+    "output_tokens" : 715
+  }, {
+    "status" : "SETTLED",
+    "reserved_cny" : 0.03533000,
+    "settled_cny" : 0.01005400,
+    "input_tokens" : 2047,
+    "output_tokens" : 745
+  }, {
+    "status" : "SETTLED",
+    "reserved_cny" : 0.03530000,
+    "settled_cny" : 0.00973000,
+    "input_tokens" : 2045,
+    "output_tokens" : 705
+  } ],
+  "verifiedInputTokens" : 22471,
+  "verifiedOutputTokens" : 7851,
+  "accountingIntegrityPassed" : true,
+  "completedAt" : 1793802470.421878700,
+  "qualityPassedCount" : 11
+}

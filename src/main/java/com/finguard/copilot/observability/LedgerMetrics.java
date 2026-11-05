@@ -60,14 +60,15 @@ public final class LedgerMetrics {
                     SELECT status,COUNT(*) AS count,
                       COALESCE(SUM(CASE WHEN status IN ('RESERVED','UNKNOWN_HELD') THEN reserved_cny ELSE 0 END),0) AS held,
                       COALESCE(SUM(CASE WHEN status='SETTLED' THEN settled_cny ELSE 0 END),0) AS settled
-                    FROM model_budget_reservation GROUP BY status
+                    FROM (SELECT status,reserved_cny,settled_cny FROM model_budget_reservation
+                      UNION ALL SELECT status,reserved_cny,settled_cny FROM agent_model_call) calls GROUP BY status
                     """)) {
                 String state=(String)row.get("status");if(!STATES.contains(state)) throw new IllegalStateException();
                 states.put(state,new Amounts(number(row.get("count")),number(row.get("held")),number(row.get("settled"))));
             }
-            long calls=jdbc.queryForObject("SELECT COUNT(*) FROM model_call_reservation",Long.class);
-            long usage=jdbc.queryForObject("SELECT COUNT(*) FROM model_usage_ledger",Long.class);
-            long responses=jdbc.queryForObject("SELECT COUNT(DISTINCT analysis_id) FROM model_budget_event WHERE event_type='PROVIDER_RESPONSE'",Long.class);
+            long calls=jdbc.queryForObject("SELECT (SELECT COUNT(*) FROM model_call_reservation)+(SELECT COUNT(*) FROM agent_model_call)",Long.class);
+            long usage=jdbc.queryForObject("SELECT (SELECT COUNT(*) FROM model_usage_ledger)+(SELECT COUNT(*) FROM agent_model_call WHERE input_tokens IS NOT NULL)",Long.class);
+            long responses=jdbc.queryForObject("SELECT (SELECT COUNT(DISTINCT analysis_id) FROM model_budget_event WHERE event_type='PROVIDER_RESPONSE')+(SELECT COUNT(*) FROM agent_model_call WHERE provider_response_sha256 IS NOT NULL)",Long.class);
             snapshot.set(new Snapshot(Map.copyOf(states),calls,usage,responses,clock.millis()));healthy=1;
         } catch(RuntimeException ignored){healthy=0;failures.increment();}
     }

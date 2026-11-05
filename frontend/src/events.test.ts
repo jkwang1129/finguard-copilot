@@ -49,3 +49,10 @@ test("returns a controlled authentication error and never echoes payload text", 
     readProgress(stream(body), id, "0", () => {}),
   ).rejects.toMatchObject({ code: "UNAUTHENTICATED" });
 });
+test("accepts controlled Agent revision metadata in fragmented reconnect events", async () => {
+  const text = frame("1", "WAITING_FOR_HUMAN").replace('"failureCode":null', '"agentRevision":"9007199254740993","agentNode":"TOOLS","toolNames":["search_review_policy"],"failureCode":null');
+  const values: string[] = [];
+  await readProgress(stream(text, 1), id, "0", (event) => values.push(event.agentRevision!));
+  expect(values).toEqual(["9007199254740993"]);
+  await expect(readProgress(stream(text.replace('"TOOLS"', '"uncontrolled-body"')), id, "0", () => {})).rejects.toThrow();
+});

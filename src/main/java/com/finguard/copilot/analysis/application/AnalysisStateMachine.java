@@ -24,6 +24,19 @@ public final class AnalysisStateMachine {
         if (isTerminal(current)) {
             throw new IllegalStateException("terminal analysis status cannot transition");
         }
+        Set<AnalysisStatus> agent=EnumSet.of(AnalysisStatus.PLANNING,AnalysisStatus.TOOL_RUNNING,AnalysisStatus.WAITING_FOR_HUMAN);
+        if(agent.contains(current) || agent.contains(requested)){
+            if(requested==AnalysisStatus.FAILED)return requested;
+            boolean allowed=switch(current){
+                case RETRIEVAL_READY -> requested==AnalysisStatus.PLANNING;
+                case PLANNING -> Set.of(AnalysisStatus.TOOL_RUNNING,AnalysisStatus.GENERATING,AnalysisStatus.VALIDATING,AnalysisStatus.WAITING_FOR_HUMAN).contains(requested);
+                case TOOL_RUNNING -> Set.of(AnalysisStatus.GENERATING,AnalysisStatus.WAITING_FOR_HUMAN).contains(requested);
+                case WAITING_FOR_HUMAN -> requested==AnalysisStatus.PLANNING;
+                default -> false;
+            };
+            if(allowed)return requested;
+            throw new IllegalStateException("Agent status transition not allowed");
+        }
         if (requested.ordinal() < current.ordinal()) {
             return current;
         }
@@ -49,6 +62,7 @@ public final class AnalysisStateMachine {
             case GENERATING -> AnalysisStatus.VALIDATING;
             case VALIDATING -> AnalysisStatus.SUCCEEDED;
             case SUCCEEDED, FAILED -> throw new IllegalStateException("terminal status has no next state");
+            case PLANNING, TOOL_RUNNING, WAITING_FOR_HUMAN -> throw new IllegalStateException("Agent status requires a conditional edge");
         };
     }
 }

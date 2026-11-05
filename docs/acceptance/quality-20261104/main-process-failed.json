@@ -1,0 +1,39 @@
+{
+  "runId": "20261104183249",
+  "startedAt": "2026-11-04T18:32:49.7929322+08:00",
+  "status": "FAILED",
+  "coreDatabase": "fg_core_e2e_20261104183249",
+  "copilotDatabase": "fg_copilot_e2e_20261104183249",
+  "rabbitVhost": "fg-e2e-20261104183249",
+  "qdrantContainer": "fg-e2e-qdrant-20261104183249",
+  "provider": "deepseek",
+  "model": "deepseek-flash",
+  "prompt": "review-analysis-v2",
+  "maxModelCalls": 1,
+  "embedding": "e5-small-int8-55102a6d5c23b708db337173",
+  "embeddingManifestSha256": "55102a6d5c23b708db337173e13e93954b1d9cf0fb7632cfa3d2ce42b643d10d",
+  "currency": "CNY",
+  "priceTableVersion": "deepseek-flash-native-20261104-peak-miss-cny-v1",
+  "fixture": false,
+  "expectedCalls": 1,
+  "harnessSha256": "245f968e8db8109be910c81ef3df5cf0ac5d32de870bd8852c4f34b9acc529da",
+  "smokeBudgetCny": 0.1,
+  "estimatedUpperBoundCny": 0.08,
+  "inputPricePerMillionCny": 2.0,
+  "outputPricePerMillionCny": 8.0,
+  "copilotJarSha256": "83b091600cda944a7eadcb48b6a1bf4730c985ce1024c51b23ad3dc589a3a0cb",
+  "coreJarSha256": "c910fdb485e1ef55470c3bd30bbd42c15f07ec2f7e164be1b38a12e45cafee28",
+  "checks": [
+    {
+      "passed": true,
+      "name": "Run-owned RabbitMQ configuration is bound before Core startup"
+    },
+    {
+      "passed": true,
+      "name": "Core health UP with real MySQL/RabbitMQ/Redis"
+    }
+  ],
+  "error": "Service exited during startup; inspect the run-specific service log",
+  "servicesLeftRunning": false,
+  "finishedAt": "2026-11-04T18:33:34.2909813+08:00"
+}

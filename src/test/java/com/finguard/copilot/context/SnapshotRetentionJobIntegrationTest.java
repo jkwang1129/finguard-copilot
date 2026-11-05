@@ -58,12 +58,48 @@ class SnapshotRetentionJobIntegrationTest {
 
     @BeforeEach
     void cleanTables() {
+        jdbc.update("DELETE FROM analysis_checkpoint");
+        jdbc.update("DELETE FROM analysis_tool_execution");
+        jdbc.update("DELETE FROM agent_run_policy");
         jdbc.update("DELETE FROM analysis_message_receipt");
         jdbc.update("DELETE FROM analysis_result");
         jdbc.update("DELETE FROM outbox_event");
         jdbc.update("DELETE FROM analysis_input_snapshot");
         jdbc.update("DELETE FROM analysis_idempotency_key");
         jdbc.update("DELETE FROM analysis_run");
+    }
+
+    @Test
+    void expiredFrozenQueuedAgentWithoutCheckpointTerminatesAndCannotDeferAgain() {
+        UUID id=insertRun("expired-queued-agent", "2026-07-26 00:00:00.000000");
+        insertSnapshot(id,"2026-07-26 00:00:00.000000","2026-08-25 00:00:00.000000");
+        jdbc.update("UPDATE analysis_run SET status='QUEUED' WHERE id=UUID_TO_BIN(?)",id.toString());
+        jdbc.update("INSERT INTO agent_run_policy(analysis_id,workflow_version,snapshot_sha256,index_version,runtime_enabled) VALUES(UUID_TO_BIN(?),'agent-v1',UNHEX(REPEAT('cd',32)),'test',TRUE)",id.toString());
+        new SnapshotRetentionJob(jdbc,properties,Clock.fixed(NOW,ZoneOffset.UTC)).runOnce();
+        assertThat(jdbc.queryForObject("SELECT failure_code FROM analysis_run WHERE id=UUID_TO_BIN(?)",String.class,id.toString())).isEqualTo("CONTEXT_STALE");
+        var store=new com.finguard.copilot.agent.checkpoint.CheckpointStore(jdbc,new org.springframework.transaction.support.TransactionTemplate(new org.springframework.jdbc.datasource.DataSourceTransactionManager(jdbc.getDataSource())),new com.finguard.copilot.events.AnalysisEventRepository(jdbc),new SnapshotCodec(),Clock.fixed(NOW,ZoneOffset.UTC),Duration.ofMinutes(2));
+        store.deferDisabled(new com.finguard.copilot.dispatch.AnalysisRequestedMessage(1,UUID.randomUUID(),id,NOW));
+        assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM outbox_event WHERE analysis_id=UUID_TO_BIN(?)",Integer.class,id.toString())).isZero();
+    }
+
+    @Test
+    void expiredAgentPurgesDerivedContentFencesOwnerAndKeepsAuditHashes() {
+        UUID id=insertRun("expired-agent", "2026-07-26 00:00:00.000000");
+        insertSnapshot(id,"2026-07-26 00:00:00.000000","2026-08-25 00:00:00.000000");
+        jdbc.update("UPDATE analysis_run SET status='TOOL_RUNNING' WHERE id=UUID_TO_BIN(?)",id.toString());
+        jdbc.update("INSERT INTO agent_run_policy(analysis_id,workflow_version,snapshot_sha256,index_version,runtime_enabled) VALUES(UUID_TO_BIN(?),'agent-v1',UNHEX(REPEAT('cd',32)),'test',TRUE)",id.toString());
+        jdbc.update("INSERT INTO analysis_checkpoint(analysis_id,schema_version,workflow_version,next_node,memory_json,memory_sha256,snapshot_sha256,index_version,owner_token,lease_until) VALUES(UUID_TO_BIN(?),1,'agent-v1','TOOLS','{\"private\":\"derived-fact\"}',REPEAT('a',64),UNHEX(REPEAT('cd',32)),'test','old-owner',CURRENT_TIMESTAMP(6))",id.toString());
+        jdbc.update("INSERT INTO analysis_tool_execution(analysis_id,slot,step_key,tool_name,arguments_sha256,status,result_json,result_sha256) VALUES(UUID_TO_BIN(?),1,'tool','get_task_state',REPEAT('b',64),'SUCCEEDED','{\"private\":\"derived-fact\"}',REPEAT('c',64))",id.toString());
+        jdbc.update("INSERT INTO analysis_mcp_capability(capability_sha256,analysis_id,reviewer_username,revision,tool_scope_json,expires_at) VALUES(REPEAT('e',64),UUID_TO_BIN(?),'snapshot-reviewer',0,'[\"get_task_state\"]',CURRENT_TIMESTAMP(6))",id.toString());
+        assertThat(new SnapshotRetentionJob(jdbc,properties,Clock.fixed(NOW,ZoneOffset.UTC)).runOnce()).isEqualTo(1);
+        var checkpoint=jdbc.queryForMap("SELECT * FROM analysis_checkpoint WHERE analysis_id=UUID_TO_BIN(?)",id.toString());
+        assertThat(checkpoint.get("memory_json")).isNull();
+        assertThat(checkpoint.get("memory_sha256")).isEqualTo("a".repeat(64));
+        assertThat(checkpoint.get("owner_token")).isNull();
+        assertThat(jdbc.queryForObject("SELECT result_json FROM analysis_tool_execution WHERE analysis_id=UUID_TO_BIN(?)",String.class,id.toString())).isNull();
+        assertThat(jdbc.queryForObject("SELECT result_sha256 FROM analysis_tool_execution WHERE analysis_id=UUID_TO_BIN(?)",String.class,id.toString())).isEqualTo("c".repeat(64));
+        assertThat(jdbc.queryForObject("SELECT failure_code FROM analysis_run WHERE id=UUID_TO_BIN(?)",String.class,id.toString())).isEqualTo("CONTEXT_STALE");
+        assertThat(jdbc.queryForObject("SELECT revoked_at FROM analysis_mcp_capability WHERE analysis_id=UUID_TO_BIN(?)",java.sql.Timestamp.class,id.toString())).isNotNull();
     }
 
     @Test

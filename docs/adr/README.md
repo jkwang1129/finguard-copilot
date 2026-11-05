@@ -16,3 +16,4 @@ ADR 记录已经确定且会影响后续实现的选择。状态为 `Accepted` �
 | [0009](0009-agent-evaluation-and-observability.md) | 规则、Judge、人工校准和 Trace 组成评测闭环 | Accepted |
 | [0010](0010-bounded-model-routing-and-quota.md) | 多模型路由受预算、配额和安全策略约束 | Accepted |
 | [0011](0011-validated-sse-and-lightweight-ui.md) | SSE 只传受控事件并配套轻量演示页面 | Accepted |
+| [0013](0013-phase5-durable-graph-and-human-resume.md) | 固定Graph、MySQL恢复真相与人工续程 | Local engineering accepted |

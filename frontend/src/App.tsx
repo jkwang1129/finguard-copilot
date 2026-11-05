@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { ApiError, ReviewApi } from "./api";
 import type { Api, Page, Progress, Session, Status, Verdict } from "./api";
 import { readProgress } from "./events";
+import { AgentReviewPanel } from "./AgentReviewPanel";
 import "./App.css";
 
 const defaultClient = new ReviewApi();
@@ -13,6 +14,9 @@ const labels: Record<Status, string> = {
   VALIDATING: "正在校验结果",
   SUCCEEDED: "建议已通过校验",
   FAILED: "分析失败",
+  PLANNING: "正在选择核查步骤",
+  TOOL_RUNNING: "正在执行只读核查",
+  WAITING_FOR_HUMAN: "等待人工确认",
 };
 const recommendations = {
   CONFIRMED: "建议确认风险",
@@ -189,6 +193,12 @@ function App({ client = defaultClient }: { client?: Api }) {
                   }
                 : previous,
             );
+            if (["PLANNING", "TOOL_RUNNING", "WAITING_FOR_HUMAN"].includes(update.status)) {
+              const sequence = update.sequence;
+              void client.view(auth.token, id, signal).then((fresh) => {
+                if (current() && cursor.current === sequence) setPage(fresh);
+              }).catch((cause) => { if (current()) report(cause, version); });
+            }
           });
         } catch (cause) {
           if (
@@ -410,6 +420,9 @@ function App({ client = defaultClient }: { client?: Api }) {
               </section>
             ) : (
               <>
+                {page.agent && <AgentReviewPanel page={page} session={session} client={client}
+                  onUpdated={() => { void begin(page.analysisId, session, true); }}
+                  onError={(cause) => report(cause, epoch.current)} />}
                 <section className="card">
                   <div className="section-top">
                     <h2>分析概览</h2>

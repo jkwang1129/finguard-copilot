@@ -56,7 +56,7 @@ public final class KnowledgeIndexEvaluationService {
         try {
             for (RagCase ragCase : cases) {
                 List<VectorSearchResult> results = vectorStore.search(new VectorSearchQuery(
-                        indexVersion, embeddingGateway.embed(ragCase.query(), embeddingVersion), topK));
+                        indexVersion, embeddingGateway.embedQuery(ragCase.query(), embeddingVersion), topK));
                 List<VectorSearchResult> accepted = results.stream()
                         .filter(result -> result.score() >= minimumScore)
                         .toList();

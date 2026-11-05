@@ -1,0 +1,15 @@
+[extend]
+useDefault = true
+
+# These frozen evaluation files contain public file-integrity hashes. Require
+# both an exact evidence path and a filename-keyed SHA; credential keys elsewhere
+# (including api_key in these same files) retain the default detection rules.
+[[rules]]
+id = "generic-api-key"
+
+[[rules.allowlists]]
+description = "Published evaluation file integrity hashes"
+condition = "AND"
+regexTarget = "match"
+paths = ['''(^|/)docs/(evaluations/semantic-main(-20261104|-guard-requalification)-manifest\.json|acceptance/semantic-margin-20261105/rag-v2-freeze\.json)$''']
+regexes = ['''^[^"\r\n]+\.(java|class|jar|xml|ps1|json|jsonl|txt|py|toml|lock)"\s*:\s*"[a-f0-9]{64}"?$''']

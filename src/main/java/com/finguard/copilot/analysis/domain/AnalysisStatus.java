@@ -7,5 +7,8 @@ public enum AnalysisStatus {
     GENERATING,
     VALIDATING,
     SUCCEEDED,
-    FAILED
+    FAILED,
+    PLANNING,
+    TOOL_RUNNING,
+    WAITING_FOR_HUMAN
 }

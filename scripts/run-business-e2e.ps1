@@ -12,6 +12,11 @@ param(
     [Nullable[decimal]]$OutputPricePerMillionCny,
     [string]$PriceTableVersion,
     [switch]$LocalModelStub,
+    [switch]$AgentAcceptance,
+    [switch]$AgentFaultMatrix,
+    [switch]$McpAcceptance,
+    [switch]$AgentBranchMatrix,
+    [switch]$AgentInfrastructureMatrix,
     [switch]$IsolatedRedis,
     [switch]$ExpectPolicyRejection,
     [switch]$ExpectFactRejection,
@@ -20,12 +25,24 @@ param(
     [switch]$ExpectRedisFailure,
     [switch]$PlanOnly,
     [switch]$BrowserAcceptance,
-    [switch]$KeepRunning
+    [switch]$KeepRunning,
+    [switch]$SemanticEmbedding,
+    [string]$EmbeddingEndpoint='http://127.0.0.1:8766',
+    [string]$EmbeddingVersion,
+    [string]$EmbeddingManifestSha256
 )
 $ErrorActionPreference = 'Stop'
 $initialEnvironment = @{}
 Get-ChildItem Env: | ForEach-Object { $initialEnvironment[$_.Name] = $_.Value }
 $root = Split-Path -Parent $PSScriptRoot
+if($SemanticEmbedding){
+    $embeddingUri=[Uri]$EmbeddingEndpoint
+    if($embeddingUri.Scheme -ne 'http' -or $embeddingUri.Host -ne '127.0.0.1' -or $embeddingUri.Port -lt 1 -or $embeddingUri.UserInfo -or $embeddingUri.Query -or $embeddingUri.Fragment -or $embeddingUri.AbsolutePath -ne '/' -or -not $EmbeddingVersion -or $EmbeddingManifestSha256 -notmatch '^[a-f0-9]{64}$'){throw 'Pinned loopback semantic embedding configuration required'}
+}
+if ($AgentFaultMatrix) { $AgentAcceptance=$true }
+if ($McpAcceptance) { $AgentAcceptance=$true }
+if ($AgentBranchMatrix -or $AgentInfrastructureMatrix) { $AgentAcceptance=$true }
+if ($AgentAcceptance -and -not $LocalModelStub) { throw 'AgentAcceptance requires LocalModelStub; no paid native provider qualification is authorized' }
 if ($BrowserAcceptance -and (-not $LocalModelStub -or -not $KeepRunning)) { throw 'BrowserAcceptance requires LocalModelStub and KeepRunning; synthetic local credentials only' }
 if ($BrowserAcceptance -and -not (Test-Path -LiteralPath (Join-Path $CoreRoot 'src/main/resources/static/demo/index.html'))) {
     throw 'BrowserAcceptance requires a Core checkout with the review console; specify -CoreRoot C:\dev\finguard-core'
@@ -88,7 +105,7 @@ if ($PlanOnly) {
       coreRoot=$CoreRoot;currency='CNY';priceTableVersion=$PriceTableVersion;smokeBudgetCny=$SmokeBudgetCny;
       estimatedUpperBoundCny=$estimatedUpperBoundCny;
       fixture=[bool]$LocalModelStub;expectedCalls=$expectedCalls;
-      scope='isolated synthetic business E2E, fixed embeddings; not semantic quality'} | ConvertTo-Json -Compress
+      scope=$(if($SemanticEmbedding){'isolated synthetic business E2E, pinned semantic embeddings, one-document policy smoke; not broad retrieval quality'}else{'isolated synthetic business E2E, fixed embeddings; not semantic quality'})} | ConvertTo-Json -Compress
     foreach ($entry in @(Get-ChildItem Env:)) {
         if (-not $initialEnvironment.ContainsKey($entry.Name)) { [Environment]::SetEnvironmentVariable($entry.Name,$null,'Process') }
     }
@@ -109,7 +126,7 @@ $reportPath = Join-Path $output 'report.json'
 $report = [ordered]@{ runId=$runId; startedAt=[DateTimeOffset]::Now.ToString('o'); status='RUNNING';
     coreDatabase=$coreDb; copilotDatabase=$copilotDb; rabbitVhost=$vhost;
     qdrantContainer=$qdrant; provider=$Provider; model=$ModelId; prompt=$promptVersion;
-    maxModelCalls=1; embedding='fixed-v1'; currency='CNY';priceTableVersion=$PriceTableVersion;
+    maxModelCalls=1; embedding=$(if($SemanticEmbedding){$EmbeddingVersion}else{'fixed-v1'}); embeddingManifestSha256=$EmbeddingManifestSha256; currency='CNY';priceTableVersion=$PriceTableVersion;
     fixture=[bool]$LocalModelStub;expectedCalls=$expectedCalls;
     harnessSha256=(Get-FileHash $PSCommandPath -Algorithm SHA256).Hash.ToLowerInvariant();
     smokeBudgetCny=$SmokeBudgetCny;estimatedUpperBoundCny=$estimatedUpperBoundCny;
@@ -147,7 +164,7 @@ function Health([string]$Url, [Diagnostics.Process]$Process, [string]$ExpectedSt
 function Start-Java([string]$Name, [string]$Directory, [string]$Jar) {
     $java = Join-Path $env:JAVA_HOME 'bin\java.exe'
     if (-not (Test-Path -LiteralPath $java)) { $java = (Get-Command java.exe).Source }
-    $process = Start-Process -FilePath $java -ArgumentList @('-Xmx384m','-jar',$Jar) -WorkingDirectory $Directory `
+    $process = Start-Process -FilePath $java -ArgumentList @('-Xmx384m','-Djdk.httpclient.disableRetryConnect=true','-jar',$Jar) -WorkingDirectory $Directory `
         -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $output "$Name.log") `
         -RedirectStandardError (Join-Path $output "$Name.stderr.log")
     return $process
@@ -162,9 +179,14 @@ function Http-Status([string]$Method,[string]$Url,[hashtable]$Headers,[string]$B
         throw
     }
 }
+function Start-AmqpProxy([string]$Name){
+    $python=(Get-Command python.exe -ErrorAction Stop).Source
+    return Start-Process -FilePath $python -ArgumentList @((Join-Path $root 'scripts/e2e/amqp_fixture_proxy.py')) -WorkingDirectory $root `
+        -WindowStyle Hidden -PassThru -RedirectStandardOutput (Join-Path $output "$Name.log") -RedirectStandardError (Join-Path $output "$Name.stderr.log")
+}
 try {
     if (-not $env:COPILOT_MODEL_API_KEY) { throw 'Set COPILOT_MODEL_API_KEY in the current process before running' }
-    $ports = @(8080,8081,9091,6333); if ($LocalModelStub) { $ports += 18765 }; if ($LocalModelStub -or $IsolatedRedis) { $ports += 16380 }
+    $ports = @(8080,8081,9091,6333); if ($LocalModelStub) { $ports += 18765 }; if ($LocalModelStub -or $IsolatedRedis) { $ports += 16380 }; if($AgentInfrastructureMatrix){$ports+=15679}
     foreach ($port in $ports) {
         if (Get-NetTCPConnection -State Listen -LocalPort $port -ErrorAction SilentlyContinue) { throw "Port $port is already occupied" }
     }
@@ -228,6 +250,7 @@ try {
         $report.coreJarSha256=(Get-FileHash (Join-Path $CoreRoot 'target/finguard-core-0.0.1-SNAPSHOT.jar') -Algorithm SHA256).Hash.ToLowerInvariant()
     }
     $env:SERVER_PORT='8081'; $env:COPILOT_MANAGEMENT_PORT='9091'; $env:COPILOT_MANAGEMENT_ADDRESS='127.0.0.1'; $env:SPRING_PROFILES_ACTIVE=$profile
+    if($AgentInfrastructureMatrix){$amqpProxy=Start-AmqpProxy 'amqp-proxy';$processes+=$amqpProxy;$env:SPRING_RABBITMQ_PORT='15679'}
     $env:COPILOT_DB_URL="jdbc:mysql://127.0.0.1:3306/$copilotDb"+'?sslMode=DISABLED&allowPublicKeyRetrieval=true'
     $env:COPILOT_DB_USERNAME=$dbUser; $env:COPILOT_DB_PASSWORD=$mysql.MYSQL_PASSWORD
     $env:COPILOT_MODEL_PROVIDER=$Provider; $env:COPILOT_MODEL_ID=$ModelId
@@ -246,13 +269,27 @@ try {
     $env:FINGUARD_CORE_BASE_URL='http://127.0.0.1:8080'
     $env:COPILOT_QDRANT_ENDPOINT='http://127.0.0.1:6333'
     $env:COPILOT_QDRANT_COLLECTION_PREFIX="e2e-$runId"
-    $env:COPILOT_EMBEDDING_VERSION='fixed-v1'; $env:E2E_INDEX_VERSION="published-$runId"
+    if($SemanticEmbedding){
+        $env:COPILOT_EMBEDDING_MODE='semantic';$env:COPILOT_EMBEDDING_DIMENSIONS='384'
+        $env:COPILOT_EMBEDDING_ENDPOINT=$EmbeddingEndpoint;$env:COPILOT_EMBEDDING_VERSION=$EmbeddingVersion
+        $env:COPILOT_EMBEDDING_MANIFEST_SHA256=$EmbeddingManifestSha256
+    }else{$env:COPILOT_EMBEDDING_MODE='fixed';$env:COPILOT_EMBEDDING_DIMENSIONS='8';$env:COPILOT_EMBEDDING_VERSION='fixed-v1'}
+    $env:COPILOT_RETRIEVAL_MINIMUM_SCORE='-1.0' # Single-document process smoke; multi-document thresholds are evaluated separately.
+    $env:E2E_INDEX_VERSION="published-$runId"
+    if ($AgentAcceptance) {
+        $env:COPILOT_AGENT_ENABLED='true'; $env:COPILOT_AGENT_RUNTIME_ENABLED='true'
+        $env:COPILOT_AGENT_MAX_ANALYSIS_CNY='0.10'; $env:COPILOT_AGENT_HUMAN_GATE='true'
+    }
     $copilot = Start-Java 'copilot' $root (Join-Path $root 'target\finguard-copilot-0.0.1-SNAPSHOT.jar')
     $expectedHealth=if ($ExpectRedisFailure) { 'DOWN' } else { 'UP' }
     $processes += $copilot; Health 'http://127.0.0.1:9091' $copilot $expectedHealth
     Check "Copilot $profile profile health $expectedHealth" $true
     $report.flywayVersion=Sql "SELECT version FROM $copilotDb.flyway_schema_history WHERE success=1 ORDER BY installed_rank DESC LIMIT 1;"
-    Check 'Current V12 event, trace linkage, governance and exact JSON text schema is active' ($report.flywayVersion -eq '12' -and
+    $requiredVersions = @(Get-ChildItem -LiteralPath (Join-Path $root 'src/main/resources/db/migration') -Filter 'V*__*.sql' |
+        ForEach-Object { if ($_.Name -match '^V([0-9]+)__') { $Matches[1] } })
+    $appliedVersions = @((Sql "SELECT version FROM $copilotDb.flyway_schema_history WHERE success=1 ORDER BY installed_rank;") -split "`n" | ForEach-Object { $_.Trim() })
+    $report.flywayVersions=$appliedVersions
+    Check 'All current migrations, events, trace linkage, governance and exact JSON text schema are active' (@($requiredVersions | Where-Object { $_ -notin $appliedVersions }).Count -eq 0 -and
         (Sql "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema='$copilotDb' AND table_name IN ('analysis_input_snapshot','analysis_result') AND column_name IN ('facts_json','result_json') AND data_type='longtext';") -eq '2')
     $report.corePid=$core.Id; $report.copilotPid=$copilot.Id
     $java = Join-Path $env:JAVA_HOME 'bin\java.exe'
@@ -296,6 +333,10 @@ INSERT INTO review_tasks(source_type,risk_hit_id) VALUES('RISK_HIT',LAST_INSERT_
     Check 'Core supplies actual sanitized task context' ($context.transaction.amount -eq 120000.10)
     $url = 'http://127.0.0.1:8081/api/copilot/review-analyses'
     $body = @{reviewTaskId=$taskId}|ConvertTo-Json
+    if ($AgentAcceptance) {
+        . (Join-Path $PSScriptRoot 'e2e/phase5_acceptance.ps1')
+        return
+    }
     Check 'Unauthenticated Copilot request rejected with 401' ((Http-Status 'POST' $url @{} $body) -eq 401)
     Check 'ADMIN without REVIEWER rejected with 403' ((Http-Status 'POST' $url $adminHeaders $body) -eq 403)
     $accepted = Invoke-WebRequest $url -UseBasicParsing -Method Post -Headers $headers -ContentType 'application/json' -Body $body

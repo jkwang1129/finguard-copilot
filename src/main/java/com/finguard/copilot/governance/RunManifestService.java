@@ -26,17 +26,31 @@ public final class RunManifestService implements ModelCallPreflight {
     private final GovernanceProperties governance;
     private final Clock clock;
     private final CallAdmission admission;
+    private final com.finguard.copilot.knowledge.port.EmbeddingGateway embedding;
+    private final Map<String,Object> retrievalDescriptor;
     public RunManifestService(VersionedArtifactStore store,KnowledgeIndexRepository indexes,CopilotProperties properties,
             NumericGuardProperties numeric,ReviewedPolicyProperties reviewed,String embeddingVersion,GovernanceProperties governance,Clock clock) {
         this(store,indexes,properties,numeric,reviewed,embeddingVersion,governance,clock,null);
     }
     public RunManifestService(VersionedArtifactStore store,KnowledgeIndexRepository indexes,CopilotProperties properties,
             NumericGuardProperties numeric,ReviewedPolicyProperties reviewed,String embeddingVersion,GovernanceProperties governance,Clock clock,CallAdmission admission) {
+        this(store,indexes,properties,numeric,reviewed,embeddingVersion,governance,clock,admission,null);
+    }
+    public RunManifestService(VersionedArtifactStore store,KnowledgeIndexRepository indexes,CopilotProperties properties,
+            NumericGuardProperties numeric,ReviewedPolicyProperties reviewed,String embeddingVersion,GovernanceProperties governance,Clock clock,CallAdmission admission,
+            com.finguard.copilot.knowledge.port.EmbeddingGateway embedding) {
+        this(store,indexes,properties,numeric,reviewed,embeddingVersion,governance,clock,admission,embedding,Map.of());
+    }
+    public RunManifestService(VersionedArtifactStore store,KnowledgeIndexRepository indexes,CopilotProperties properties,
+            NumericGuardProperties numeric,ReviewedPolicyProperties reviewed,String embeddingVersion,GovernanceProperties governance,Clock clock,CallAdmission admission,
+            com.finguard.copilot.knowledge.port.EmbeddingGateway embedding,Map<String,Object> retrievalDescriptor) {
         this.store=Objects.requireNonNull(store);this.indexes=Objects.requireNonNull(indexes);this.properties=properties;
         this.policyConfiguration=CanonicalJson.tree(Map.of("numeric",numeric,"reviewed",reviewed,
                 "corePolicySha256",CoreLargeAmountPolicyGuard.CONTENT_SHA256));
         this.embeddingVersion=Objects.requireNonNull(embeddingVersion);this.governance=governance;this.clock=clock;
         this.admission=admission;
+        this.embedding=embedding;
+        this.retrievalDescriptor=Map.copyOf(retrievalDescriptor);
     }
 
     @Override public ModelRequest prepare(UUID analysisId,FactSnapshot snapshot,ModelRequest request,List<KnowledgeEvidence> evidence,String retrievedIndexVersion) {
@@ -74,8 +88,12 @@ public final class RunManifestService implements ModelCallPreflight {
         bind(manifest,artifacts,"prompt",request.promptVersion(),Map.of("sha256",CanonicalJson.sha256(request.systemInstruction())));
         bind(manifest,artifacts,"schema","analysis-output-v1",Map.of("sha256",CanonicalJson.sha256(request.outputSchemaJson())));
         bind(manifest,artifacts,"policy","policy-"+CanonicalJson.hash(policyConfiguration),policyConfiguration);
-        bind(manifest,artifacts,"embedding",embeddingVersion,Map.of("version",embeddingVersion,"dimensions",properties.embedding().dimensions(),
+        var embeddingIdentity=new TreeMap<String,Object>(Map.of("version",embeddingVersion,"dimensions",properties.embedding().dimensions(),
                 "implementation","FixedEmbeddingGateway"));
+        if(embedding!=null)embeddingIdentity.putAll(embedding.descriptor());
+        bind(manifest,artifacts,"embedding",embeddingVersion,embeddingIdentity);
+        if(!retrievalDescriptor.isEmpty())
+            bind(manifest,artifacts,"retrieval","retrieval-"+CanonicalJson.hash(retrievalDescriptor),retrievalDescriptor);
         bind(manifest,artifacts,"price",version,Map.of("provider",model.provider(),"modelId",model.modelId(),"currency",model.currency(),
                 "inputPerMillion",model.inputPricePerMillion(),"outputPerMillion",model.outputPricePerMillion(),
                 "validFrom",governance.priceValidFrom().toString(),"validUntil",governance.priceValidUntil().toString(),"basis","peak-cache-miss"));
