@@ -1,0 +1,9 @@
+**
+!pyproject.toml
+!uv.lock
+!src/
+!src/**
+!scripts/
+!scripts/acceptance_client.py
+**/__pycache__/
+**/*.py[cod]

@@ -1,0 +1,193 @@
+x-copilot-data: &copilot-data
+  COPILOT_DB_URL: jdbc:mysql://mysql:3306/copilot?sslMode=DISABLED&allowPublicKeyRetrieval=true
+  COPILOT_DB_USERNAME: copilot
+  COPILOT_DB_PASSWORD: ${FG_COPILOT_DB_PASSWORD:?generate local credentials}
+  COPILOT_QDRANT_ENDPOINT: http://qdrant:6333
+  COPILOT_QDRANT_COLLECTION_PREFIX: phase6
+  COPILOT_EMBEDDING_MODE: fixed
+  COPILOT_EMBEDDING_VERSION: fixed-v1
+  COPILOT_EMBEDDING_DIMENSIONS: "8"
+
+x-readiness: &readiness
+  MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: "true"
+  MANAGEMENT_ENDPOINT_HEALTH_GROUP_READINESS_INCLUDE: readinessState,db,rabbit,redis
+
+x-java-health: &java-health
+  interval: 5s
+  timeout: 3s
+  retries: 24
+  start_period: 30s
+
+services:
+  mysql:
+    image: mysql:8.4.10@sha256:c592c15aaf4a1961e15d82eb31ea5987dda862d1c4b1e93424438c0e91dc1f8d
+    environment:
+      MYSQL_ROOT_PASSWORD: ${FG_MYSQL_ROOT_PASSWORD:?generate local credentials}
+      MYSQL_DATABASE: core
+      MYSQL_USER: core
+      MYSQL_PASSWORD: ${FG_CORE_DB_PASSWORD:?generate local credentials}
+      FG_COPILOT_DB_PASSWORD: ${FG_COPILOT_DB_PASSWORD:?generate local credentials}
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./init-copilot-db.sh:/docker-entrypoint-initdb.d/01-copilot.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "MYSQL_PWD=$$FG_COPILOT_DB_PASSWORD mysql -h 127.0.0.1 -u copilot -D copilot -e 'SELECT 1' >/dev/null"]
+      interval: 5s
+      timeout: 3s
+      retries: 24
+    networks: [backend]
+
+  rabbitmq:
+    image: rabbitmq:4.3.4-management@sha256:4e628d3cbc61ef45c5918e19bb9844874410d96d4ced897ced7d072d63ad555c
+    environment:
+      RABBITMQ_DEFAULT_USER: finguard
+      RABBITMQ_DEFAULT_PASS: ${FG_RABBIT_PASSWORD:?generate local credentials}
+    volumes: ["rabbitmq-data:/var/lib/rabbitmq"]
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "check_port_connectivity"]
+      interval: 5s
+      timeout: 5s
+      retries: 24
+    networks: [backend]
+
+  redis:
+    image: redis:8.2.8-alpine@sha256:a7859ed111db3c1f5404a973a4747505d559fb5ca32d37e447afc0ef845a2103
+    command: ["sh", "-c", "exec redis-server --requirepass \"$$REDISCLI_AUTH\""]
+    environment:
+      REDISCLI_AUTH: ${FG_REDIS_PASSWORD:?generate local credentials}
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep -qx PONG"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    networks: [backend]
+
+  qdrant:
+    image: qdrant/qdrant:v1.15.5@sha256:0fb8897412abc81d1c0430a899b9a81eb8328aa634e7242d1bc804c1fe8fe863
+    volumes: ["qdrant-data:/qdrant/storage"]
+    healthcheck:
+      test:
+        - CMD
+        - bash
+        - -ec
+        - |
+          exec 3<>/dev/tcp/127.0.0.1/6333
+          printf 'GET /readyz HTTP/1.0\r\n\r\n' >&3
+          read -r status <&3
+          [[ "$$status" == *" 200 "* ]]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    networks: [backend]
+
+  core:
+    build:
+      context: ../..
+      target: core-runtime
+      additional_contexts:
+        core-source: "${FG_CORE_SOURCE:-../..}"
+    environment:
+      SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT: "3000"
+      MYSQL_HOST: mysql
+      MYSQL_DATABASE: core
+      MYSQL_USER: core
+      MYSQL_PASSWORD: ${FG_CORE_DB_PASSWORD:?generate local credentials}
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_USERNAME: finguard
+      RABBITMQ_PASSWORD: ${FG_RABBIT_PASSWORD:?generate local credentials}
+      REDIS_HOST: redis
+      REDIS_PASSWORD: ${FG_REDIS_PASSWORD:?generate local credentials}
+      JWT_SECRET_BASE64: ${FG_JWT_SECRET:?generate local credentials}
+      FINGUARD_AUTH_BOOTSTRAP_ENABLED: "true"
+      FINGUARD_AUTH_BOOTSTRAP_ADMIN_USERNAME: e2e-admin
+      FINGUARD_AUTH_BOOTSTRAP_ADMIN_PASSWORD: ${FG_ADMIN_PASSWORD:?generate local credentials}
+      FINGUARD_AUTH_BOOTSTRAP_REVIEWER_USERNAME: e2e-reviewer
+      FINGUARD_AUTH_BOOTSTRAP_REVIEWER_PASSWORD: ${FG_REVIEWER_PASSWORD:?generate local credentials}
+    ports: ["127.0.0.1:${FG_CORE_PORT:-18080}:8080"]
+    healthcheck:
+      <<: *java-health
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/actuator/health"]
+    depends_on:
+      mysql: {condition: service_healthy}
+      rabbitmq: {condition: service_healthy}
+      redis: {condition: service_healthy}
+    networks: [backend, edge]
+
+  copilot:
+    build: {context: ../.., target: runtime}
+    environment:
+      <<: [*copilot-data, *readiness]
+      SPRING_PROFILES_ACTIVE: real-deepseek
+      SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT: "3000"
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_RABBITMQ_USERNAME: finguard
+      SPRING_RABBITMQ_PASSWORD: ${FG_RABBIT_PASSWORD:?generate local credentials}
+      COPILOT_REDIS_HOST: redis
+      COPILOT_REDIS_PASSWORD: ${FG_REDIS_PASSWORD:?generate local credentials}
+      COPILOT_EVENTS_REDIS_ENABLED: "true"
+      FINGUARD_CORE_BASE_URL: http://core:8080
+      COPILOT_GOVERNANCE_FIXTURE_MODE: "true"
+      COPILOT_MODEL_PROVIDER: deepseek
+      COPILOT_MODEL_ID: local-test-stub
+      COPILOT_MODEL_BASE_URL: http://127.0.0.1:18765
+      COPILOT_MODEL_CHAT_COMPLETIONS_PATH: /chat/completions
+      COPILOT_MODEL_API_KEY: local-fixture
+      COPILOT_MODEL_CURRENCY: CNY
+      COPILOT_PRICE_TABLE_VERSION: phase6-local-fixture-v1
+      COPILOT_PRICE_VALID_FROM: "2020-01-01T00:00:00Z"
+      COPILOT_PRICE_VALID_UNTIL: "2100-01-01T00:00:00Z"
+      COPILOT_RETRIEVAL_MINIMUM_SCORE: "-1.0"
+    healthcheck:
+      <<: *java-health
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:9091/actuator/health/readiness"]
+    depends_on:
+      core: {condition: service_healthy}
+      qdrant: {condition: service_healthy}
+    networks: [backend]
+
+  model-fixture:
+    image: python:3.12-alpine@sha256:e6dae589c1c05976188fd3bd019afd091445fc533ed2ea29001beddc7368a9c8
+    network_mode: service:copilot
+    user: "10001:10001"
+    read_only: true
+    command: ["python", "/fixture/local_model_stub.py"]
+    volumes: ["../../scripts/e2e/local_model_stub.py:/fixture/local_model_stub.py:ro"]
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:18765/_calls"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+  frontend:
+    build:
+      context: ../../frontend
+      args:
+        VITE_CORE_REVIEW_URL: http://127.0.0.1:${FG_CORE_PORT:-18080}/demo/index.html
+    ports: ["127.0.0.1:${FG_WEB_PORT:-15173}:8080"]
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8080/healthz"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    depends_on:
+      copilot: {condition: service_healthy}
+      model-fixture: {condition: service_healthy}
+    networks: [backend, edge]
+
+  knowledge-seed:
+    profiles: [seed]
+    build: {context: ../.., target: knowledge-seed}
+    environment:
+      <<: *copilot-data
+      E2E_INDEX_VERSION: phase6-fixture-v1
+    networks: [backend]
+
+volumes:
+  mysql-data:
+  rabbitmq-data:
+  qdrant-data:
+
+networks:
+  backend:
+    internal: true
+  edge:

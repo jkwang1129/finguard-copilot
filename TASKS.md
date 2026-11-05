@@ -161,18 +161,20 @@ Java 265 项、Python 100 项及前端 lint/测试/构建通过；Phase 3 工程
 - [x] 既有24个Java公告匹配包完成兼容维护及当前应用适用性核查：23包命中消除；Spring WebMVC仍有2条原始版本命中，当前无触发视图路径；依赖快照全套539通过。
 - [ ] 将剩余2条MVC原始版本命中随适配平台升级消除；新增XSLT/视图片段功能前重新核查，不能将当前功能不适用判断当作上游已修复。
 
-- [ ] 创建 Java 服务和 React 页面所需的非 root、多阶段 Docker 镜像。
-- [ ] 创建隔离的开发和集成 Compose 环境。
-- [ ] 配置健康检查、就绪检查和本地端口绑定。
-- [ ] 使用完整 Git SHA 标记并验证部署镜像。
-- [ ] 编写 Linux 部署和回滚脚本。
-- [ ] 验证 MySQL 备份恢复、RabbitMQ/Outbox 恢复和 Qdrant 索引重建。
-- [ ] 演练 Core、MySQL、RabbitMQ、Redis、Qdrant、Langfuse 和模型提供商故障。
-- [ ] 生成部署、回滚、故障、验收和清理报告。
+- [x] P6-1 创建 Core、Copilot 和 React 的非 root、多阶段 Docker 镜像。
+- [x] P6-1 创建隔离的本地开发和集成 Compose 环境。
+- [x] P6-1 配置健康检查、就绪检查和本地端口绑定，从空卷启动并通过 36 项只读审核与隔离检查。复跑方式与范围见[验收手册](docs/operations/phase6-integration.md)。
+- [x] P6-2 使用完整 Git SHA 标记并验证镜像 ID、OCI 标签及归档校验和，接入 CI 构建和镜像扫描。
+- [x] P6-2 编写 Linux 部署和回滚脚本，在 Linux CLI 中实测 A → B → A，验证页面版本切换和 MySQL 数据保留。
+- [ ] 运行更新后的 GitHub CI，保留远端冷缓存构建及镜像扫描记录。
+- [ ] 复核锁定 Core 制品的 Java 依赖扫描命中并选定通过审阅的 Core 版本。
+- [x] P6-3 验证两个 MySQL 库的逻辑备份恢复、RabbitMQ 停机与 Outbox 重投、Qdrant 空卷重建及实际引用。
+- [x] P6-4 演练 Core、MySQL、RabbitMQ、Redis、Qdrant、Langfuse 和本地模型替身故障，并验证 Agent 重启续程与 STDIO MCP。
+- [x] P6-4 生成[部署、回滚、故障、验收与 Docker 资源清理报告](docs/acceptance/2026-11-05-phase6-production-like.md)。
 
 ## 收尾门禁
 
-- [ ] 全部普通测试通过且无跳过。
+- [x] Phase 6 本地回归通过。Java 640、Python 评测 187、MCP 桥 4、本地语义运行 31、前端 18，最终回归均无跳过。
 - [ ] Golden Dataset、RAG、Agent、Judge 校准、安全和真实模型评测结果可追溯。
 - [ ] 无业务写副作用、无秘密、无高基数敏感指标。
 - [ ] 文档链接、OpenAPI、运行手册和架构图与实现一致。

@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.List;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.finguard.copilot.foundation.stub.FixedEmbeddingGateway;
+import com.finguard.copilot.knowledge.domain.KnowledgeChunk;
 import com.finguard.copilot.knowledge.domain.KnowledgeSourceType;
 import com.finguard.copilot.knowledge.ingest.*;
 import com.finguard.copilot.knowledge.index.*;
@@ -54,9 +55,22 @@ public class PublishedKnowledgeSeed {
         final String selectedPolicy = policy;
         var ingestion = new KnowledgeIngestionService(new DocumentCleaner(), new DocumentChunker(2048, 0),
                 new KnowledgeAdmissionPolicy(), documents, Instant::now);
-        transactions.executeWithoutResult(status -> ingestion.register(new KnowledgeDocumentRequest(selectedDocumentId,
-                KnowledgeSourceType.POLICY, "Isolated review policy", "v1", selectedPolicy)));
-        var chunks = documents.findChunks(documentId, "v1");
+        List<KnowledgeChunk> chunks;
+        if (args.length == 0) {
+            transactions.executeWithoutResult(status -> ingestion.register(new KnowledgeDocumentRequest(selectedDocumentId,
+                    KnowledgeSourceType.POLICY, "Isolated review policy", "v1", selectedPolicy)));
+            chunks = documents.findChunks(documentId, "v1");
+        } else if (List.of(args).equals(List.of("--rebuild-fixture"))) {
+            var published = indexes.findPublished().orElseThrow();
+            chunks = indexes.findChunks(published.indexVersion());
+            if (chunks.size() != 1 || !documentId.equals(chunks.get(0).documentId())
+                    || !"v1".equals(chunks.get(0).documentVersion())
+                    || !canonical.checksum().equals(chunks.get(0).contentChecksum())) {
+                throw new IllegalStateException("Published index does not match the one-document recovery fixture");
+            }
+        } else {
+            throw new IllegalArgumentException("Expected no arguments or --rebuild-fixture");
+        }
         transactions.executeWithoutResult(status -> new KnowledgeIndexBuildService(embedding, vectors,
                 indexes, embeddingVersion, Instant::now).build(version, chunks));
         var evaluation = new KnowledgeIndexEvaluationService(embedding, vectors, indexes,

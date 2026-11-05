@@ -1,0 +1,13 @@
+services:
+  core:
+    build: !reset null
+    image: finguard-core:${FG_RELEASE_SHA:?set release revision}
+    pull_policy: never
+  copilot:
+    build: !reset null
+    image: finguard-copilot:${FG_RELEASE_SHA:?set release revision}
+    pull_policy: never
+  frontend:
+    build: !reset null
+    image: finguard-frontend:${FG_RELEASE_SHA:?set release revision}
+    pull_policy: never

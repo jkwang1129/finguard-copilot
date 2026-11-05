@@ -23,6 +23,8 @@ C:\dev\finguard-copilot    AI 审核辅助系统（本仓库）
 
 Phase5已按P5-1至P5-6顺序完成本地工程实现和[总验收](docs/acceptance/2026-11-03-phase5-final-acceptance.md)：Java535、Python187、MCP桥4、前端18项及lint/build通过；26例跨运行时一致，最终制品87项真实进程检查通过。运行入口见[Phase5手册](docs/operations/phase5-agent-workflow.md)、[本地MCP手册](docs/operations/phase5-mcp.md)。真实native供应商资格、真实人工/模型质量及部署门槛仍在[TASKS](TASKS.md)单列，不由合成验收替代。
 
+Phase 6 本地集成入口见[集成手册](docs/operations/phase6-integration.md)。隔离环境使用真实 Core、Copilot、React 和中间件，配合合成审核任务与本地模型替身。完整 SHA 制品、Linux 切换和故障复跑见[发布、回滚与恢复](docs/operations/phase6-release.md)。
+
 2026-11-03：P4-4 可观测性与 P4-5 事务事件、SSE 和审核页面已完成本地工程验收；[P4-6总验收](docs/acceptance/2026-11-03-p4-6-final-acceptance.md)完成404项Java、183项Python、11项前端及六场景224项进程检查，最后OpenAPI文档修正后另有17项相关测试和新制品38项进程检查通过。最新操作入口见[审核页面手册](docs/operations/phase4-5-review-console.md)、[可观测性手册](docs/operations/phase4-4-observability.md)及[Phase4计划](docs/PHASE4_TASK_PLAN.md)。真实人工校准、合格备用模型和生产质量/部署仍单列待验收。以下保留各阶段的历史范围与证据。
 
 2026-10-22 提交前复核发现三条异常路径：模型 HTTP 超时未接线、数据库回滚后可能重复请求模型、失败用量记录异常可能导致消息丢弃。2026-10-24 已补修复和离线回归，见[异常路径修复验收](docs/acceptance/2026-10-24-phase3-failure-recovery.md)；既有真实模型质量结论不因此改变。

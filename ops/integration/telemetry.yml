@@ -1,0 +1,31 @@
+services:
+  copilot:
+    environment:
+      COPILOT_MANAGEMENT_ADDRESS: 0.0.0.0
+      COPILOT_LANGFUSE_TRACES_ENDPOINT: http://127.0.0.1:14318/api/public/otel/v1/traces
+      COPILOT_LANGFUSE_PUBLIC_KEY: ${COPILOT_LANGFUSE_PUBLIC_KEY:?generate local credentials}
+      COPILOT_LANGFUSE_SECRET_KEY: ${COPILOT_LANGFUSE_SECRET_KEY:?generate local credentials}
+
+  telemetry-relay:
+    image: ghcr.io/nginx/nginx-unprivileged:1.30-alpine@sha256:44e74ca483234093081138b6d7b6f561d55557756a2deefc3a5056148defeb99
+    network_mode: service:copilot
+    volumes: ["./telemetry-relay.conf:/etc/nginx/conf.d/default.conf:ro"]
+
+  prometheus:
+    image: prom/prometheus:v3.7.3@sha256:49214755b6153f90a597adcbff0252cc61069f8ab69ce8411285cd4a560e8038
+    volumes: ["./prometheus.yml:/etc/prometheus/prometheus.yml:ro"]
+    networks: [backend]
+
+  grafana:
+    image: grafana/grafana:12.3.1@sha256:2175aaa91c96733d86d31cf270d5310b278654b03f5718c59de12a865380a31f
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: ${COPILOT_GRAFANA_ADMIN_PASSWORD:?generate local credentials}
+      GF_AUTH_ANONYMOUS_ENABLED: "false"
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+    volumes:
+      - ../observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ../observability/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    networks: [backend]

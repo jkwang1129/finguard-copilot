@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, 'codex/release-*']
   pull_request:
 
 permissions:
@@ -76,3 +76,47 @@ jobs:
       - uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  release-images:
+    needs: [java, python, frontend, secret-scan]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Read the pinned Core revision
+        id: core
+        run: |
+          core_sha=$(cat ops/integration/core-revision.txt)
+          [[ "$core_sha" =~ ^[0-9a-f]{40}$ ]]
+          echo "revision=$core_sha" >> "$GITHUB_OUTPUT"
+      - uses: actions/checkout@v4
+        with:
+          repository: jkwang1129/finguard-core
+          ref: ${{ steps.core.outputs.revision }}
+          path: target/core-source
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Build and verify Git-addressed images
+        run: |
+          python scripts/release.py build --core-root target/core-source \
+            --core-ref "$(cat ops/integration/core-revision.txt)" \
+            --expect-sha "$GITHUB_SHA" --output target/releases
+      - name: Scan every release image
+        run: |
+          cache=$(mktemp -d)
+          trap 'rm -r -- "$cache"' EXIT
+          for service in core copilot frontend; do
+            docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+              -v "$cache:/root/.cache/trivy" \
+              aquasec/trivy:0.72.0@sha256:cffe3f5161a47a6823fbd23d985795b3ed72a4c806da4c4df16266c02accdd6f \
+              image --image-src docker --scanners vuln --format json --timeout 10m \
+              "finguard-$service:$GITHUB_SHA" > "target/releases/$GITHUB_SHA/scan-$service.json"
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: finguard-images-${{ github.sha }}
+          path: target/releases/${{ github.sha }}/
+          if-no-files-found: error

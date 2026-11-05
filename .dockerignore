@@ -1,0 +1,8 @@
+**
+!pom.xml
+!src/
+!src/main/
+!src/main/**
+!scripts/
+!scripts/e2e/
+!scripts/e2e/PublishedKnowledgeSeed.java

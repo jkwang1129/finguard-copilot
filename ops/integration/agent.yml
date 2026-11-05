@@ -1,0 +1,24 @@
+services:
+  copilot:
+    environment:
+      COPILOT_AGENT_ENABLED: "true"
+      COPILOT_AGENT_RUNTIME_ENABLED: "true"
+      COPILOT_AGENT_MAX_ANALYSIS_CNY: "0.10"
+      COPILOT_AGENT_HUMAN_GATE: "true"
+
+  mcp-relay:
+    image: ghcr.io/nginx/nginx-unprivileged:1.30-alpine@sha256:44e74ca483234093081138b6d7b6f561d55557756a2deefc3a5056148defeb99
+    network_mode: service:copilot
+    volumes: ["./mcp-relay.conf:/etc/nginx/conf.d/default.conf:ro"]
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:8081/healthz"]
+      interval: 3s
+      timeout: 2s
+      retries: 10
+
+  mcp-client:
+    profiles: [mcp]
+    build: {context: ../../tools/mcp-bridge}
+    network_mode: service:copilot
+    read_only: true
+    tmpfs: ["/tmp"]
