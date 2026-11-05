@@ -6,7 +6,7 @@
 - 首轮远端运行暴露 SSE 测试中的清理时序竞争。第二轮四组测试通过，三个 Trivy 扫描均完成。扫描后的清理步骤因容器生成的文件归属 root 失败。改为通过 Docker 删除本次运行的数据卷。[首轮 CI](https://github.com/jkwang1129/finguard-copilot/actions/runs/42036410666) · [第二轮 CI](https://github.com/jkwang1129/finguard-copilot/actions/runs/42037935295)
 - 第三轮 Gitleaks 将上游公开分词器修订和文件哈希当作凭据。调整字段名称，从前一候选提交创建最终发布分支，保留原运行证据。[第三轮 CI](https://github.com/jkwang1129/finguard-copilot/actions/runs/42043557503)
 - Core 选用 `33179b0356fa1ce6714da42d3c3ee99e069d62b8`，在 Copilot 构建端统一升级六组依赖。最终 JAR 中核对到 Jackson 2.21.7、RabbitMQ Java 客户端 5.37.0、Netty 4.1.137.Final、Commons Lang 3.18.0、Log4j 2.25.5、Tomcat 10.1.61。对照原 35 条扫描命中，33 条对应组件已达到报告中的修复版本。该制品通过 36 项隔离 Compose 验收。
-- Core 仍含 Spring MVC 6.2.19。按锁定提交核查了 Web 源码，未找到 `XsltView`、SSE `FragmentsRendering`、`ModelAndView` 或配置的视图解析器。这两条保留为原始版本命中及未来新增相关功能的复核项。Copilot 升级目标为 Boot 4.0.9，其 BOM 管理 Framework 7.0.10。 [CVE-2026-47884](https://spring.io/security/cve-2026-47884/) · [CVE-2026-47890](https://spring.io/security/cve-2026-47890/)
+- Core 仍含 Spring MVC 6.2.19。按锁定提交核查了 Web 源码，未找到 `XsltView`、SSE `FragmentsRendering`、`ModelAndView` 或配置的视图解析器。这两条保留为原始版本命中及未来新增相关功能的复核项。Copilot 升级至 Boot 4.0.9，从实际容器提取的 JAR 包含 `spring-webmvc-7.0.10.jar`，通过 36 项隔离 Compose 验收。使用 Boot 的 Jackson 2 兼容模块保留 API 和持久化契约。 [CVE-2026-47884](https://spring.io/security/cve-2026-47884/) · [CVE-2026-47890](https://spring.io/security/cve-2026-47890/)
 
 ## 模型与反馈
 

@@ -9,10 +9,11 @@ import com.finguard.copilot.api.error.GlobalExceptionHandler;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 class ResumeAnalysisControllerTest {
     @Test void requiresFreshBearerIdempotencyAndAnExactInt64RevisionWithoutFreeText() throws Exception {
         var service=mock(ResumeAnalysisService.class);UUID id=UUID.randomUUID();
-        var mvc=MockMvcBuilders.standaloneSetup(new ResumeAnalysisController(service)).setControllerAdvice(new GlobalExceptionHandler()).build();
+        var mvc=MockMvcBuilders.standaloneSetup(new ResumeAnalysisController(service)).setMessageConverters(new MappingJackson2HttpMessageConverter()).setControllerAdvice(new GlobalExceptionHandler()).build();
         when(service.resume(id,9007199254740993L,ResumeAction.CONTINUE,"key","token"))
             .thenReturn(new ResumeReceipt(id,9007199254740994L,AnalysisStatus.PLANNING,false));
         String path="/api/copilot/review-analyses/"+id+"/resume";

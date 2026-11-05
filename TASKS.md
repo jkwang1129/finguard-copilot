@@ -160,7 +160,7 @@ Java 265 项、Python 100 项及前端 lint/测试/构建通过；Phase 3 工程
 ## 阶段 6：production-like 部署
 
 - [x] 既有24个Java公告匹配包完成兼容维护及当前应用适用性核查：23包命中消除；Spring WebMVC仍有2条原始版本命中，当前无触发视图路径；依赖快照全套539通过。
-- [ ] 将剩余2条MVC原始版本命中随适配平台升级消除；新增XSLT/视图片段功能前重新核查，不能将当前功能不适用判断当作上游已修复。
+- [x] Copilot 升级至 Spring Boot 4.0.9，制品使用修复两条 MVC 公告的 Spring Framework 7.0.10。远端镜像复扫另列。
 
 - [x] P6-1 创建 Core、Copilot 和 React 的非 root、多阶段 Docker 镜像。
 - [x] P6-1 创建隔离的本地开发和集成 Compose 环境。
@@ -168,7 +168,7 @@ Java 265 项、Python 100 项及前端 lint/测试/构建通过；Phase 3 工程
 - [x] P6-2 使用完整 Git SHA 标记并验证镜像 ID、OCI 标签及归档校验和，接入 CI 构建和镜像扫描。
 - [x] P6-2 编写 Linux 部署和回滚脚本，在 Linux CLI 中实测 A → B → A，验证页面版本切换和 MySQL 数据保留。
 - [ ] 运行更新后的 GitHub CI，保留远端冷缓存构建及镜像扫描记录。
-- [ ] 复核锁定 Core 制品的 Java 依赖扫描命中并选定通过审阅的 Core 版本。
+- [x] 复核并锁定 Core `33179b0356fa1ce6714da42d3c3ee99e069d62b8`，六组依赖采用修复版本，保留两条当前无对应触发路径的 MVC 版本命中。 [收尾验收](docs/acceptance/2026-11-05-phase6-closeout.md)
 - [x] P6-3 验证两个 MySQL 库的逻辑备份恢复、RabbitMQ 停机与 Outbox 重投、Qdrant 空卷重建及实际引用。
 - [x] P6-4 演练 Core、MySQL、RabbitMQ、Redis、Qdrant、Langfuse 和本地模型替身故障，并验证 Agent 重启续程与 STDIO MCP。
 - [x] P6-4 生成[部署、回滚、故障、验收与 Docker 资源清理报告](docs/acceptance/2026-11-05-phase6-production-like.md)。

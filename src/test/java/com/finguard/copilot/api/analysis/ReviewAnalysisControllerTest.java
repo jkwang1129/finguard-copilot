@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -38,7 +39,7 @@ class ReviewAnalysisControllerTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new ReviewAnalysisController(createService, getService))
+        mockMvc = MockMvcBuilders.standaloneSetup(new ReviewAnalysisController(createService, getService)).setMessageConverters(new MappingJackson2HttpMessageConverter())
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
     }

@@ -8,10 +8,11 @@ import com.finguard.copilot.api.error.GlobalExceptionHandler;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 class McpCapabilityControllerTest {
     @Test void rejectsNonlocalOriginsExtraFieldsAndMissingIdentityBeforeIssuance() throws Exception {
         var service=mock(McpCapabilityService.class);var adapter=mock(McpToolAdapter.class);
-        var mvc=MockMvcBuilders.standaloneSetup(new McpCapabilityController(service,adapter)).setControllerAdvice(new GlobalExceptionHandler()).build();
+        var mvc=MockMvcBuilders.standaloneSetup(new McpCapabilityController(service,adapter)).setMessageConverters(new MappingJackson2HttpMessageConverter()).setControllerAdvice(new GlobalExceptionHandler()).build();
         String url="/api/copilot/review-analyses/"+UUID.randomUUID()+"/mcp-capabilities";
         mvc.perform(post(url).contentType(MediaType.APPLICATION_JSON).content("{\"toolScope\":[\"get_task_state\"]}"))
             .andExpect(status().isUnauthorized());
