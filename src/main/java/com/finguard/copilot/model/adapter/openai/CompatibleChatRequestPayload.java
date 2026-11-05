@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.finguard.copilot.config.CopilotProperties;
+import com.finguard.copilot.governance.ReviewModelRoute;
 import com.finguard.copilot.model.port.ModelRequest;
 
 /** Shared by transport and preflight so the measured body is the body actually sent. */
@@ -19,9 +20,10 @@ public final class CompatibleChatRequestPayload {
         messages.addObject().put("role","user").put("content",request.context());
         payload.put("max_tokens",Math.min(request.maxOutputTokens(),model.outputTokenLimit()));
         payload.put("temperature","zhipu".equalsIgnoreCase(model.provider()) && request.temperature()==0 ? 0.01d : request.temperature());
-        if("deepseek".equalsIgnoreCase(model.provider())) payload.putObject("thinking").put("type","disabled");
+        boolean nonThinking = "deepseek".equalsIgnoreCase(model.provider()) || ReviewModelRoute.isQualifiedBackup(model);
+        if(nonThinking) payload.putObject("thinking").put("type","disabled");
         var format=payload.putObject("response_format");
-        if("qwen".equalsIgnoreCase(model.provider()) || "deepseek".equalsIgnoreCase(model.provider())) format.put("type","json_object");
+        if("qwen".equalsIgnoreCase(model.provider()) || nonThinking) format.put("type","json_object");
         else {
             format.put("type","json_schema");
             var schema=format.putObject("json_schema");

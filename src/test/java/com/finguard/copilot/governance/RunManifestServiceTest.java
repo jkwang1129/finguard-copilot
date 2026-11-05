@@ -96,6 +96,37 @@ class RunManifestServiceTest {
         assertThat(manifest.path("inputUpperBound").asInt()).isGreaterThan(resourceSchema().length());
         assertThat(manifest.has("retrieval")).isFalse();
     }
+
+    @Test void freezesTheBackupRouteAndPriceBeforeAcquiringTheOnlyCall() {
+        service("CNY", "2", "price-v1");
+        var primary = new CopilotProperties.Model("deepseek", "deepseek-flash", URI.create("https://api.deepseek.com"),
+                new SecretValue("fixture-primary"), "/chat/completions", 32000, 2000, Duration.ofSeconds(20), "primary-priced");
+        var backup = ReviewModelRoute.select(primary, "review-analysis-v2", true, false, new SecretValue("fixture-backup"));
+        var props = new CopilotProperties(null, new CopilotProperties.Embedding(8), new CopilotProperties.Retrieval(5), null, null,
+                primary, new CopilotProperties.Prompt("review-analysis-v2"), CopilotProperties.Budget.defaults());
+        var governance = new GovernanceProperties(new BigDecimal("0.30"), null, null, null, null, null, false);
+        var admission = mock(CallAdmission.class);
+        var service = new RunManifestService(store, indexes, props, new NumericGuardProperties(List.of()),
+                new ReviewedPolicyProperties(List.of()), "fixed-v1", governance, Clock.fixed(at, ZoneOffset.UTC), admission,
+                null, Map.of(), backup);
+        service.prepare(id, snapshot(), request("synthetic review"), List.of(), "idx-1");
+
+        var ordered = inOrder(store, admission);
+        var manifest = ArgumentCaptor.forClass(ObjectNode.class);
+        @SuppressWarnings("unchecked") ArgumentCaptor<List<VersionedArtifactStore.Artifact>> artifacts = ArgumentCaptor.forClass(List.class);
+        ordered.verify(store).freeze(eq(id), manifest.capture(), artifacts.capture());
+        ordered.verify(admission).open(id);
+        ordered.verifyNoMoreInteractions();
+        assertThat(manifest.getValue().path("route").path("version").asText()).isEqualTo("zhipu-review-backup-v1");
+        assertThat(manifest.getValue().path("requestSha256").asText()).hasSize(64);
+        var route = artifacts.getValue().stream().filter(a -> a.kind().equals("route")).findFirst().orElseThrow().content();
+        assertThat(route.path("qualificationSha256").asText()).isEqualTo(ReviewModelRoute.EVALUATION_SHA256);
+        assertThat(route.path("fallback").asBoolean()).isTrue();
+        var price = artifacts.getValue().stream().filter(a -> a.kind().equals("price")).findFirst().orElseThrow().content();
+        assertThat(price.path("provider").asText()).isEqualTo("zhipu");
+        assertThat(price.path("outputPerMillion").asInt()).isEqualTo(28);
+        assertThat(CanonicalJson.encode(artifacts.getValue())).doesNotContain("fixture-backup", "synthetic review");
+    }
     @Test void semanticManifestIdentifiesActualModelArtifactsInsteadOfFixedVectors() {
         service("CNY","2","price-v1"); // initialize published membership
         var model=new CopilotProperties.Model("deepseek","deepseek-flash",URI.create("https://api.deepseek.com"),

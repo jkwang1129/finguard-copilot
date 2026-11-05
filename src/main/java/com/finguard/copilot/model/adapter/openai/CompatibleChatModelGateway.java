@@ -60,7 +60,7 @@ public final class CompatibleChatModelGateway implements ModelGateway {
             var entity = restClient.post()
                     .uri(model.chatCompletionsPath())
                     .contentType(MediaType.APPLICATION_JSON)
-                    .body(payload)
+                    .body(payload.toString())
                     .retrieve()
                     .toEntity(String.class);
             String responseBody=entity.getBody();

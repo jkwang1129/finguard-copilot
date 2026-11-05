@@ -113,6 +113,36 @@ uv run --python 3.12 python -m finguard_agent_evaluation.phase4_provider_judge `
 输入 4096、输出 64 tokens 的高峰价估算，供应商实际扣费以账单为准。2026-11-01 的
 10 次真实调用已完成，详见 P4-2 验收记录；与 AI 模拟标签的结果不是人机一致率。
 
+## 将审核反馈筛选为可复跑案例
+
+在授权的隔离环境，用只读数据库会话导出已经完成且有反馈的分析。限制在批准的审核批次内，
+将以下查询的结果写成 UTF-8 JSONL，每行一个对象。只在本机保存这份关联文件。
+
+```sql
+SELECT JSON_OBJECT('analysis_id', LOWER(BIN_TO_UUID(r.id)),
+                   'status', r.status, 'verdict', f.verdict)
+FROM review_feedback f JOIN analysis_run r ON r.id = f.analysis_id
+WHERE r.status = 'SUCCEEDED'
+  AND f.created_at >= ? AND f.created_at < ?
+ORDER BY r.id;
+```
+
+审核人另存一份 `approved.jsonl`。每行只有 `analysis_id` 和 `case`。`case` 使用
+`data/phase4-holdout-v1.jsonl` 的字段，使用新案例 ID、合成金额、规则和政策标识，独立标注
+`expected`。只选择可由离线单阈值参考模型表达的案例。审核同意或不同意是筛选信号，
+正确标签由审核人按证据和政策确定。去除账号、人员、原始金额、真实标识与自由文本。
+
+```powershell
+uv run --locked python -m finguard_agent_evaluation.feedback_regression `
+  --feedback <feedback.jsonl> --approved <approved.jsonl> `
+  --output reports/feedback-v1 --source reviewer-export
+```
+
+合成演练使用 `--source fixture`。输出 `cases.jsonl` 和 `manifest.json`。用清单中的
+`dataset_sha256` 运行 `phase4_reference_runner`，再用 `phase4_cli` 复核报告。
+输出不含分析 UUID。真实反馈导出和审核关联表保留在受限目录，只有审核通过的脱敏制品
+可对外分发。合成全链路测试位于 `tests/test_feedback_regression.py`。
+
 ## Worker 同批补验收（2026-11-02）
 
 `data/phase4-worker-v2.jsonl` 冻结 16 例（单阈值、实际知识注入载荷、多条件、政策冲突各4）。

@@ -23,6 +23,10 @@ public final class DeepseekTextTokenBound {
                 !URI.create("https://api.deepseek.com").equals(model.baseUrl()) || !"/chat/completions".equals(model.chatCompletionsPath()))
                 )
             throw RunManifestService.rejected("input bound unavailable for model protocol");
+        return wireUpperBound(model,request);
+    }
+
+    static int wireUpperBound(CopilotProperties.Model model, ModelRequest request) {
         try {
             // UTF8 bytes include every system/schema/user byte and JSON escaping.
             // Identity normalizer + byte BPE cannot expand the plain text token count.

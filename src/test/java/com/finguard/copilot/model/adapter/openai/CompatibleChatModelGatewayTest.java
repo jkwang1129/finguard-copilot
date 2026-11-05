@@ -174,6 +174,23 @@ class CompatibleChatModelGatewayTest {
     }
 
     @Test
+    void qualifiedBackupUsesTheEvaluatedNonThinkingProtocolAndOneRequest() {
+        RestClient.Builder builder = RestClient.builder();
+        MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();
+        var model = model("zhipu", "glm-5.2", URI.create("https://open.bigmodel.cn/api/paas/v4"));
+        var gateway = new CompatibleChatModelGateway(model, builder);
+        server.expect(requestTo("https://open.bigmodel.cn/api/paas/v4/chat/completions"))
+                .andExpect(jsonPath("$.thinking.type").value("disabled"))
+                .andExpect(jsonPath("$.temperature").value(0.01))
+                .andExpect(jsonPath("$.response_format.type").value("json_object"))
+                .andRespond(org.springframework.test.web.client.response.MockRestResponseCreators.withStatus(
+                        org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE));
+        assertThatThrownBy(() -> gateway.complete(request())).isInstanceOfSatisfying(CopilotException.class,
+                error -> assertThat(error.code()).isEqualTo(ErrorCode.MODEL_UNAVAILABLE));
+        server.verify();
+    }
+
+    @Test
     void doesNotOfferOrExecuteModelSuppliedArbitraryTools() {
         RestClient.Builder builder = RestClient.builder();
         MockRestServiceServer server = MockRestServiceServer.bindTo(builder).build();

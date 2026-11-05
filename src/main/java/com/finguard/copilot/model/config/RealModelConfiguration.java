@@ -47,7 +47,12 @@ public class RealModelConfiguration {
     CopilotProperties.Model realModel(CopilotProperties properties, Environment environment) {
         String profile = activeRealProfile(environment);
         properties.model().validateForRealProfile(profile);
-        return properties.model();
+        boolean primaryUnavailable = environment.getProperty("COPILOT_REVIEW_PRIMARY_UNAVAILABLE", Boolean.class, false);
+        boolean fixtureOrAgent = environment.getProperty("finguard.copilot.governance.fixture-mode", Boolean.class, false)
+                || environment.getProperty("finguard.copilot.agent.enabled", Boolean.class, false);
+        return com.finguard.copilot.governance.ReviewModelRoute.select(properties.model(), properties.prompt().version(),
+                primaryUnavailable, fixtureOrAgent, new com.finguard.copilot.config.SecretValue(
+                        environment.getProperty("COPILOT_REVIEW_BACKUP_API_KEY", "")));
     }
 
     @Bean
@@ -147,21 +152,23 @@ public class RealModelConfiguration {
 
     @Bean
     com.finguard.copilot.governance.RedisProviderPermits redisProviderPermits(
-            ObjectProvider<org.springframework.data.redis.core.StringRedisTemplate> redis,com.finguard.copilot.governance.PermitProperties permits) {
-        return new com.finguard.copilot.governance.RedisProviderPermits(redis::getObject,permits.providerConcurrency(),permits.reviewerPerMinute());
+            ObjectProvider<org.springframework.data.redis.core.StringRedisTemplate> redis,com.finguard.copilot.governance.PermitProperties permits,
+            CopilotProperties.Model model) {
+        return new com.finguard.copilot.governance.RedisProviderPermits(redis::getObject,permits.providerConcurrency(),permits.reviewerPerMinute(),
+                com.finguard.copilot.governance.ReviewModelRoute.isQualifiedBackup(model) ? "zhipu" : "deepseek");
     }
 
     @Bean
     com.finguard.copilot.governance.CallAdmission callAdmission(ObjectProvider<com.finguard.copilot.governance.BudgetReservations> budgets,
-            com.finguard.copilot.governance.RedisProviderPermits permits,CopilotProperties properties) {
-        return new com.finguard.copilot.governance.CallAdmission(budgets::getObject,permits,properties.model().timeout());
+            com.finguard.copilot.governance.RedisProviderPermits permits,CopilotProperties.Model model) {
+        return new com.finguard.copilot.governance.CallAdmission(budgets::getObject,permits,model.timeout());
     }
 
     @Bean
     com.finguard.copilot.governance.ModelCallPreflight modelCallPreflight(
             ObjectProvider<org.springframework.jdbc.core.JdbcTemplate> jdbc,
             ObjectProvider<org.springframework.transaction.support.TransactionTemplate> transactions,
-            ObjectProvider<KnowledgeIndexRepository> indexes,CopilotProperties properties,
+            ObjectProvider<KnowledgeIndexRepository> indexes,CopilotProperties properties,CopilotProperties.Model model,
             ObjectProvider<com.finguard.copilot.governance.BudgetReservations> budgets,
             com.finguard.copilot.governance.CallAdmission admission,
             NumericGuardProperties numeric,ReviewedPolicyProperties reviewed,
@@ -182,7 +189,7 @@ public class RealModelConfiguration {
                     new com.finguard.copilot.governance.VersionedArtifactStore(jdbc.getObject(),transactions.getObject()),
                     indexes.getObject(),properties,numeric,reviewed,environment.getProperty("COPILOT_EMBEDDING_VERSION","fixed-v1"),
                     governance,java.time.Clock.systemUTC(),admission,embedding,
-                    retrieval.getIfAvailable()==null?java.util.Map.of():retrieval.getObject().descriptor()).prepare(id,snapshot,request,evidence,indexVersion);
+                    retrieval.getIfAvailable()==null?java.util.Map.of():retrieval.getObject().descriptor(),model).prepare(id,snapshot,request,evidence,indexVersion);
           }
         };
     }
@@ -193,6 +200,7 @@ public class RealModelConfiguration {
             ContextAssembler contextAssembler,
             StructuredAnalysisParser parser,
             CopilotProperties properties,
+            CopilotProperties.Model model,
             NumericThresholdGuard numericThresholdGuard,
             ReviewedPolicyGuard reviewedPolicyGuard,
             com.finguard.copilot.governance.ModelCallPreflight preflight,
@@ -200,7 +208,7 @@ public class RealModelConfiguration {
             ObjectProvider<com.finguard.copilot.observability.AnalysisTelemetry> telemetry
     ) {
         return new ModelAnalysisOrchestrator(modelGateway, contextAssembler, parser,
-                properties.model(), properties.budget(), retrieval.getIfAvailable(),
+                model, properties.budget(), retrieval.getIfAvailable(),
                 properties.retrieval().topK(), numericThresholdGuard, reviewedPolicyGuard,preflight)
                 .withTelemetry(telemetry.getIfAvailable(com.finguard.copilot.observability.AnalysisTelemetry::noop));
     }

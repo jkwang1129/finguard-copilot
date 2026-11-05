@@ -21,6 +21,7 @@ public final class RunManifestService implements ModelCallPreflight {
     private final VersionedArtifactStore store;
     private final KnowledgeIndexRepository indexes;
     private final CopilotProperties properties;
+    private final CopilotProperties.Model model;
     private final JsonNode policyConfiguration;
     private final String embeddingVersion;
     private final GovernanceProperties governance;
@@ -44,7 +45,13 @@ public final class RunManifestService implements ModelCallPreflight {
     public RunManifestService(VersionedArtifactStore store,KnowledgeIndexRepository indexes,CopilotProperties properties,
             NumericGuardProperties numeric,ReviewedPolicyProperties reviewed,String embeddingVersion,GovernanceProperties governance,Clock clock,CallAdmission admission,
             com.finguard.copilot.knowledge.port.EmbeddingGateway embedding,Map<String,Object> retrievalDescriptor) {
+        this(store,indexes,properties,numeric,reviewed,embeddingVersion,governance,clock,admission,embedding,retrievalDescriptor,properties.model());
+    }
+    public RunManifestService(VersionedArtifactStore store,KnowledgeIndexRepository indexes,CopilotProperties properties,
+            NumericGuardProperties numeric,ReviewedPolicyProperties reviewed,String embeddingVersion,GovernanceProperties governance,Clock clock,CallAdmission admission,
+            com.finguard.copilot.knowledge.port.EmbeddingGateway embedding,Map<String,Object> retrievalDescriptor,CopilotProperties.Model model) {
         this.store=Objects.requireNonNull(store);this.indexes=Objects.requireNonNull(indexes);this.properties=properties;
+        this.model=Objects.requireNonNull(model);
         this.policyConfiguration=CanonicalJson.tree(Map.of("numeric",numeric,"reviewed",reviewed,
                 "corePolicySha256",CoreLargeAmountPolicyGuard.CONTENT_SHA256));
         this.embeddingVersion=Objects.requireNonNull(embeddingVersion);this.governance=governance;this.clock=clock;
@@ -54,13 +61,16 @@ public final class RunManifestService implements ModelCallPreflight {
     }
 
     @Override public ModelRequest prepare(UUID analysisId,FactSnapshot snapshot,ModelRequest request,List<KnowledgeEvidence> evidence,String retrievedIndexVersion) {
-        var model=properties.model();
         boolean fixture=governance.fixtureMode();
+        boolean backup=!model.equals(properties.model()) && ReviewModelRoute.isQualifiedBackup(model);
         if(fixture && !DeepseekTextTokenBound.fixtureEndpoint(model)) throw rejected("fixture mode requires the loopback test model");
         if(!analysisId.toString().equals(request.requestId())) throw rejected("request identity mismatch");
         if(!properties.prompt().version().equals(request.promptVersion()) ||
                 !new PromptTemplate(request.promptVersion()).render().equals(request.systemInstruction())) throw rejected("prompt content mismatch");
         if(!resource("/schema/analysis-output-v1.schema.json").equals(request.outputSchemaJson())) throw rejected("schema content mismatch");
+        if(backup && !ReviewModelRoute.PROMPT_AND_SCHEMA_SHA256.equals(CanonicalJson.sha256(
+                request.systemInstruction()+"\nOUTPUT_SCHEMA\n"+request.outputSchemaJson())))
+            throw rejected("review backup qualification does not match prompt and schema");
         String version=model.priceTableVersion();
         if(!"CNY".equals(model.currency()) || (fixture ? model.inputPricePerMillion().signum()<0 : model.inputPricePerMillion().signum()<=0) ||
                 (fixture ? model.outputPricePerMillion().signum()<0 : model.outputPricePerMillion().signum()<=0) ||
@@ -68,7 +78,8 @@ public final class RunManifestService implements ModelCallPreflight {
                 clock.instant().isBefore(governance.priceValidFrom()) || !clock.instant().isBefore(governance.priceValidUntil()))
             throw rejected("price must be positive, effective and CNY priced");
         if(request.maxOutputTokens()>Math.min(model.outputTokenLimit(),properties.budget().maxOutputTokens())) throw rejected("output cap mismatch");
-        int upper=new DeepseekTextTokenBound().upperBound(model,request,fixture);
+        int upper=backup ? DeepseekTextTokenBound.wireUpperBound(model,request)
+                : new DeepseekTextTokenBound().upperBound(model,request,fixture);
         if(upper>Math.min(model.inputTokenLimit(),properties.budget().maxInputTokens())) throw rejected("input upper bound exceeds limit");
         BigDecimal reserve=model.inputPricePerMillion().multiply(BigDecimal.valueOf(upper))
                 .add(model.outputPricePerMillion().multiply(BigDecimal.valueOf(request.maxOutputTokens())))
@@ -82,7 +93,8 @@ public final class RunManifestService implements ModelCallPreflight {
         manifest.put("snapshotSha256",HexFormat.of().formatHex(snapshot.sha256()));
         var modelContent=Map.of("provider",model.provider(),"modelId",model.modelId(),"endpoint",model.baseUrl().toString(),
                 "path",model.chatCompletionsPath(),"inputLimit",model.inputTokenLimit(),"outputLimit",model.outputTokenLimit(),
-                "timeout",model.timeout().toString(),"mode",fixture?"loopback-fixture":"text-json-non-thinking","temperature",request.temperature(),"dataClass","sanitized-review");
+                "timeout",model.timeout().toString(),"mode",fixture?"loopback-fixture":"text-json-non-thinking",
+                "temperature",backup && request.temperature()==0 ? 0.01d : request.temperature(),"dataClass","sanitized-review");
         String modelVersion="p4-model-"+CanonicalJson.hash(modelContent);
         bind(manifest,artifacts,"model",modelVersion,modelContent);
         bind(manifest,artifacts,"prompt",request.promptVersion(),Map.of("sha256",CanonicalJson.sha256(request.systemInstruction())));
@@ -98,9 +110,16 @@ public final class RunManifestService implements ModelCallPreflight {
                 "inputPerMillion",model.inputPricePerMillion(),"outputPerMillion",model.outputPricePerMillion(),
                 "validFrom",governance.priceValidFrom().toString(),"validUntil",governance.priceValidUntil().toString(),"basis","peak-cache-miss"));
         ((ObjectNode)manifest.get("price")).put("currency",model.currency());
-        bind(manifest,artifacts,"tokenBound",fixture?"fixture-byte-bound-v1":DeepseekTextTokenBound.VERSION,Map.of("recipeRevision",fixture?"loopback-fixture-v1":DeepseekTextTokenBound.RECIPE_REVISION,
-                "tokenizerSha256",fixture?"not-applicable":DeepseekTextTokenBound.TOKENIZER_SHA256,"method","wire-utf8-bytes-plus-1024","protocol","two-text-messages-json-object-thinking-disabled"));
-        bind(manifest,artifacts,"route",fixture?"fixture-primary-v1":"single-primary-v1",Map.of("provider","deepseek","modelId",model.modelId(),"reason",fixture?"explicit-test-fixture":"only-qualified-primary","fallback",false));
+        if(backup) {
+            bind(manifest,artifacts,"tokenBound","zhipu-glm52-text-byte-bound-v1",Map.of("recipeRevision",ReviewModelRoute.GLM_ENCODING_REVISION,
+                    "tokenizerSha256",ReviewModelRoute.GLM_ENCODING_SHA256,"method","wire-utf8-bytes-plus-1024","protocol","two-text-messages-json-object-thinking-disabled"));
+            bind(manifest,artifacts,"route","zhipu-review-backup-v1",Map.of("provider",model.provider(),"modelId",model.modelId(),
+                    "reason","operator-declared-primary-unavailable","fallback",true,"qualificationSha256",ReviewModelRoute.EVALUATION_SHA256));
+        } else {
+            bind(manifest,artifacts,"tokenBound",fixture?"fixture-byte-bound-v1":DeepseekTextTokenBound.VERSION,Map.of("recipeRevision",fixture?"loopback-fixture-v1":DeepseekTextTokenBound.RECIPE_REVISION,
+                    "tokenizerSha256",fixture?"not-applicable":DeepseekTextTokenBound.TOKENIZER_SHA256,"method","wire-utf8-bytes-plus-1024","protocol","two-text-messages-json-object-thinking-disabled"));
+            bind(manifest,artifacts,"route",fixture?"fixture-primary-v1":"single-primary-v1",Map.of("provider","deepseek","modelId",model.modelId(),"reason",fixture?"explicit-test-fixture":"only-qualified-primary","fallback",false));
+        }
         var limits=Map.of("maxCallCny",governance.maxCallCny(),"maxCalls",1,"maxInputTokens",properties.budget().maxInputTokens(),
                 "maxOutputTokens",properties.budget().maxOutputTokens(),"maxReviewerDailyCny",governance.maxReviewerDailyCny(),
                 "maxProviderDailyCny",governance.maxProviderDailyCny(),"maxGlobalDailyCny",governance.maxGlobalDailyCny());

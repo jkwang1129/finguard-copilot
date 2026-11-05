@@ -45,7 +45,7 @@ public final class CompatibleAgentModelGateway implements AgentModelGateway {
         Instant started=Instant.now();
         try{
             return client.post().uri(model.chatCompletionsPath()).contentType(MediaType.APPLICATION_JSON)
-                .body(payload(model,request,registry)).exchange((sent,response)->{
+                .body(payload(model,request,registry).toString()).exchange((sent,response)->{
                     if(!response.getStatusCode().is2xxSuccessful()){
                         int status=response.getStatusCode().value();
                         throw new AgentProtocolException(status==429?ErrorCode.MODEL_RATE_LIMITED:

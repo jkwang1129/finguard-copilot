@@ -35,29 +35,38 @@ public final class RedisProviderPermits {
             """,Long.class);
     private static final DefaultRedisScript<Long> RELEASE=new DefaultRedisScript<>("return redis.call('ZREM',KEYS[1],ARGV[1])",Long.class);
     private final Supplier<StringRedisTemplate> redis;
+    private final String leaseKey;
     private final int concurrency,reviewerPerMinute;
     public record Lease(String ownerToken) {}
     public RedisProviderPermits(StringRedisTemplate redis,int concurrency,int reviewerPerMinute) {this(()->redis,concurrency,reviewerPerMinute);}
     public RedisProviderPermits(Supplier<StringRedisTemplate> redis,int concurrency,int reviewerPerMinute) {
+        this(redis,concurrency,reviewerPerMinute,"deepseek");
+    }
+    public RedisProviderPermits(Supplier<StringRedisTemplate> redis,int concurrency,int reviewerPerMinute,String provider) {
         this.redis=redis;this.concurrency=concurrency;this.reviewerPerMinute=reviewerPerMinute;
+        this.leaseKey=switch(provider) {
+            case "deepseek" -> LEASE_KEY;
+            case "zhipu" -> "{finguard-model}:leases:zhipu";
+            default -> throw new IllegalArgumentException("Unsupported review permit provider");
+        };
     }
     public Lease acquire(String reviewerKey,Duration timeout) {
         if(reviewerKey==null || !reviewerKey.matches("[0-9a-f]{64}")) throw capacity();
         String owner=UUID.randomUUID().toString();
         long leaseMillis=Math.addExact(Math.multiplyExact(timeout.toMillis(),2),30000);
         try {
-            Long granted=redis.get().execute(ACQUIRE,List.of(LEASE_KEY,"{finguard-model}:quota:"+reviewerKey),
+            Long granted=redis.get().execute(ACQUIRE,List.of(leaseKey,"{finguard-model}:quota:"+reviewerKey),
                     owner,Integer.toString(concurrency),Integer.toString(reviewerPerMinute),Long.toString(leaseMillis));
             if(!Long.valueOf(1).equals(granted)) throw capacity();
             return new Lease(owner);
         } catch(RuntimeException e) {throw capacity();}
     }
     public boolean valid(Lease lease,Duration requiredRemaining) {
-        try {return Long.valueOf(1).equals(redis.get().execute(VALID,List.of(LEASE_KEY),lease.ownerToken(),Long.toString(requiredRemaining.toMillis())));}
+        try {return Long.valueOf(1).equals(redis.get().execute(VALID,List.of(leaseKey),lease.ownerToken(),Long.toString(requiredRemaining.toMillis())));}
         catch(RuntimeException e) {throw capacity();}
     }
     public void release(Lease lease) {
-        try {redis.get().execute(RELEASE,List.of(LEASE_KEY),lease.ownerToken());}
+        try {redis.get().execute(RELEASE,List.of(leaseKey),lease.ownerToken());}
         catch(RuntimeException e) {throw capacity();}
     }
     public static CopilotException capacity() {return new CopilotException(ErrorCode.MODEL_CAPACITY_UNAVAILABLE,"model capacity permission unavailable");}

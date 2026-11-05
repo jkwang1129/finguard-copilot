@@ -13,8 +13,12 @@ _ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._:-]{0,127}\Z")
 
 
 def _records(path: Path) -> list[dict]:
+    return decode_records(path.read_bytes())
+
+
+def decode_records(raw: bytes) -> list[dict]:
     try:
-        lines = path.read_text(encoding="utf-8").splitlines()
+        lines = raw.decode("utf-8").splitlines()
         if not lines or any(not line.strip() for line in lines):
             raise ValueError("empty or blank JSONL record")
         records = [json.loads(line) for line in lines]
@@ -35,8 +39,9 @@ def main(argv: list[str] | None = None) -> int:
                 args.index_version, args.rule_version, args.source)
     if any(not _ID.fullmatch(value) for value in versions):
         raise ValueError("invalid version/source identifier")
-    digest = hashlib.sha256(args.dataset.read_bytes()).hexdigest()
-    cases = _records(args.dataset)
+    dataset_bytes = args.dataset.read_bytes()
+    digest = hashlib.sha256(dataset_bytes).hexdigest()
+    cases = decode_records(dataset_bytes)
     projected = []
     for case in cases:
         if not isinstance(case, dict):
