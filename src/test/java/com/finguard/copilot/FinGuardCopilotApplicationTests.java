@@ -25,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
         "COPILOT_DB_PASSWORD=",
         "spring.rabbitmq.listener.simple.auto-startup=false",
         "management.health.rabbit.enabled=false",
-        "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration"
+        "spring.autoconfigure.exclude=org.springframework.boot.amqp.autoconfigure.RabbitAutoConfiguration"
 })
 @AutoConfigureMockMvc
 @Testcontainers

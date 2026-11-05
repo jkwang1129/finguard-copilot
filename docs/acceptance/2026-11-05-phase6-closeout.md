@@ -23,4 +23,4 @@
 
 备用模型的输入预算使用固定文本协议和 UTF-8 字节上界，绑定已核对的 GLM-5.2 ByteLevel BPE tokenizer 修订与 SHA-256。该验证限于单次文本审核，Agent 原生工具路径单独保留资格门槛。 [GLM-5.2 tokenizer](https://huggingface.co/zai-org/GLM-5.2/blob/cf457fa734ab149ffef225f80893eb38c6ff5cdc/tokenizer.json) · [智谱非思考模式](https://docs.bigmodel.cn/cn/guide/capabilities/thinking)
 
-反馈使用合成输入验收。两个反馈中筛选一个独立标注案例，冻结脱敏制品并复跑 1/1。验证了未批准、重复、额外字段、未完成分析和自由文本的拒绝行为。真实反馈样本待补。 [反馈筛选与回归命令](../../tools/agent-evaluation/README.md#将审核反馈筛选为可复跑案例)
+反馈使用合成输入验收。单测从两个反馈中筛选一个独立标注案例，覆盖未批准、重复、额外字段、未完成分析和自由文本的拒绝行为。另一次隔离 Compose 验收经 HTTP 提交合成审核反馈，从 MySQL 只读导出，冻结去除原分析 ID 的回归集并重放 1/1，整批 37 项检查通过。真实反馈样本待补。 [反馈筛选与回归命令](../../tools/agent-evaluation/README.md#将审核反馈筛选为可复跑案例)
