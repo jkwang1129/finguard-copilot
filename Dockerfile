@@ -11,6 +11,7 @@ RUN --mount=type=cache,target=/root/.m2,id=finguard-copilot-m2,sharing=locked \
 FROM maven AS core-build
 COPY --from=core-source pom.xml ./
 COPY --from=core-source src/main ./src/main
+COPY ops/integration/core-maven.config .mvn/maven.config
 RUN --mount=type=cache,target=/root/.m2,id=finguard-core-m2,sharing=locked \
     mvn -B -ntp -Daether.connector.connectTimeout=10000 -Daether.connector.requestTimeout=30000 -DskipTests package \
     && cp target/finguard-core-*.jar app.jar

@@ -11,6 +11,7 @@ import com.finguard.copilot.common.error.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import static org.assertj.core.api.Assertions.*;
+import static org.awaitility.Awaitility.await;
 import static org.mockito.Mockito.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -64,7 +65,7 @@ class AnalysisEventsHttpTest {
             assertThat(body.lines().filter(line->line.startsWith("id:")).map(line->line.substring(3)).toList())
                 .containsExactly(java.util.stream.LongStream.rangeClosed(1,130).mapToObj(Long::toString).toArray(String[]::new));
             verify(access,times(4)).authorize(id,"token");
-            assertThat(streams.active()).isZero();
+            await().atMost(Duration.ofSeconds(2)).untilAsserted(() -> assertThat(streams.active()).isZero());
         }
     }
 }

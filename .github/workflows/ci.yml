@@ -19,7 +19,7 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-          cache: maven
+          cache: ${{ !startsWith(github.ref, 'refs/heads/codex/release-') && 'maven' || '' }}
       - name: Test Java service
         run: bash ./mvnw -B -ntp clean test -DargLine=-Xmx512m -Dspring.test.context.cache.maxSize=1
 
@@ -33,7 +33,7 @@ jobs:
       - uses: astral-sh/setup-uv@v6
         with:
           python-version: '3.12'
-          enable-cache: true
+          enable-cache: ${{ !startsWith(github.ref, 'refs/heads/codex/release-') }}
           cache-dependency-glob: |
             tools/agent-evaluation/uv.lock
             tools/mcp-bridge/uv.lock
@@ -60,7 +60,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-          cache: npm
+          cache: ${{ !startsWith(github.ref, 'refs/heads/codex/release-') && 'npm' || '' }}
           cache-dependency-path: frontend/package-lock.json
       - run: npm ci
       - run: npm run lint

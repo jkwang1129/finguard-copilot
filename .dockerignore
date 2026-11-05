@@ -6,3 +6,6 @@
 !scripts/
 !scripts/e2e/
 !scripts/e2e/PublishedKnowledgeSeed.java
+!ops/
+!ops/integration/
+!ops/integration/core-maven.config
