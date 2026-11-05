@@ -106,8 +106,8 @@ jobs:
             --expect-sha "$GITHUB_SHA" --output target/releases
       - name: Scan every release image
         run: |
-          cache=$(mktemp -d)
-          trap 'rm -r -- "$cache"' EXIT
+          cache=$(docker volume create "finguard-trivy-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}")
+          trap 'docker volume rm "$cache" >/dev/null' EXIT
           for service in core copilot frontend; do
             docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
               -v "$cache:/root/.cache/trivy" \
@@ -115,8 +115,13 @@ jobs:
               image --image-src docker --scanners vuln --format json --timeout 10m \
               "finguard-$service:$GITHUB_SHA" > "target/releases/$GITHUB_SHA/scan-$service.json"
           done
+      - name: Bind scan reports to the release manifest
+        run: |
+          python scripts/release.py verify --releases target/releases --sha "$GITHUB_SHA" \
+            > "target/releases/$GITHUB_SHA/acceptance.json"
       - uses: actions/upload-artifact@v4
         with:
           name: finguard-images-${{ github.sha }}
           path: target/releases/${{ github.sha }}/
+          compression-level: 0
           if-no-files-found: error

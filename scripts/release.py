@@ -159,6 +159,25 @@ def ensure_images(directory, manifest):
             raise ValueError(f"Loaded image identity mismatch for {app}")
 
 
+def verify(args):
+    directory, manifest = load_manifest(args.releases, args.sha)
+    if sha_file(directory / "images.tar") != manifest["archiveSha256"]:
+        raise ValueError("Release archive checksum mismatch")
+    scans = {}
+    for app, image_id in manifest["images"].items():
+        path = directory / f"scan-{app}.json"
+        report = json.loads(path.read_bytes())
+        if (report["ArtifactName"] != f"finguard-{app}:{args.sha}"
+                or report["Metadata"]["ImageID"] != image_id):
+            raise ValueError(f"Scan image identity mismatch for {app}")
+        findings = [finding for result in report["Results"] for finding in result.get("Vulnerabilities", [])]
+        if app == "copilot" and {"CVE-2026-47884", "CVE-2026-47890"} & {item["VulnerabilityID"] for item in findings}:
+            raise ValueError("Copilot still matches a Spring MVC advisory targeted by this release")
+        scans[app] = {"sha256": sha_file(path), "versionMatches": len(findings)}
+    print(json.dumps({"revision": args.sha, "coreRevision": manifest["coreRevision"],
+                      "archiveSha256": manifest["archiveSha256"], "scans": scans}, indent=2))
+
+
 @contextmanager
 def locked_state(directory):
     import fcntl
@@ -245,6 +264,10 @@ def main():
     builder.add_argument("--expect-sha")
     builder.add_argument("--output", type=Path, required=True)
     builder.set_defaults(handler=build)
+    verifier = subparsers.add_parser("verify")
+    verifier.add_argument("--releases", type=Path, required=True)
+    verifier.add_argument("--sha", required=True)
+    verifier.set_defaults(handler=verify)
     for name in ("deploy", "rollback"):
         command = subparsers.add_parser(name)
         command.add_argument("--project", required=True)

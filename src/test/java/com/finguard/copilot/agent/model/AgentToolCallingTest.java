@@ -10,6 +10,7 @@ import com.finguard.copilot.agent.tool.ToolRegistry;
 import com.finguard.copilot.config.*;
 import org.junit.jupiter.api.*;
 import org.springframework.http.*;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestClient;
 

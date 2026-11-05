@@ -14,7 +14,7 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.boot.autoconfigure.AutoConfigurations;
 import org.springframework.boot.autoconfigure.context.ConfigurationPropertiesAutoConfiguration;
-import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
+import org.springframework.boot.validation.autoconfigure.ValidationAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.runner.ApplicationContextRunner;
 import org.springframework.context.annotation.Configuration;
@@ -33,7 +33,7 @@ class RealModelPropertiesTest {
     private final ApplicationContextRunner contextRunner = new ApplicationContextRunner()
             .withConfiguration(AutoConfigurations.of(
                     ConfigurationPropertiesAutoConfiguration.class,
-                    org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration.class,
+                    org.springframework.boot.jackson2.autoconfigure.Jackson2AutoConfiguration.class,
                     ValidationAutoConfiguration.class
             ))
             .withUserConfiguration(PropertiesConfiguration.class);
@@ -111,9 +111,29 @@ class RealModelPropertiesTest {
     }
 
     @Test
+    void choosesQualifiedReviewBackupBeforeConstructingTheGateway() {
+        var runner = contextRunner.withUserConfiguration(RealModelConfiguration.class)
+                .withPropertyValues(BASE_PROPERTIES)
+                .withPropertyValues("spring.profiles.active=real-deepseek", "finguard.copilot.model.provider=deepseek",
+                        "finguard.copilot.model.model-id=deepseek-flash", "finguard.copilot.model.base-url=https://api.deepseek.com",
+                        "finguard.copilot.model.chat-completions-path=/chat/completions", "finguard.copilot.model.api-key=fixture-primary",
+                        "finguard.copilot.model.price-table-version=deepseek-priced", "finguard.copilot.prompt.version=review-analysis-v2",
+                        "COPILOT_REVIEW_BACKUP_API_KEY=fixture-backup");
+        runner.run(context -> assertThat(context.getBean(CopilotProperties.Model.class).provider()).isEqualTo("deepseek"));
+        var outage = runner.withPropertyValues("COPILOT_REVIEW_PRIMARY_UNAVAILABLE=true");
+        outage.run(context -> {
+            assertThat(context).hasNotFailed().hasSingleBean(ModelGateway.class);
+            assertThat(context.getBean(CopilotProperties.Model.class).modelId()).isEqualTo("glm-5.2");
+            assertThat(context.getBean(CopilotProperties.class).model().provider()).isEqualTo("deepseek");
+        });
+        outage.withPropertyValues("finguard.copilot.agent.enabled=true").run(context -> assertThat(context).hasFailed());
+        outage.withPropertyValues("COPILOT_REVIEW_BACKUP_API_KEY=").run(context -> assertThat(context).hasFailed());
+    }
+
+    @Test
     void createsRequiredQdrantRetrievalWithBootAutoConfiguredObjectMapper() {
         contextRunner.withConfiguration(AutoConfigurations.of(
-                        org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration.class))
+                        org.springframework.boot.jackson2.autoconfigure.Jackson2AutoConfiguration.class))
                 .withBean(com.finguard.copilot.knowledge.persistence.KnowledgeIndexRepository.class,
                         () -> org.mockito.Mockito.mock(com.finguard.copilot.knowledge.persistence.KnowledgeIndexRepository.class))
                 .withBean(com.finguard.copilot.knowledge.persistence.KnowledgeDocumentRepository.class,

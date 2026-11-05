@@ -37,6 +37,17 @@ class RedisProviderPermitsIntegrationTest {
         permits.release(current);
         assertThatThrownBy(()->permits.acquire("b".repeat(64),Duration.ofSeconds(1))).hasMessageContaining("capacity");
     }
+    @Test void backupProviderHasItsOwnCapacityAndSharesTheReviewerQuota() {
+        var primary = new RedisProviderPermits(redis, 1, 1);
+        var backup = new RedisProviderPermits(() -> redis, 1, 1, "zhipu");
+        var timeout = Duration.ofSeconds(1);
+        var primaryLease = primary.acquire("a".repeat(64), timeout);
+        assertThatThrownBy(() -> backup.acquire("a".repeat(64), timeout)).hasMessageContaining("capacity");
+        var backupLease = backup.acquire("b".repeat(64), timeout);
+        assertThat(backup.valid(backupLease, Duration.ZERO)).isTrue();
+        assertThat(primary.valid(primaryLease, Duration.ZERO)).isTrue();
+        assertThatThrownBy(() -> backup.acquire("c".repeat(64), timeout)).hasMessageContaining("capacity");
+    }
     @Test void missingRedisNeverGrantsPermission() {
         var unavailable=org.mockito.Mockito.mock(StringRedisTemplate.class);
         org.mockito.Mockito.when(unavailable.execute(org.mockito.ArgumentMatchers.any(org.springframework.data.redis.core.script.RedisScript.class),
