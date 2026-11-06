@@ -70,7 +70,7 @@ def test_snapshot_failure_is_a_recorded_failure_not_dropped_case():
 def test_paired_cli_binds_code_and_data_and_is_reproducible(tmp_path):
     root=Path(__file__).parents[3]
     dataset=root/"tools/agent-evaluation/data/phase4-worker-v2.jsonl"
-    java=root/"docs/evaluations/phase4-worker-v2-java-baseline.json"
+    java=root/"tools/agent-evaluation/data/worker-comparison/phase4-worker-v2-java-baseline.json"
     freeze=tmp_path/"freeze.json"
     manifest=dict(dataset_sha256=hashlib.sha256(dataset.read_bytes()).hexdigest(),count=16,
                   reference_source_sha256=hashlib.sha256(Path(module.__file__).read_bytes()).hexdigest(),
@@ -99,14 +99,14 @@ def test_paired_cli_binds_code_and_data_and_is_reproducible(tmp_path):
 def test_independent_v3_is_frozen_and_keeps_reference_misses(tmp_path):
     root=Path(__file__).parents[3]
     dataset=root/"tools/agent-evaluation/data/phase4-worker-v3.jsonl"
-    freeze=root/"docs/evaluations/phase4-worker-v3-freeze.json"
+    freeze=root/"tools/agent-evaluation/data/worker-comparison/phase4-worker-v3-freeze.json"
     manifest=json.loads(freeze.read_text(encoding="utf-8"))
     assert hashlib.sha256(dataset.read_bytes()).hexdigest()==manifest["dataset_sha256"]
     cases=[Case.model_validate_json(line) for line in dataset.read_text(encoding="utf-8").splitlines()]
     assert len(cases)==len({case.case_id for case in cases})==24
     assert {category:sum(case.category==category for case in cases) for category in ("single","all","injection","conflict")}==manifest["category_counts"]
     output=tmp_path/"independent.json"
-    assert module.main(["--dataset",str(dataset),"--java",str(root/"docs/evaluations/phase4-worker-v3-java-verified.json"),
+    assert module.main(["--dataset",str(dataset),"--java",str(root/"tools/agent-evaluation/data/worker-comparison/phase4-worker-v3-java-verified.json"),
                         "--freeze",str(freeze),"--output",str(output)])==0
     report=json.loads(output.read_text(encoding="utf-8"))
     assert report["java_correct"]==report["total"]==24

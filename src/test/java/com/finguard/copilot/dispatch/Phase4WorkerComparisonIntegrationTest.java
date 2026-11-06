@@ -68,7 +68,7 @@ class Phase4WorkerComparisonIntegrationTest {
 
     @Test void capturesEveryFrozenCaseWithTerminalResultUsageReceiptAndReplay() throws Exception {
         Path dataset=Path.of(System.getProperty("p4.evaluation.dataset","tools/agent-evaluation/data/phase4-worker-v2.jsonl"));
-        var freeze=JSON.readTree(Files.readString(Path.of(System.getProperty("p4.evaluation.freeze","docs/evaluations/phase4-worker-v2-freeze.json"))));
+        var freeze=JSON.readTree(Files.readString(Path.of(System.getProperty("p4.evaluation.freeze","tools/agent-evaluation/data/worker-comparison/phase4-worker-v2-freeze.json"))));
         String digest=hash(Files.readAllBytes(dataset));
         assertThat(digest).isEqualTo(freeze.get("dataset_sha256").asText());
         List<Map<String,Object>> records=new ArrayList<>();

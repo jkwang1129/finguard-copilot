@@ -11,10 +11,5 @@
 *.jar binary
 
 # Frozen evidence is addressed by its exact bytes, including historical CRLF.
-docs/evaluations/** -text whitespace=trailing-space,space-before-tab,cr-at-eol
-docs/acceptance/phase5/** -text whitespace=trailing-space,space-before-tab,cr-at-eol
-docs/acceptance/quality-20261104/** -text whitespace=trailing-space,space-before-tab,cr-at-eol
-docs/acceptance/semantic-requalification-20261104/** -text whitespace=trailing-space,space-before-tab,cr-at-eol
-docs/acceptance/semantic-margin-20261105/** -text whitespace=trailing-space,space-before-tab,cr-at-eol
 tools/agent-evaluation/data/** -text whitespace=trailing-space,space-before-tab,cr-at-eol
 src/test/resources/semantic-requalification/original-preparation.json -text whitespace=trailing-space,space-before-tab,cr-at-eol

@@ -1,9 +1,0 @@
-component_calls	11
-component_budgets	SETTLED	11	0.10595400	0.00000000
-component_runs	FAILED	FACT_VALIDATION_FAILED	7
-component_runs	SUCCEEDED	NONE	4
-component_results	4
-process_calls	0
-process_budgets	0
-process_analyses	0
-process_core_review_tasks	0
