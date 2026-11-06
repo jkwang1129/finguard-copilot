@@ -115,7 +115,7 @@ Java 265 项、Python 100 项及前端 lint/测试/构建通过；Phase 3 工程
 - [x] 取得真实人工标签并完成 Judge 抽样校准：2026-11-04本项目用户提交10个标签，新冻结样本/真实Judge批次一致10/10，0缺失；只覆盖项目合成政策，不认证金融专家或生产质量。见[真人标签来源](docs/evaluations/phase4-human-label-provenance-20261104.json)和[实际校准](docs/evaluations/phase4-human-calibration-20261104-v1.json)。原AI模拟记录及历史Judge保留。
 - [x] 实现 Bad Case 分类、已知坏案例回归及独立新集复验（Java16/16、24/24）。
 - [x] 实现审核反馈筛选、冻结和回归重放，并通过合成数据验收。
-- [ ] 补真实审核反馈样本，并按同一流程完成独立标签与回归验收。
+- [x] 在合成业务案例上完成真人独立标注、页面反馈、脱敏冻结和离线回归验收，重放 1/1。 [真人反馈验收](docs/acceptance/2026-11-05-phase6-closeout.md#审核反馈验收)
 - [x] 将合成 H03 数值边界纳入已知回归，增加确定性数值兜底及受控建议枚举诊断；另冻结独立新集（不声称重放了未保存的历史真实输出）。
 - [x] 实现 reviewer feedback API 与权限检查（V7、归属检查、MySQL 并发测试）。
 - [x] 生成可重复的离线评测报告（合成单规则范围；版本真实性与模型结果仍标未验证）。
@@ -167,8 +167,8 @@ Java 265 项、Python 100 项及前端 lint/测试/构建通过；Phase 3 工程
 - [x] P6-1 配置健康检查、就绪检查和本地端口绑定，从空卷启动并通过 36 项只读审核与隔离检查。复跑方式与范围见[验收手册](docs/operations/phase6-integration.md)。
 - [x] P6-2 使用完整 Git SHA 标记并验证镜像 ID、OCI 标签及归档校验和，接入 CI 构建和镜像扫描。
 - [x] P6-2 编写 Linux 部署和回滚脚本，在 Linux CLI 中实测 A → B → A，验证页面版本切换和 MySQL 数据保留。
-- [ ] 运行更新后的 GitHub CI，保留远端冷缓存构建及镜像扫描记录。
-- [x] 复核并锁定 Core `33179b0356fa1ce6714da42d3c3ee99e069d62b8`，六组依赖采用修复版本，保留两条当前无对应触发路径的 MVC 版本命中。 [收尾验收](docs/acceptance/2026-11-05-phase6-closeout.md)
+- [x] 完成发布提交的 GitHub 冷缓存 CI，并核验同一提交的镜像制品与扫描报告。 [冷缓存 CI](https://github.com/jkwang1129/finguard-copilot/actions/runs/42046088486) · [镜像制品](https://github.com/jkwang1129/finguard-copilot/actions/runs/42046088486/artifacts/13424673273)
+- [x] 复核并锁定 Core `33179b0356fa1ce6714da42d3c3ee99e069d62b8`，六组依赖采用修复版本，保留两条 MVC 与一条 OGNL 版本命中。 [收尾验收](docs/acceptance/2026-11-05-phase6-closeout.md)
 - [x] P6-3 验证两个 MySQL 库的逻辑备份恢复、RabbitMQ 停机与 Outbox 重投、Qdrant 空卷重建及实际引用。
 - [x] P6-4 演练 Core、MySQL、RabbitMQ、Redis、Qdrant、Langfuse 和本地模型替身故障，并验证 Agent 重启续程与 STDIO MCP。
 - [x] P6-4 生成[部署、回滚、故障、验收与 Docker 资源清理报告](docs/acceptance/2026-11-05-phase6-production-like.md)。

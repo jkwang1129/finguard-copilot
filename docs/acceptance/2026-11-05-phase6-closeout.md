@@ -5,6 +5,7 @@
 - 发布分支为 `codex/release-phase6-final`。分支推送从完整 Git SHA 构建，禁用 Maven、uv、npm 恢复缓存。镜像扫描使用每次运行新建的 Trivy 数据卷，三个报告和镜像归档共同上传。
 - 首轮远端运行暴露 SSE 测试中的清理时序竞争。第二轮四组测试通过，三个 Trivy 扫描均完成。扫描后的清理步骤因容器生成的文件归属 root 失败。改为通过 Docker 删除本次运行的数据卷。[首轮 CI](https://github.com/jkwang1129/finguard-copilot/actions/runs/42036410666) · [第二轮 CI](https://github.com/jkwang1129/finguard-copilot/actions/runs/42037935295)
 - 第三轮 Gitleaks 将上游公开分词器修订和文件哈希当作凭据。调整字段名称，从前一候选提交创建最终发布分支，保留原运行证据。[第三轮 CI](https://github.com/jkwang1129/finguard-copilot/actions/runs/42043557503)
+- 发布提交 `c039bf908d29cabecba50b7c0a7555ea5652c80d` 通过冷缓存 CI，合入 `main` 后同一提交的 CI 也已通过。下载发布制品后复核了镜像归档 SHA-256、扫描报告哈希和镜像 ID。Copilot 和前端均为 0 条版本命中。Core 保留 2 条 MVC 和 1 条 MyBatis 内嵌 OGNL 版本命中，锁定源码的静态审阅未发现相应触发路径。 [冷缓存 CI](https://github.com/jkwang1129/finguard-copilot/actions/runs/42046088486) · [`main` CI](https://github.com/jkwang1129/finguard-copilot/actions/runs/42152082243) · [镜像制品与扫描报告](https://github.com/jkwang1129/finguard-copilot/actions/runs/42046088486/artifacts/13424673273)
 - Core 选用 `33179b0356fa1ce6714da42d3c3ee99e069d62b8`，在 Copilot 构建端统一升级六组依赖。最终 JAR 中核对到 Jackson 2.21.7、RabbitMQ Java 客户端 5.37.0、Netty 4.1.137.Final、Commons Lang 3.18.0、Log4j 2.25.5、Tomcat 10.1.61。对照原 35 条扫描命中，33 条对应组件已达到报告中的修复版本。该制品通过 36 项隔离 Compose 验收。
 - Core 仍含 Spring MVC 6.2.19。按锁定提交核查了 Web 源码，未找到 `XsltView`、SSE `FragmentsRendering`、`ModelAndView` 或配置的视图解析器。这两条保留为原始版本命中及未来新增相关功能的复核项。Copilot 升级至 Boot 4.0.9，从实际容器提取的 JAR 包含 `spring-webmvc-7.0.10.jar`，通过 36 项隔离 Compose 验收。使用 Boot 的 Jackson 2 兼容模块保留 API 和持久化契约。 [CVE-2026-47884](https://spring.io/security/cve-2026-47884/) · [CVE-2026-47890](https://spring.io/security/cve-2026-47890/)
 
@@ -23,4 +24,8 @@
 
 备用模型的输入预算使用固定文本协议和 UTF-8 字节上界，绑定已核对的 GLM-5.2 ByteLevel BPE tokenizer 修订与 SHA-256。该验证限于单次文本审核，Agent 原生工具路径单独保留资格门槛。 [GLM-5.2 tokenizer](https://huggingface.co/zai-org/GLM-5.2/blob/cf457fa734ab149ffef225f80893eb38c6ff5cdc/tokenizer.json) · [智谱非思考模式](https://docs.bigmodel.cn/cn/guide/capabilities/thinking)
 
-反馈使用合成输入验收。单测从两个反馈中筛选一个独立标注案例，覆盖未批准、重复、额外字段、未完成分析和自由文本的拒绝行为。另一次隔离 Compose 验收经 HTTP 提交合成审核反馈，从 MySQL 只读导出，冻结去除原分析 ID 的回归集并重放 1/1，整批 37 项检查通过。真实反馈样本待补。 [反馈筛选与回归命令](../../tools/agent-evaluation/README.md#将审核反馈筛选为可复跑案例)
+### 审核反馈验收
+
+自动化验收使用合成输入。单测从两个反馈中筛选一个独立标注案例，覆盖未批准、重复、额外字段、未完成分析和自由文本的拒绝行为。另一次隔离 Compose 验收经 HTTP 提交合成审核反馈，从 MySQL 只读导出，冻结回归集并重放 1/1，整批 37 项检查通过。
+
+2026-11-06，项目作者在 `main` 的隔离环境中对 **1 条合成大额风险案例**先独立标注「确认保留」，再在审核页面提交「同意建议」。MySQL 只读核对得到 1 条反馈，Core 业务审核仍为 `PENDING`。脱敏案例冻结后，LangGraph 离线单阈值规则重放 **1/1**，与独立标签一致。本轮使用本地模型替身，验收范围为真人反馈入库、筛选、脱敏、冻结与回归重放。 [反馈筛选与回归命令](../../tools/agent-evaluation/README.md#将审核反馈筛选为可复跑案例)
