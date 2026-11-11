@@ -6,6 +6,15 @@ FinGuard Copilot 是一个 Java 风控审核辅助项目。审核员输入任务
 
 [查看审核台截图](#效果展示) · [启动本地演示](#快速开始) · [了解系统架构](#系统架构) · [查看验证结果](docs/VERIFICATION.md)
 
+### 工程亮点
+
+| 能力 | 实现 |
+| --- | --- |
+| **可核查的 RAG 审核** | 用 Core 快照保留命中时的金额与阈值，从 Qdrant 检索已发布政策。建议须通过结构、金额与引用校验才会展示。 [证据校验](#1-可核对的业务证据与政策引用) |
+| **可暂停、可恢复的 Agent** | Java Graph 编排只读工具调用，MySQL 保存检查点，审核员可在工具执行前确认。整次分析上限为 2 次模型调用、4 次工具执行。 [Agent 执行器](src/main/java/com/finguard/copilot/agent/runtime/BoundedAgentRunner.java) |
+| **可靠投递与费用追踪** | 事务 Outbox、RabbitMQ 和幂等 Worker 支持任务重投。模型请求发送前占用预算，结果不确定时保留账本占用，便于核对用量和费用。 [异步链路](#一次分析如何执行) · [调用账本](src/main/java/com/finguard/copilot/agent/budget/AgentCallLedger.java) |
+| **可复跑的 Agent 评测** | 用冻结案例验证工具协议、恢复状态与拒答，Java 与离线 LangGraph 的 26 个合成契约案例全部匹配。 [评测与验收](docs/VERIFICATION.md) |
+
 | 想了解什么 | 从这里开始 |
 | --- | --- |
 | 产品做什么 | [项目介绍](#项目介绍) · [功能特性](#功能特性) · [使用场景](#使用场景) |
@@ -122,13 +131,15 @@ sequenceDiagram
 
 - 从 Core 获取交易、对账、风险规则与命中时的阈值。大额场景保留十进制金额和原始来源字段。
 - 政策文档清洗和分段后构建候选索引，通过检索评测才发布。结果附上政策版本和命中的片段。
-- 模型返回后校验 JSON Schema、金额、证据及引用。证据缺失与运行失败分别展示，审核员可以看到缺什么，或是哪一步未完成。
+- 按版本加载 Prompt，为业务事实和政策片段分配独立 Token 预算。政策片段超额时裁剪，关键事实超额时停止生成。 [上下文组装](src/main/java/com/finguard/copilot/context/ContextAssembler.java)
+- 模型返回后按 JSON Schema 对应的契约检查结构，并核验金额、证据及引用。审核台分别显示证据不足与运行失败。 [输出校验](src/main/java/com/finguard/copilot/guardrail)
 
 ### 2. 异步审核与可恢复的 Agent
 
 - 审核台显示排队、检索、生成、校验等进度，可以凭分析编号重新打开。
-- 可选 Agent 路径用固定 Schema 调用白名单只读工具，把检查点写入 MySQL。需要人工确认时暂停，收到带运行修订号的操作后再继续。
-- Agent Trace 用于查看工作流步骤。授权后的 STDIO MCP 桥复用同一组只读工具。 [Agent 源码](src/main/java/com/finguard/copilot/agent) · [MCP 桥](tools/mcp-bridge)
+- 可选 Agent 路径让模型选择白名单工具，Java 按固定 Schema 校验参数并执行读取，再把工具结果交回模型。可读范围包括审核事实、任务状态与政策检索。 [工具执行](src/main/java/com/finguard/copilot/agent/tool/ToolExecutor.java)
+- 启用人工确认时，Graph 在工具执行前暂停，记录 MySQL 检查点。继续时复查审核员权限、来源事实和运行修订号，已用的模型与工具额度随检查点保留。 [人工继续](src/main/java/com/finguard/copilot/agent/hitl/ResumeAnalysisService.java)
+- Agent Trace 展示运行步骤和调用状态。本地 STDIO MCP 桥通过短期授权复用相同工具和剩余额度。 [Agent Trace](src/main/java/com/finguard/copilot/agent/graph/AgentTraceService.java) · [MCP 桥](tools/mcp-bridge)
 
 ### 3. 模型调用与成本治理
 
@@ -140,6 +151,7 @@ sequenceDiagram
 
 - 审核员对建议选择「同意建议」「不同意建议」或「暂无法判断」。反馈保存在 Copilot，提交后不可覆盖。
 - 反馈可与独立人工标签配对，经筛选、脱敏后冻结为评测样本，复跑建议、引用与拒答等检查。 [反馈回归流程](tools/agent-evaluation/README.md#审核反馈回归)
+- Python 评测工具支持规则评分、LLM-as-Judge 与人工标签校准。LangGraph 用同一批冻结案例做离线工作流对照。 [评测工具](tools/agent-evaluation)
 
 ## 效果展示
 
@@ -165,10 +177,13 @@ sequenceDiagram
 | 已验证场景 | 结果 |
 | --- | --- |
 | 本地 Compose 端到端流程 | 从空卷启动并通过 **36 项**检查，覆盖登录、请求重放、Worker、政策引用、SSE 和 Core 数据校验。 |
+| Agent 工作流 | **26/26** 个合成契约案例在 Java 与离线 LangGraph 间匹配。另有 **87/87** 项本地进程检查，覆盖工具调用、人工继续、进程恢复与 MCP 互通。 |
 | 故障与数据恢复 | **46 项**恢复批次检查，覆盖 MySQL 恢复、RabbitMQ 停机重投和 Qdrant 空卷重建。 |
 | 模型与人工反馈 | 两个模型分别通过固定合成集的 **12/12** 条建议检查与 **5/5** 条应拒答检查。另用一条合成案例验证真人提交反馈与离线复跑。 |
 
 [完整验证结果、运行范围与制品](docs/VERIFICATION.md)
+
+默认 Docker 演示走普通审核流程。可单独复跑 Agent 场景，验证工具执行前暂停、服务重启后恢复与本地 MCP。 [Agent 故障演练](docs/VERIFICATION.md#复跑-agent-工作流)
 
 ## 项目结构
 
